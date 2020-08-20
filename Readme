@@ -1,0 +1,6 @@
+Proyecto que genera Pruebas de Preguntas Parametrizadas.
+
+- Cada pregunta (parametrizada o no) se trabaja en un archivo.
+- Un archivo de texto contiene la estructura general de la prueba.
+- Las preguntas de la prueba pueden consistir de un archivo o de una
+  carpeta. Si es una carpeta, se toma un archivo al azar de la pregunta.
