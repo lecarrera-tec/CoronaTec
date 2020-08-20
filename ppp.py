@@ -114,7 +114,7 @@ class PPP:
         while l.strip().startswith(info.LSECCION):
             counter += 1
             print(str(counter) + ' : Llamando a seccion ...')
-            l = parser.extraer(l, 'orden')
+            l = parser.derecha_igual(l, 'orden')
             self.secciones.append(Seccion(finp, l == 'random'))
             l = finp.readline().strip()
 

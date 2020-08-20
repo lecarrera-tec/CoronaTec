@@ -47,6 +47,8 @@ class Seccion:
             while ignorar:
                 l = f.readline().strip()
                 ignorar = len(l) == 0 or l[0] == info.COMMENT
+        else:
+            self.titulo = ''
 
         # Tenemos instrucciones.
         if l == info.INSTRUCCIONES:
@@ -89,11 +91,11 @@ class Seccion:
     def get_latex(self) -> List[str]:
         """Genera el código LaTeX de la sección."""
         # Comenzamos por las instrucciones de la sección.
-        latex: List[str] = self.instrucciones
+        tex: List[str] = self.instrucciones
         # Agregamos el puntaje.
-        latex.append('\\noindent\\textbf{Puntaje:} %d pts' 
+        tex.append('\\noindent\\textbf{Puntaje:} %d pts' 
                           % self.get_puntaje())
-        latex.append('')
+        tex.append('')
         # Si las preguntas se presentan en orden aleatorio, entonces
         # las revolvemos
         if self.aleatorias: 
@@ -103,11 +105,11 @@ class Seccion:
             puntaje: int = path[0]
             filename: str = Seccion.choose_question(path[1])
 
-            latex.append('\\begin{ejer}[%d %s]' 
+            tex.append('\\begin{ejer}[%d %s]' 
                               % (puntaje, 'pts' if puntaje > 1 else 'pt'))
-            latex += pregunta.get_latex(filename)
-            latex.append('\\end{ejer}')
-        return latex
+            tex += pregunta.get_latex(filename)
+            tex.append('\\end{ejer}')
+        return tex
 
     @staticmethod
     def choose_question(path: str) -> str:
