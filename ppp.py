@@ -1,4 +1,5 @@
 from typing import List
+import logging
 
 from seccion import Seccion
 import info
@@ -17,7 +18,7 @@ class PPP:
         (aqu\'i es donde est\'a la informaci\'on importante)
     """
 
-    def __init__(self, filename : str) :
+    def __init__(self, filename: str):
         """
         Constructor. Recibe como argumento la direccion un archivo 
         de tipo .ppp
@@ -26,7 +27,7 @@ class PPP:
         de cada una de las secciones.
 
         Se definen las variables:
-            - path          : direcci\'on a la carpeta de la prueba.
+            - dir_trabajo   : direcci\'on a la carpeta de la prueba.
                               Se requiere porque la direcci\'on de las
                               preguntas es relativa a dicha carpeta.
             - curso         : Nombre del curso.
@@ -39,25 +40,27 @@ class PPP:
         # Definimos el puntaje total como 0, de manera temporal.
         self.puntaje = 0
 
-        # Definimos el path local por default, pero si la direccion
-        # dada no es un archivo en el directorio actual, entonces 
-        # vamos a guardar el path al archivo, porque la referencia 
-        # a los archivos de las preguntas es relativa al path del 
-        # archivo principal. 
+        # Definimos el directorio local como el directorio de trabajo, 
+        # pero si la direcci\'on dada no es un archivo en el directorio 
+        # actual, entonces vamos a guardar la direcci\'on al archivo, 
+        # porque la referencia a los archivos de las preguntas es 
+        # relativa al directorio del archivo principal. 
+        # TODO Hay que pensar en una soluci\'on para las im\'agenes
+        # en LaTeX.
         # Warning! Estamos pensando en linux!
-        self.path = './'
+        self.dir_trabajo: str = './'
         idx = filename.rfind('/')
         if idx > 0:
-            self.path = filename[0:idx+1]
+            self.dir_trabajo = filename[0:idx+1]
 
         # Vamos a leer el archivo linea x linea. Por lo general se van 
         # a ignorar lineas en blanco y lineas que comiencen con el 
         # caracter de comentario.
         finp = open(filename, 'r')
 
-        # Lo primero que deber\'iamos encontrar en el archivo es el 
-        # nombre del curso. Buscamos primero la etiqueta.
-        ignorar = True
+        # Lo primero que deber\'iamos encontrar en el archivo es el nombre 
+        # del curso. Buscamos primero la etiqueta.
+        ignorar: bool = True
         while ignorar:
             l = finp.readline().strip()
             ignorar = len(l) == 0 or l[0] == info.COMMENT 
@@ -65,7 +68,7 @@ class PPP:
 
         # Guardamos el texto del nombre del curso.
         self.curso = finp.readline().strip()
-        print('<Curso> : ' + self.curso)
+        logging.info('<Curso>: %s' % self.curso)
 
         # Luego deber\'ia seguir el t\'itulo de la prueba. Buscamos la 
         # etiqueta respectiva.
@@ -77,7 +80,7 @@ class PPP:
 
         # Guardamos el texto del titulo.
         self.titulo = finp.readline().strip()
-        print('<Titulo> : ' + self.titulo)
+        logging.info('<Titulo>: %s' % self.titulo)
 
         # Buscamos la siguiente etiqueta.
         ignorar = True
@@ -85,38 +88,49 @@ class PPP:
             l = finp.readline().strip()
             ignorar = len(l) == 0 or l[0] == info.COMMENT
         
-        # Revisamos si son las instrucciones. Pueden abarcar varias 
-        # l\'ineas de texto. Si no hubiera instrucciones, observe que
-        # entonces la variable estar\'ia en blanco.
-        self.instrucciones = []
-        if l == info.INSTRUCCIONES:
-            l = finp.readline()
-            while l.find(info.ABRIR) == -1:
-                self.instrucciones.append(l)
-                l = finp.readline()
-
         # Ahora revisamos si existe encabezado para LaTeX. Si no 
-        # hubiera instrucciones, observe que entonces la variable 
+        # hubiera encabezado, observe que entonces la variable 
         # estar\'ia en blanco.
-        self.encabezado = []
+        lista: List[str] = []
+        continuar : bool
         if l == info.ENCABEZADO:
             l = finp.readline()
             while l.find(info.ABRIR) == -1:
-                self.encabezado.append(l)
+                lista.append(l)
                 l = finp.readline()
+        logging.info('<Encabezado>')
+        self.encabezado = '%s\n' % ''.join(lista).strip()
+        logging.info(self.encabezado)
 
-        # No queda de otra. Tienen que seguir las secciones.
-        # Una lista de instancias.
+        # Revisamos si son las instrucciones. Pueden abarcar varias 
+        # l\'ineas de texto. Si no hubiera instrucciones, observe que
+        # entonces la variable estar\'ia en blanco.
+        lista = []
+        if l.strip() == info.INSTRUCCIONES:
+            l = finp.readline()
+            while l.find(info.ABRIR) == -1:
+                lista.append(l)
+                l = finp.readline()
+        logging.info('<Instrucciones>')
+        self.instrucciones = '%s\n' % ''.join(lista).strip()
+        logging.info(self.instrucciones)
+
+        # No queda de otra. Tienen que seguir las secciones. Una lista 
+        # de instancias de la clase Seccion.
         l = l.strip()
         assert(l.startswith(info.LSECCION))
         counter = 0
         self.secciones = [];
+        es_aleatorio: bool = False
         while l.strip().startswith(info.LSECCION):
             counter += 1
-            print(str(counter) + ' : Llamando a seccion ...')
-            l = parser.derecha_igual(l, 'orden')
-            self.secciones.append(Seccion(finp, l == 'random'))
+            logging.info('%d : Llamando a seccion ...' % counter)
+            es_aleatorio = parser.derecha_igual(l, 'orden') == 'aleatorio'
+            self.secciones.append(
+                    Seccion(finp, dir_trabajo = self.dir_trabajo, 
+                            aleatorio = es_aleatorio))
             l = finp.readline().strip()
+        logging.info('Fin de PPP\n')
 
     def get_puntaje(self) -> int:
         """
@@ -126,4 +140,3 @@ class PPP:
             for cada in self.secciones:
                 self.puntaje += cada.get_puntaje()
         return self.puntaje
-

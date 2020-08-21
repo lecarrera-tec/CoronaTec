@@ -1,6 +1,7 @@
-from typing import List, Tuple
+import logging
 import os
 import random
+from typing import List, Tuple
 
 import info
 import pregunta
@@ -12,9 +13,10 @@ class Seccion:
       - el título de la sección
       - instrucciones específicas (si las hubiera)
       - y lo importante, que es la dirección (path) de cada una de las 
-        preguntas. Puede ser una carpeta o un archivo tipo '.preg'
+        preguntas. Puede ser una carpeta o un archivo tipo 
+        info.EXTENSION.
     """
-    def __init__(self, f, rand: bool = False):
+    def __init__(self, f, dir_trabajo: str, aleatorio: bool = False):
         """Constructor a partir de archivo y el orden de las preguntas.
 
         Se supone que la última línea que se leyó del archivo es 
@@ -24,13 +26,13 @@ class Seccion:
             - titulo: titulo de la sección, si tiene.
             - instrucciones: si son dadas por el usuario.
             - puntaje: puntaje total de la sección
-            - paths: tuplas [int, str], formadas por el puntaje de la 
-                     pregunta y la dirección
+            - preguntas: tuplas [int, str], formadas por el puntaje de 
+                         la pregunta y la dirección
             - aleatorias: Si el orden de las preguntas debe ser
                           aleatorio o no.
         """
         self.puntaje: int = 0
-        self.aleatorias: bool = rand
+        self.aleatorias: bool = aleatorio
 
         # Nos brincamos los comentarios y los espacios en blanco.
         ignorar: bool = True
@@ -41,7 +43,7 @@ class Seccion:
         # Si tenemos un título
         if l == info.TITULO:
             self.titulo: str = f.readline().strip()
-            print('<Titulo>: %s' % self.titulo)
+            logging.info('<Titulo>: %s' % self.titulo)
             # y nos brincamos los comentarios y espacios en blanco
             ignorar = True
             while ignorar:
@@ -51,20 +53,20 @@ class Seccion:
             self.titulo = ''
 
         # Tenemos instrucciones.
+        lista: List[str] = []
         if l == info.INSTRUCCIONES:
             l = f.readline()
-            self.instrucciones: List[str] = []
             while l.find(info.ABRIR) == -1:
-                self.instrucciones.append(l)
+                lista.append(l)
                 l = f.readline()
+            self.instrucciones = '%s\n' % ''.join(lista)
 
         # Deberían de seguir las direcciones a los archivos de las 
         # preguntas.
-        print('??: %s' % l)
         assert(l.strip().startswith(info.PREGUNTAS))
         # Vamos a guardar una lista de tuplas, donde el primer 
         # elemento es el puntaje, y el segundo la dirección.
-        self.paths: List[Tuple[int, str]] = []
+        self.preguntas: List[Tuple[int, str]] = []
         # Guardamos cada línea, hasta que encontremos la primera 
         # línea en blanco: esto señala el final de la sección.
         while True:
@@ -76,40 +78,45 @@ class Seccion:
             # la pregunta. Se guarda la tupla.
             elif l[0] != info.COMMENT:
                 idx: int = l.find(',')
+                pts: int = 1
+                path: str = dir_trabajo + l[idx+1:].strip()
                 if idx > 0:  # <pts>,<path>
-                    self.paths.append((int(l[0:idx]), l[idx+1:].strip()))
-                else:  # <path>, entonces por default el puntaje es 1.
-                    self.paths.append((1, l[idx+1:].strip()))
+                    pts = int(l[0:idx])
+                self.preguntas.append((pts, path))
+                logging.info(str(self.preguntas[-1]))
 
     def get_puntaje(self) -> int:
         """Devuelve el puntaje total de la sección."""
-        if self.puntaje > 0:
-            for preg in self.paths:
+        if self.puntaje == 0:
+            for preg in self.preguntas:
                 self.puntaje += preg[0]
         return self.puntaje
 
-    def get_latex(self) -> List[str]:
+    def get_latex(self) -> str:
         """Genera el código LaTeX de la sección."""
+        logging.info('Entrando a Seccion.get_latex ...')
+        lista: List[str] = []
         # Comenzamos por las instrucciones de la sección.
-        tex: List[str] = self.instrucciones
+        lista.append(self.instrucciones)
         # Agregamos el puntaje.
-        tex.append('\\noindent\\textbf{Puntaje:} %d pts' 
+        lista.append('  \\noindent\\textbf{Puntaje:} %d pts\n\n' 
                           % self.get_puntaje())
-        tex.append('')
         # Si las preguntas se presentan en orden aleatorio, entonces
         # las revolvemos
         if self.aleatorias: 
-            random.shuffle(self.paths)
+            logging.info('Revolviendo las preguntas.')
+            random.shuffle(self.preguntas)
         # Vamos agregando el texto de cada pregunta de la sección.
-        for path in self.paths:
-            puntaje: int = path[0]
-            filename: str = Seccion.choose_question(path[1])
-
-            tex.append('\\begin{ejer}[%d %s]' 
+        puntaje: int
+        filename: str
+        for path in self.preguntas:
+            puntaje = path[0]
+            filename = Seccion.choose_question(path[1])
+            lista.append('  \\begin{ejer}[%d %s]\n' 
                               % (puntaje, 'pts' if puntaje > 1 else 'pt'))
-            tex += pregunta.get_latex(filename)
-            tex.append('\\end{ejer}')
-        return tex
+            lista.append(pregunta.get_latex(filename))
+            lista.append('  \\end{ejer}\n\n')
+        return ('%s\n' % ''.join(lista).strip())
 
     @staticmethod
     def choose_question(path: str) -> str:
@@ -126,12 +133,14 @@ class Seccion:
         if path.endswith(info.EXTENSION):
             return path
 
+        if not path.endswith('/'):
+            path = '%s/' % path
         # Generando la lista de archivos de tipo pregunta. Se asume que
-        # el path es una carpeta.
+        # la dirección es una carpeta.
         lista: List[str] = []
         for me in os.listdir(path):
             if me.endswith(info.EXTENSION):
-                lista.append(me)
+                lista.append('%s%s' % (path, me))
 
         # Se devuelve un elemento al azar.
         return random.choice(lista)

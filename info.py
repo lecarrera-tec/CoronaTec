@@ -1,5 +1,8 @@
 """
-Opciones para el texto de los archivos de entrada.
+Claves para el texto de los archivos de entrada.
+
+Cuando la clave puede incluir opciones, se utiliza la letra L al inicio
+para aclarar que es la parte izquierda (Left) del texto.
 """
 COMMENT: str = '#'
 ABRIR: str = '<'
@@ -20,10 +23,13 @@ PREGUNTAS: str = '%sPreguntas%s' % (ABRIR, CERRAR)
 LTIPO: str = '%stipo' % ABRIR
 VARIABLES: str = '%svariables%s' % (ABRIR, CERRAR)
 PREGUNTA: str = '%spregunta%s' % (ABRIR, CERRAR)
-ITEM: str = '%sitem%s' % (ABRIR, CERRAR)
+LITEM: str = '%sitem' % ABRIR
 RESPUESTA: str = '%srespuesta%s' % (ABRIR, CERRAR)
 SOLUCION: str = '%ssolucion%s' % (ABRIR, CERRAR)
 
-# Constante que se multiplica por el número de identificación
+# Ver paquete paralist.
+FORMATO_ITEM: str = '[A)]'
+
+# Constante diabólica que se multiplica por el número de identificación
 # para generar la semilla.
-BY_SHIFT: int = 99913
+BY_SHIFT: int = 99929
