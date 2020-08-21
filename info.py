@@ -30,6 +30,9 @@ SOLUCION: str = '%ssolucion%s' % (ABRIR, CERRAR)
 # Ver paquete paralist.
 FORMATO_ITEM: str = '[A)]'
 
+# para eliminar
+STRIP = ' \t\n%s%s' % (ABRIR, CERRAR)
+
 # Constante diabólica que se multiplica por el número de identificación
 # para generar la semilla.
 BY_SHIFT: int = 99929

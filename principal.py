@@ -76,6 +76,6 @@ for linea in Lista:
     fout.close();
 
     # Se genera el pdf
-    #os.system('pdflatex %s' % filename)
-    #os.system('pdflatex %s' % filename)
+    os.system('pdflatex %s' % filename)
+    os.system('pdflatex %s' % filename)
     logging.info('Fin de examen\n')

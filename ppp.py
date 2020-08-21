@@ -12,10 +12,10 @@ class PPP:
 
     Contiene la estructura principal:
       - El nombre del curso.
-      - El t\'itulo de la prueba.
+      - El título de la prueba.
       - Instrucciones generales para la prueba.
       - La lista de las secciones, que son a su vez una clase.
-        (aqu\'i es donde est\'a la informaci\'on importante)
+        (aquí es donde está la información importante)
     """
 
     def __init__(self, filename: str):
@@ -27,11 +27,11 @@ class PPP:
         de cada una de las secciones.
 
         Se definen las variables:
-            - dir_trabajo   : direcci\'on a la carpeta de la prueba.
-                              Se requiere porque la direcci\'on de las
+            - dir_trabajo   : dirección a la carpeta de la prueba.
+                              Se requiere porque la dirección de las
                               preguntas es relativa a dicha carpeta.
             - curso         : Nombre del curso.
-            - titulo        : T\'itulo de la prueba.
+            - titulo        : Título de la prueba.
             - instrucciones : Instrucciones de la prueba.
             - encabezado    : Encabezado a agregar a \LaTeX
             - secciones     : Una lista de instancias de la clase 
@@ -41,11 +41,11 @@ class PPP:
         self.puntaje = 0
 
         # Definimos el directorio local como el directorio de trabajo, 
-        # pero si la direcci\'on dada no es un archivo en el directorio 
-        # actual, entonces vamos a guardar la direcci\'on al archivo, 
+        # pero si la dirección dada no es un archivo en el directorio 
+        # actual, entonces vamos a guardar la dirección al archivo, 
         # porque la referencia a los archivos de las preguntas es 
         # relativa al directorio del archivo principal. 
-        # TODO Hay que pensar en una soluci\'on para las im\'agenes
+        # TODO Hay que pensar en una solución para las imágenes
         # en LaTeX.
         # Warning! Estamos pensando en linux!
         self.dir_trabajo: str = './'
@@ -58,7 +58,7 @@ class PPP:
         # caracter de comentario.
         finp = open(filename, 'r')
 
-        # Lo primero que deber\'iamos encontrar en el archivo es el nombre 
+        # Lo primero que deberíamos encontrar en el archivo es el nombre 
         # del curso. Buscamos primero la etiqueta.
         ignorar: bool = True
         while ignorar:
@@ -70,7 +70,7 @@ class PPP:
         self.curso = finp.readline().strip()
         logging.info('<Curso>: %s' % self.curso)
 
-        # Luego deber\'ia seguir el t\'itulo de la prueba. Buscamos la 
+        # Luego debería seguir el título de la prueba. Buscamos la 
         # etiqueta respectiva.
         ignorar = True
         while ignorar:
@@ -90,7 +90,7 @@ class PPP:
         
         # Ahora revisamos si existe encabezado para LaTeX. Si no 
         # hubiera encabezado, observe que entonces la variable 
-        # estar\'ia en blanco.
+        # estaría en blanco.
         lista: List[str] = []
         continuar : bool
         if l == info.ENCABEZADO:
@@ -98,22 +98,26 @@ class PPP:
             while l.find(info.ABRIR) == -1:
                 lista.append(l)
                 l = finp.readline()
-        logging.info('<Encabezado>')
-        self.encabezado = '%s\n' % ''.join(lista).strip()
-        logging.info(self.encabezado)
+            logging.info('<Encabezado>')
+            self.encabezado = '%s\n' % ''.join(lista).strip()
+            logging.info(self.encabezado)
+        else:
+            self.encabezado = ''
 
         # Revisamos si son las instrucciones. Pueden abarcar varias 
-        # l\'ineas de texto. Si no hubiera instrucciones, observe que
-        # entonces la variable estar\'ia en blanco.
+        # líneas de texto. Si no hubiera instrucciones, observe que
+        # entonces la variable estaría en blanco.
         lista = []
         if l.strip() == info.INSTRUCCIONES:
             l = finp.readline()
             while l.find(info.ABRIR) == -1:
                 lista.append(l)
                 l = finp.readline()
-        logging.info('<Instrucciones>')
-        self.instrucciones = '%s\n' % ''.join(lista).strip()
-        logging.info(self.instrucciones)
+            logging.info('<Instrucciones>')
+            self.instrucciones = '%s\n' % ''.join(lista).strip()
+            logging.info(self.instrucciones)
+        else:
+            self.instrucciones = ''
 
         # No queda de otra. Tienen que seguir las secciones. Una lista 
         # de instancias de la clase Seccion.
@@ -122,13 +126,13 @@ class PPP:
         counter = 0
         self.secciones = [];
         es_aleatorio: bool = False
-        while l.strip().startswith(info.LSECCION):
+        while l.startswith(info.LSECCION):
+            l = l.strip(info.STRIP)
             counter += 1
             logging.info('%d : Llamando a seccion ...' % counter)
             es_aleatorio = parser.derecha_igual(l, 'orden') == 'aleatorio'
             self.secciones.append(
-                    Seccion(finp, dir_trabajo = self.dir_trabajo, 
-                            aleatorio = es_aleatorio))
+                    Seccion(finp, self.dir_trabajo, es_aleatorio))
             l = finp.readline().strip()
         logging.info('Fin de PPP\n')
 

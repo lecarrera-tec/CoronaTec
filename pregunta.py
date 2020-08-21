@@ -23,7 +23,8 @@ def get_latex(filename: str) -> str:
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
     assert(l.startswith(info.LTIPO))
-    tipo: str = parser.derecha_igual(l, info.LTIPO)
+    l = l.strip(info.STRIP)
+    tipo: str = parser.derecha_igual(l, 'tipo')
     if tipo == 'respuesta corta':
         opcion: str = parser.derecha_igual(l, 'opcion')
         if opcion == '' or opcion == 'entero':
