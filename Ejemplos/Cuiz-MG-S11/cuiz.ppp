@@ -1,0 +1,34 @@
+<Curso>
+Matemática General
+
+<Titulo>
+Cuiz Semana 11
+
+<Encabezado>
+\usepackage{hyperref}
+
+<Instrucciones>
+Utilice el link \url{https://forms.gle/BkvRBmV8aDqn7CoHA} para responder esta prueba.
+
+<Seccion, orden = aleatorio>
+  <Titulo>
+  I Parte
+
+  <Instrucciones>
+  Cada pregunta vale 1 pt.
+
+  <Preguntas>
+  1,Pregunta01
+  1,Pregunta02
+  1,Pregunta03
+
+<Seccion>
+  <Titulo>
+  II Parte
+
+  <Instrucciones>
+  Cada pregunta vale 2 pts.
+
+  <Preguntas>
+  2,Pregunta04
+  2,Pregunta05
