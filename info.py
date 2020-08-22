@@ -4,7 +4,7 @@ Claves para el texto de los archivos de entrada.
 Cuando la clave puede incluir opciones, se utiliza la letra L al inicio
 para aclarar que es la parte izquierda (Left) del texto.
 """
-COMMENT: str = '#'
+COMMENT: str = '%'
 ABRIR: str = '<'
 CERRAR: str = '>'
 
