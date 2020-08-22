@@ -18,9 +18,9 @@
 
 Este proyecto consta de los siguientes programas:
 \begin{itemize}
-  \item \verb|generar| Esta es la función que genera las pruebas. Requiere dos archivos como argumentos: el primero es el archivo \verb|ppp| donde se guarda la información general de la prueba, y el segundo el archivo con la lista de los estudiantes (descargado del tec digital y convertido a CVS).
+  \item \verb|generar| Esta es la función que genera las pruebas. Requiere dos archivos como argumentos: el primero es el archivo \verb|ppp| donde se guarda la información general de la prueba, y el segundo la carpeta con la listas de los grupos de las personas estudiantes (cada uno de ellos descargado del tec digital y convertido a CSV). En esta misma carpeta guarda las evaluaciones.
 
-  \item \verb|evaluar| Esta es la función que realiza la evaluación. Requiere el archivo \verb|ppp|, el archivo con la lista de los estudiantes (descargado del tec digital y convertido a CVS), y el archivo de las respuestas descargado de Google Forms como CVS.
+  \item \verb|evaluar| Esta es la función que realiza la evaluación. Requiere el archivo \verb|ppp|, la carpeta con las listas de los estudiantes, y el archivo de las respuestas descargado de Google Forms como CSV.
 
   \item \verb|vista_previa| Esta función recibe como argumento la dirección del archivo de una pregunta, y de manera opcional el número de ejemplos por generar, para generar un pdf de la pregunta. Esto permite revisar que la pregunta esté bien definida, y ver si genera los resultados esperados.
 \end{itemize}
@@ -30,67 +30,53 @@ Este proyecto consta de los siguientes programas:
 \section{Estructura del archivo general}
 \begin{verbatim}
 <Curso>
-Matemática General
+__Nombre del curso__
 
 <Titulo>
-II Examen Parcial
+__Título de la prueba__
 
 <Encabezado>
-# Estas líneas se agregan al encabezado del archivo latex.
+__Paquetes, comandos nuevos, etc, para el encabezado del archivo LaTeX__
 
 <Instrucciones>
-Este es un examen ...
+__Instrucciones del examen__
 
 <Seccion[, orden = aleatorio]>
   <Titulo>
+  __Opcional si es sólo una sección__
 
   <Instrucciones>
+  __Opcional si es sólo una sección__
 
   <Preguntas>
-  [<pts>,]<relative path preg 1>
-  [<pts>,]<relative path preg 2>
-  ...
-
+    puntaje = __int__, origen = __string__, muestras = __int__
 <Fin>
 \end{verbatim}
 
 \begin{itemize}
   \item Tanto el nombre del curso como el título suponemos que es solamente una línea de texto debajo de la etiqueta respectiva.
   \item Las instrucciones pueden abarcar varios renglones e incluir líneas en blanco, para que \LaTeX\ separe los párrafos. 
-  \item En las instrucciones \emph{no} se deben incluir comentarios.
-  \item En las instrucciones \emph{no} debe aparecer el símbolo de abrir etiquetas (ver \verb|info.abrir|).
+  \item En las instrucciones \emph{no} debe aparecer el símbolo de abrir etiquetas (ver \verb|info.abrir|) como primer car\'acter del p\'arrafo, porque es la forma de determinar que all\'i finalizan.
   \item No debe haber espacios en blanco entre las direcciones de las preguntas, pero sí se permiten comentarios.
-  \item La dirección puede ser un archivo con extensión \verb|.preg| o una carpeta.
-  \item Si la dirección es una carpeta, entonces el puntaje para cualquiera de las preguntas es el mismo, y se toma de acá. Si el puntaje no aparece, entonces es 1~pt por default. En el caso de una sola pregunta, el puntaje puede ser modificado por la pregunta que se llama. Para el caso de múltiples preguntas, el puntaje se mantiene en 1 o el definido acá.
+  \item El \verb|origen| de la pregunta puede ser un archivo con extensión \verb|.tex| o una carpeta.
+  \item Si la dirección es una carpeta, entonces el puntaje para cualquiera de las preguntas es el mismo, y se toma de acá. Si el puntaje no aparece, entonces es 1~pt por default.
   \item Las preguntas finalizan con una línea en blanco o con el final del archivo.
 \end{itemize}
 
 \section{Estructura del archivo para cada pregunta}
 
 \begin{verbatim}
-<tipo = <tipo>[, <opciones> = {lista}>
+<tipo = __tipo__[, __opcion__ = __str__]>
 
 <variables>
-<definiciones>
+  __nombre__ = __definicion__
 
 <pregunta>
-<texto>
+  __texto de la pregunta__
 
-<item = <resp>>
-<item>
-
-<item = <resp>] 
-<item>
-
+<item[, __opciones__]>
+  __respuesta o distractor__
 \end{verbatim}
-
-Los tipos para las preguntas son:
-\begin{itemize}
-  \item \verb|seleccion unica, random|
-  \item \verb|seleccion unica, sort|
-  \item \verb|respuesta corta, simple|
-  \item \verb|respuesta corta, compuesta|
-\end{itemize}
 
 \subsection{Selección única}
 Las opciones para selección única son las siguientes:
@@ -189,6 +175,9 @@ En el caso de un solo argumento, entonces la sucesión comienza en 0 y termina e
 Si lo que se quiere es tomar un elemento aleatorio de la sucesión simple, entonces mejor utilizar las funciones \verb|randrange| o \verb|randint|. Para el caso en que se concatenan dos sucesiones, entonces utilizar \verb|choice|.
 
 
+\end{document}
+
+
 \section{Pregunta}
 
 \subsection{Tipos de pregunta}
@@ -207,4 +196,3 @@ Si lo que se quiere es tomar un elemento aleatorio de la sucesión simple, enton
     \end{description}
 \end{itemize}
 
-\end{document}

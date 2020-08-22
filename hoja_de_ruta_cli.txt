@@ -1,5 +1,5 @@
 * Selección única, sin parametrizar, banco de preguntas
-  - Generar un sólo string de texto para la pregunta en latex.
+    [Generar un sólo string de texto para la pregunta en latex.] Listo!
   - Incluir la posibilidad de que se escojan varios archivos por carpeta.
   - Definir cómo hacer para una nueva página. Tal vez utilizar 
     \begin{samepage} ... \end{samepage} y \nopagebreak. El primer evita que se
@@ -16,10 +16,12 @@
     distintas.
   - Programar la revisión. Los argumentos deberían de ser el archivo .ppp,
     la carpeta con las listas de los estudiantes, y el archivo CVS generado
-    por google forms.
+    por google forms. Generar una interfaz. Se podría utilizar inicialmente
+    diccionarios, donde la llave sea el número de carnet del estudiante.
   - Probar con un cuiz real. Incluir la opción de que haya que anular una
-    pregunta mediante dos opciones: cualquiera, se le dan los puntos, 
-    y ninguna, se elimina la pregunta (o poner 0 puntos en la pregunta).
+    pregunta mediante dos opciones: *cualquiera*, se le dan los puntos, 
+    y *ninguna*, se elimina la pregunta (equivalente a poner 0 puntos en el
+    valor de la pregunta).
 
 * Respuesta corta, sin parámetros, banco de preguntas.
   - respuesta entera;
@@ -35,6 +37,6 @@
     de dígitos que se van a utilizar para mostrar valores.
 
 * Selección única, parametrizadas.
-  - Items en orden creciente.
   - Items en orden fijo
   - Items con índice dado (parametrizado) 
+  - Items en orden creciente.
