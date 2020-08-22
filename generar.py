@@ -11,7 +11,7 @@ from seccion import Seccion
 import latex
 import info
 
-logging.basicConfig(filename='output.log', level=logging.DEBUG, filemode='w')
+logging.basicConfig(filename='output.log', level=logging.INFO, filemode='w')
 
 # Si no se tienen la cantidad de argumentos correcta, se sale.
 if (len(sys.argv) != 3):
@@ -46,7 +46,7 @@ for linea in Lista:
     random.seed(info.BY_SHIFT * int(idstr))
 
     # Se comienza a generar el archivo.
-    tex = latex.pre_latex(nombre, examen.get_puntaje())
+    tex: List[str] = latex.pre_latex(nombre, examen.get_puntaje())
     tex.append('\\noindent \\textbf{Instrucciones: }')
     tex.append(examen.instrucciones)
 
@@ -58,12 +58,12 @@ for linea in Lista:
     logging.info('Se tienen %d secciones en total' % len(examen.secciones))
     if len(examen.secciones) > 1 or len(seccion.titulo) > 0:
         tex.append('  \\section{%s}\n\n' % seccion.titulo)
-        tex += seccion.get_latex()
+        tex.append(seccion.get_latex())
 
     # Ahora se trabaja con el resto de las secciones
     for seccion in examen.secciones[1:]:
         tex.append('  \\section{%s}\n\n' % seccion.titulo)
-        tex += seccion.get_latex()
+        tex.append(seccion.get_latex())
 
     # Cerrando el documento.
     tex.append('\\end{document}\n')
@@ -77,5 +77,5 @@ for linea in Lista:
 
     # Se genera el pdf
     os.system('pdflatex %s' % filename)
-    os.system('pdflatex %s' % filename)
+    #os.system('pdflatex %s' % filename)
     logging.info('Fin de examen\n')
