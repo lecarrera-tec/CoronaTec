@@ -18,9 +18,9 @@ Utilice el link \url{https://forms.gle/BkvRBmV8aDqn7CoHA} para responder esta pr
   Cada pregunta vale 1 pt.
 
   <Preguntas>
-  1,Pregunta01
-  1,Pregunta02
-  1,Pregunta03
+    puntaje = 1, origen = Pregunta01, muestra = 1
+    puntaje = 1, origen = Pregunta02, muestra = 1
+    puntaje = 1, origen = Pregunta03, muestra = 1
 
 <Seccion>
   <Titulo>
@@ -30,5 +30,5 @@ Utilice el link \url{https://forms.gle/BkvRBmV8aDqn7CoHA} para responder esta pr
   Cada pregunta vale 2 pts.
 
   <Preguntas>
-  2,Pregunta04
-  2,Pregunta05
+    puntaje = 2, origen = Pregunta04, muestra = 1
+    puntaje = 2, origen = Pregunta05, muestra = 1

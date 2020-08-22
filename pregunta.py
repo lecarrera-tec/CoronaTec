@@ -38,7 +38,7 @@ def latex_corta_entera(lines: List[str]) -> str:
     return ''
 
 def latex_unica(lines: List[str], orden: str) -> str:
-    logging.info('Entrando a "latex_unica"')
+    logging.debug('Entrando a "latex_unica"')
     logging.debug('Orden : %s' % orden)
     logging.debug('Texto : %s', ''.join(lines))
     lista: List[str] = []
@@ -75,7 +75,7 @@ def latex_unica(lines: List[str], orden: str) -> str:
         else:
             item = '%s%s' % (item, l)
         l = lines.pop(0)
-    # Falta agregar a la lista el \'ultimo item
+    # Falta agregar a la lista el último item
     litems.append(item)
     # Desordenamos los items.
     if orden == 'aleatorio':

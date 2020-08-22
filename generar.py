@@ -30,11 +30,11 @@ Lista: List[str] = finput.readlines()
 finput.close()
 
 # Ahora se trabaja con cada estudiante de la Lista.
-linea : str    # L\'inea de c\'odigo
+linea : str    # Línea de código
 idstr : str    # String del identificador del estudiante.
 separar : List[str]   # Separar CSV
 for linea in Lista:
-    logging.info('Nuevo examen.')
+    logging.debug('Nuevo examen.')
     # Separamos el número de identificación del resto del nombre.
     # ##-id-## <apellidos/nombres>
     separar = linea.split(',')
@@ -42,7 +42,7 @@ for linea in Lista:
     nombre = separar[1].strip()
 
     # Se inicializa la semilla usando el identificador multiplicado por
-    # una constante diab\'olica.
+    # una constante diabólica.
     random.seed(info.BY_SHIFT * int(idstr))
 
     # Se comienza a generar el archivo.
@@ -50,12 +50,12 @@ for linea in Lista:
     tex.append('\\noindent \\textbf{Instrucciones: }')
     tex.append(examen.instrucciones)
 
-    # Si es s\'olo una secci\'on y no tiene t\'itulo, entonces no agregamos
-    # la etiqueta de secci\'on en LaTeX. En caso contrario, se agrega
+    # Si es sólo una sección y no tiene título, entonces no agregamos
+    # la etiqueta de sección en LaTeX. En caso contrario, se agrega
     # la etiqueta para cada una de las secciones, aunque no tengan 
-    # t\'itulo.
+    # título.
     seccion = examen.secciones[0]
-    logging.info('Se tienen %d secciones en total' % len(examen.secciones))
+    logging.debug('Se tienen %d secciones en total' % len(examen.secciones))
     if len(examen.secciones) > 1 or len(seccion.titulo) > 0:
         tex.append('  \\section{%s}\n\n' % seccion.titulo)
         tex.append(seccion.get_latex())
@@ -78,4 +78,4 @@ for linea in Lista:
     # Se genera el pdf
     os.system('pdflatex %s' % filename)
     #os.system('pdflatex %s' % filename)
-    logging.info('Fin de examen\n')
+    logging.debug('Fin de examen\n')

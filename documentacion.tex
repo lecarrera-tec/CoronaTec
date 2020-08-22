@@ -49,14 +49,14 @@ __Instrucciones del examen__
   __Opcional si es sólo una sección__
 
   <Preguntas>
-    puntaje = __int__, origen = __string__, muestras = __int__
+    puntaje = __int__, origen = __string__, muestra = __int__
 <Fin>
 \end{verbatim}
 
 \begin{itemize}
   \item Tanto el nombre del curso como el título suponemos que es solamente una línea de texto debajo de la etiqueta respectiva.
   \item Las instrucciones pueden abarcar varios renglones e incluir líneas en blanco, para que \LaTeX\ separe los párrafos. 
-  \item En las instrucciones \emph{no} debe aparecer el símbolo de abrir etiquetas (ver \verb|info.abrir|) como primer car\'acter del p\'arrafo, porque es la forma de determinar que all\'i finalizan.
+  \item En las instrucciones \emph{no} debe aparecer el símbolo de abrir etiquetas (ver \verb|info.abrir|) como primer carácter del párrafo, porque es la forma de determinar que allí finalizan.
   \item No debe haber espacios en blanco entre las direcciones de las preguntas, pero sí se permiten comentarios.
   \item El \verb|origen| de la pregunta puede ser un archivo con extensión \verb|.tex| o una carpeta.
   \item Si la dirección es una carpeta, entonces el puntaje para cualquiera de las preguntas es el mismo, y se toma de acá. Si el puntaje no aparece, entonces es 1~pt por default.

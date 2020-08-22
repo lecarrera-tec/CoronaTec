@@ -1,10 +1,10 @@
 * Selección única, sin parametrizar, banco de preguntas
-    [Generar un sólo string de texto para la pregunta en latex.] Listo!
-  - Incluir la posibilidad de que se escojan varios archivos por carpeta.
-  - Definir cómo hacer para una nueva página. Tal vez utilizar 
-    \begin{samepage} ... \end{samepage} y \nopagebreak. El primer evita que se
-    salte de página en medio de un párrafo. El segundo evita saltos de
-    página entre párrafos.
+    Listo! [Generar un sólo string de texto para la pregunta en latex.]
+    Listo! [Incluir la posibilidad de que se escojan varios archivos por carpeta.]
+    Listo? [Definir cómo hacer para una nueva página. Tal vez utilizar 
+           [\begin{samepage} ... \end{samepage} y \nopagebreak. El primer evita que se
+           [salte de página en medio de un párrafo. El segundo evita saltos de
+           [página entre párrafos.
   - Leer carpeta con las listas de los grupos para generar pdfs. Los
     argumentos deberían de ser el archivo .ppp y la carpeta con la lista de
     los grupos de estudiantes. Archivos CVS. Se les quita la extensión, y se
