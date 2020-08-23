@@ -158,7 +158,7 @@ class Seccion:
         # Si las preguntas se requieren en orden aleatorio, entonces
         # las revolvemos
         if self.aleatorias: 
-            logging.info('Revolviendo las preguntas.')
+            logging.debug('Revolviendo las preguntas.')
             random.shuffle(lista)
 
         # Construimos el texto del puntaje total.
@@ -203,5 +203,11 @@ class Seccion:
         if muestra > len(lista):
             logging.error('La carpeta no tiene la cantidad de preguntas requeridas')
             return lista
-
-        return random.sample(lista, muestra)
+        elif muestra < len(lista):
+            # Devolviendo una muestra ordenada.
+            idx: List[int] = random.sample([*range(len(lista))], muestra)
+            idx.sort()
+            return [lista[i] for i in idx]
+        else:
+            # El tamaño de la muestra es el tamaño de la lista.
+            return lista

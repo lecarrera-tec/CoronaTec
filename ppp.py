@@ -1,5 +1,6 @@
 from typing import List
 import logging
+import sys
 
 from seccion import Seccion
 import info
@@ -56,7 +57,11 @@ class PPP:
         # Vamos a leer el archivo linea x linea. Por lo general se van 
         # a ignorar lineas en blanco y lineas que comiencen con el 
         # caracter de comentario.
-        finp = open(filename, 'r')
+        try:
+            finp = open(filename, 'r')
+        except:
+            logging.critical('No se pudo abrir archivo principal.')
+            sys.exit()
 
         # Lo primero que deberíamos encontrar en el archivo es el nombre 
         # del curso. Buscamos primero la etiqueta.

@@ -8,12 +8,18 @@ import parser
 import info
 
 def get_latex(filename: str) -> str:
-    """Función principal.
+    """Función principal del módulo. Recibe como argumento la 
+    dirección de un archivo, y devuelve el texto de la pregunta.
 
     Lo que hace es clasificar el tipo de pregunta, y llamar a la función
     correspondiente.
     """
-    f = open(filename)
+    try:
+        f = open(filename)
+    except:
+        logging.error('No se pudo abrir archivo "%s"' % filename) 
+        return ''
+
     lines: List[str] = f.readlines()
     f.close()
     ignorar: bool = True

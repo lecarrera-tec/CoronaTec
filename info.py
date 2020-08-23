@@ -1,3 +1,4 @@
+from typing import List
 """
 Claves para el texto de los archivos de entrada.
 
@@ -33,6 +34,6 @@ FORMATO_ITEM: str = '[A)]'
 # para eliminar
 STRIP = ' \t\n%s%s' % (ABRIR, CERRAR)
 
-# Constante diabólica que se multiplica por el número de identificación
-# para generar la semilla.
-BY_SHIFT: int = 99929
+# Constante que se multiplica por el número de identificación para 
+# generar la semilla.
+BY_SHIFT: List[int] = [99929, 9929, 929, 29, 99829, 9829, 829]
