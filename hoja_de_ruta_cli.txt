@@ -2,18 +2,18 @@
     Listo! [Generar un sólo string de texto para la pregunta en latex.]
     Listo! [Incluir la posibilidad de que se escojan varios archivos por carpeta.]
     Listo? [Definir cómo hacer para una nueva página. Tal vez utilizar 
-           [\begin{samepage} ... \end{samepage} y \nopagebreak. El primer evita que se
+           [\begin{samepage} ... \end{samepage} y \nopagebreak. El primero evita que se
            [salte de página en medio de un párrafo. El segundo evita saltos de
            [página entre párrafos.
     Listo! [Leer carpeta con las listas de los grupos para generar pdfs. Los
            [argumentos deberían de ser el archivo .ppp y la carpeta con la lista de
            [los grupos de estudiantes. Archivos CSV. Se les quita la extensión, y se
            [genera una carpeta por grupo en el lugar de trabajo.
-  - Resolver el problema de incluir figuras de la carpeta donde está el
-    programa. Una posibilidad es utilizar la función del paquete *graphicx*, 
-    el problema que tiene es que habría que incluir cada una de las carpetas,
-    y podría pasar que haya dos figuras con el mismo nombre en carpetas
-    distintas.
+    Listo! [Resolver el problema de incluir figuras de la carpeta donde está el
+           [programa. Una posibilidad es utilizar la función del paquete *graphicx*, 
+           [el problema que tiene es que habría que incluir cada una de las carpetas,
+           [y podría pasar que haya dos figuras con el mismo nombre en carpetas
+           [distintas.
   - Programar la revisión. Los argumentos deberían de ser el archivo .ppp,
     la carpeta con las listas de los estudiantes, y el archivo CSV generado
     por google forms. Generar una interfaz. Se podría utilizar inicialmente

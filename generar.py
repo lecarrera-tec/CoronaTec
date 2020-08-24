@@ -132,8 +132,8 @@ for path in lestudiantes:
 
         # Se mueve el pdf a la carpeta respectiva, y se eliminan el 
         # resto de los archivos.
-        ## os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
-        ## lista = os.listdir('./')
-        ## for fname in lista:
-        ##     if fname.startswith(filename):
-        ##         os.remove(fname)
+        os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
+        lista = os.listdir('./')
+        for fname in lista:
+            if fname.startswith(filename):
+                os.remove(fname)

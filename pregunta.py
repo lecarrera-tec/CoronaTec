@@ -23,6 +23,7 @@ def get_latex(filename: str) -> str:
     lines: List[str] = f.readlines()
     f.close()
     ignorar: bool = True
+    texto: str
     while ignorar:
         l: str = lines.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == info.COMMENT
@@ -34,11 +35,28 @@ def get_latex(filename: str) -> str:
     if tipo == 'respuesta corta':
         opcion: str = parser.derecha_igual(l, 'opcion')
         if opcion == '' or opcion == 'entero':
-            return latex_corta_entera(lines)
+            texto = latex_corta_entera(lines)
     elif tipo == 'seleccion unica':
         orden: str = parser.derecha_igual(l, 'orden')
-        return latex_unica(lines, orden)
-    return ''
+        texto = latex_unica(lines, orden)
+
+    # Queda aún algo muy importante por hacer, y es modificar el path de 
+    # las figuras que se incluyan: \includegraphics[opciones]{path}
+    # Primero comenzamos extrayendo el path hasta el folder donde está
+    # el archivo.
+    idx: int = filename.rfind('/')
+    path: str = filename[:idx]
+    # Ahora buscamos cada includegraphics, y le agregamos el path.
+    idx = 0
+    while True:
+        idx = texto.find('\\includegraphics', idx)
+        if idx == -1:
+            break
+        idx = texto.find('{', idx)
+        assert(idx != -1)
+        texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
+
+    return texto
 
 def latex_corta_entera(lines: List[str]) -> str:
     return ''
