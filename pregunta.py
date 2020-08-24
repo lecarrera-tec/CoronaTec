@@ -63,12 +63,16 @@ def latex_unica(lines: List[str], orden: str) -> str:
     # variables.
     assert(l == info.PREGUNTA)
     l = lines.pop(0)
+    texto: List[str] = []
     while not l.strip().startswith(info.LITEM):
         # TODO falta revisar si los renglones tienen parámetros.
-        lista.append('    %s' % l)
+        texto.append('    %s\n' % l)
         l = lines.pop(0)
+    lista.append('%s\n%s' % (''.join(texto).rstrip(), '    \\nopagebreak\n'))
     # Ahora siguen los items.
+    texto = []
     assert(l.strip().startswith(info.LITEM))
+    # TODO Hay que parsear cada item por si está parametrizado.
     # TODO Hay que leer la opción de indice del item cuando corresponda.
     # Primero se va a crear una lista de los items.
     litems: List[str] = []
@@ -76,13 +80,13 @@ def latex_unica(lines: List[str], orden: str) -> str:
     l = lines.pop(0)
     while len(lines) > 0:
         if l.strip().startswith(info.LITEM):
-            litems.append(item)
-            item = ''
+            litems.append('%s\n      \\nopagebreak\n' % ''.join(texto).rstrip())
+            texto = []
         else:
-            item = '%s%s' % (item, l)
+            texto.append('%s' % l)
         l = lines.pop(0)
     # Falta agregar a la lista el último item
-    litems.append(item)
+    litems.append('%s\n      \\nopagebreak\n' % ''.join(texto).rstrip())
     # Desordenamos los items.
     if orden == 'aleatorio':
         random.shuffle(litems)

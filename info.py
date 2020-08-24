@@ -11,7 +11,10 @@ CERRAR: str = '>'
 
 EXTENSION: str = '.tex'
 
-CURSO: str = '%sCurso%s' % (ABRIR, CERRAR)
+ESCUELAS: str = '%sEscuelas%s' % (ABRIR, CERRAR)
+SEMESTRE: str = '%sSemestre%s' % (ABRIR, CERRAR)
+TIEMPO: str = '%sTiempo%s' % (ABRIR, CERRAR)
+CURSOS: str = '%sCursos%s' % (ABRIR, CERRAR)
 TITULO: str = '%sTitulo%s' % (ABRIR, CERRAR)
 INSTRUCCIONES: str = '%sInstrucciones%s' % (ABRIR, CERRAR)
 ENCABEZADO: str = '%sEncabezado%s' % (ABRIR, CERRAR)

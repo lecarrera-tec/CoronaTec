@@ -31,8 +31,11 @@ class PPP:
             - dir_trabajo   : dirección a la carpeta de la prueba.
                               Se requiere porque la dirección de las
                               preguntas es relativa a dicha carpeta.
-            - curso         : Nombre del curso.
-            - titulo        : Título de la prueba.
+            - escuelas      : Lista de escuelas del examen.
+            - semestre      : Texto del semestre y año.
+            - tiempo        : Duración de la prueba.
+            - cursos        : Nombre de los cursos.
+            - titulo        : Título de la prueba.a
             - instrucciones : Instrucciones de la prueba.
             - encabezado    : Encabezado a agregar a \LaTeX
             - secciones     : Una lista de instancias de la clase 
@@ -64,16 +67,64 @@ class PPP:
             sys.exit()
 
         # Lo primero que deberíamos encontrar en el archivo es el nombre 
-        # del curso. Buscamos primero la etiqueta.
+        # de las escuelas. Buscamos primero la etiqueta.
         ignorar: bool = True
         while ignorar:
             l = finp.readline().strip()
             ignorar = len(l) == 0 or l[0] == info.COMMENT 
-        assert(l == info.CURSO)
+        assert(l == info.ESCUELAS)
+        # Agregamos todas las líneas que no comiencen con comentario
+        # hasta llegar a una línea en blanco.
+        self.escuelas: List[str] = []
+        while True:
+            l = finp.readline().strip()
+            if len(l) == 0:
+                break
+            if l.startswith(info.COMMENT):
+                continue
+            self.escuelas.append(l)
+        logging.info('<Escuelas>: %s' % ', '.join(self.escuelas))
 
-        # Guardamos el texto del nombre del curso.
-        self.curso = finp.readline().strip()
-        logging.info('<Curso>: %s' % self.curso)
+        # Sigue el semestre.
+        ignorar = True
+        while ignorar:
+            l = finp.readline().strip()
+            ignorar = len(l) == 0 or l[0] == info.COMMENT 
+        assert(l == info.SEMESTRE)
+
+        # Guardamos el texto del semestre.
+        self.semestre = finp.readline().strip()
+        logging.info('<Semestre>: %s' % self.semestre)
+
+        # Sigue el tiempo.
+        ignorar = True
+        while ignorar:
+            l = finp.readline().strip()
+            ignorar = len(l) == 0 or l[0] == info.COMMENT 
+        assert(l == info.TIEMPO)
+
+        # Guardamos el texto del tiempo.
+        self.tiempo = finp.readline().strip()
+        logging.info('%s: %s' % (info.TIEMPO, self.semestre))
+
+        # Ahora sigue el nombre de los cursos. Buscamos primero la 
+        # etiqueta.
+        ignorar = True
+        while ignorar:
+            l = finp.readline().strip()
+            ignorar = len(l) == 0 or l[0] == info.COMMENT 
+        assert(l == info.CURSOS)
+        # Agregamos todas las líneas que no comiencen con comentario
+        # hasta llegar a una línea en blanco.
+        self.cursos: List[str] = []
+        while True:
+            l = finp.readline().strip()
+            if len(l) == 0:
+                break
+            if l.startswith(info.COMMENT):
+                continue
+            self.cursos.append(l)
+        logging.info('<Cursos>: %s' % ', '.join(self.cursos))
 
         # Luego debería seguir el título de la prueba. Buscamos la 
         # etiqueta respectiva.

@@ -152,7 +152,7 @@ class Seccion:
                 lista.append('%s%s%s' % (
                     texto, 
                     pregunta.get_latex(filename),
-                    '\\end{ejer}\n\\nopagebreak\n'
+                    '\\end{ejer}\n\\bigskip\n\\pagebreak[2]\n'
                 ))
 
         # Si las preguntas se requieren en orden aleatorio, entonces

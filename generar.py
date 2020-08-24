@@ -21,7 +21,7 @@ if len(sys.argv) < 3 or len(sys.argv) > 4:
             'de repetición del examen'))
     sys.exit()
 
-# \'Indice de repetición del examen. Por default es 0.
+# Índice de repetición del examen. Por default es 0.
 ind_repeticion: int = 0
 if len(sys.argv) == 4:
     ind_repeticion = int(sys.argv[3])
@@ -30,7 +30,7 @@ if len(sys.argv) == 4:
 # Se lee el archivo de la estructura general del examen
 # y se genera (casi todo) el encabezado.
 examen = PPP(sys.argv[1])
-encabezado: List[str] = latex.get_encabezado(examen)
+encabezado: str = latex.get_encabezado(examen)
 
 # Vamos a guardar una lista de cada archivo .csv que existe, porque
 # suponemos que cada archivo es la lista de un grupo.
@@ -95,9 +95,10 @@ for path in lestudiantes:
         random.seed(info.BY_SHIFT[ind_repeticion] * int(idstr))
     
         # Se comienza a generar el archivo.
-        tex: List[str] = latex.pre_latex(nombre, examen.get_puntaje())
+        tex: List[str] = latex.pre_latex(nombre, examen)
+        tex.append('\\noindent\\rule{\\textwidth}{1pt}\\\\[1ex]\n')
         tex.append('\\noindent \\textbf{Instrucciones: }')
-        tex.append(examen.instrucciones)
+        tex.append('%s\\\\\\rule{\\textwidth}{1pt}\n\n' % examen.instrucciones)
     
         # Si es sólo una sección y no tiene título, entonces no agregamos
         # la etiqueta de sección en LaTeX. En caso contrario, se agrega
@@ -120,7 +121,7 @@ for path in lestudiantes:
         # Se imprime el documento.
         filename = idstr[-6:]
         fout = open('%s.tex' % filename, 'w')
-        fout.writelines(encabezado)
+        fout.write(encabezado)
         fout.writelines(tex)
         fout.close();
     
@@ -131,8 +132,8 @@ for path in lestudiantes:
 
         # Se mueve el pdf a la carpeta respectiva, y se eliminan el 
         # resto de los archivos.
-        os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
-        lista = os.listdir('./')
-        for fname in lista:
-            if fname.startswith(filename):
-                os.remove(fname)
+        ## os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
+        ## lista = os.listdir('./')
+        ## for fname in lista:
+        ##     if fname.startswith(filename):
+        ##         os.remove(fname)
