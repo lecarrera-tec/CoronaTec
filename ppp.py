@@ -49,8 +49,6 @@ class PPP:
         # actual, entonces vamos a guardar la dirección al archivo, 
         # porque la referencia a los archivos de las preguntas es 
         # relativa al directorio del archivo principal. 
-        # TODO Hay que pensar en una solución para las imágenes
-        # en LaTeX.
         # Warning! Estamos pensando en linux!
         self.dir_trabajo: str = './'
         idx = filename.rfind('/')

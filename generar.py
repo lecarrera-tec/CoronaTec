@@ -11,7 +11,7 @@ from seccion import Seccion
 import latex
 import info
 
-logging.basicConfig(filename='output.log', level=logging.INFO, filemode='w')
+logging.basicConfig(filename='_generar.log', level=logging.INFO, filemode='w')
 
 # Si no se tienen la cantidad de argumentos correcta, se sale.
 if len(sys.argv) < 3 or len(sys.argv) > 4:
@@ -77,7 +77,7 @@ for path in lestudiantes:
         logging.error('No se pudo abrir lista "%s"' % path)
         continue
 
-    # Se guarda la lista de cada estudiante.
+    # Se separa la lista por estudiante.
     Lista: List[str] = finput.readlines()
     finput.close()
     
@@ -91,7 +91,7 @@ for path in lestudiantes:
         nombre = separar[1].strip()
     
         # Se inicializa la semilla usando el identificador multiplicado por
-        # una constante.
+        # una constante, según el índice de repetición dado.
         random.seed(info.BY_SHIFT[ind_repeticion] * int(idstr))
     
         # Se comienza a generar el archivo.

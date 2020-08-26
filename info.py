@@ -35,7 +35,7 @@ SOLUCION: str = '%ssolucion%s' % (ABRIR, CERRAR)
 FORMATO_ITEM: str = '[A)]'
 
 # para eliminar
-STRIP = ' \t\n%s%s' % (ABRIR, CERRAR)
+STRIP: str = ' \t\n%s%s' % (ABRIR, CERRAR)
 
 # Constante que se multiplica por el número de identificación para 
 # generar la semilla.

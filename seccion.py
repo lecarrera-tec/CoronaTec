@@ -134,8 +134,9 @@ class Seccion:
         """Genera el código LaTeX de la sección."""
         logging.debug('Entrando a Seccion.get_latex ...')
         # Primero vamos a generar una lista de preguntas completas. Si 
-        # vienen aleatorias, entonces las desordenamos, las unimos y al 
-        # final agregamos la parte inicial de la seccion.
+        # se requiere que sean aleatorias, se construyen, se reordenan, 
+        # se unen, y al final se agregan a la parte inicial de la 
+        # sección.
         lista: List[str] = []
         # Vamos agregando el texto de cada pregunta de la sección.
         puntaje: int
@@ -156,9 +157,9 @@ class Seccion:
                 ))
 
         # Si las preguntas se requieren en orden aleatorio, entonces
-        # las revolvemos
+        # las reordenamos
         if self.aleatorias: 
-            logging.debug('Revolviendo las preguntas.')
+            logging.debug('Reordenando las preguntas.')
             random.shuffle(lista)
 
         # Construimos el texto del puntaje total.
@@ -167,14 +168,45 @@ class Seccion:
                 self.get_puntaje(),
                 'pts\n\\nopagebreak\n'
         )
-        # Concatenamos las instrucciones, el puntaje y colocaos al final
-        # todas las preguntas.
+        # Concatenamos las instrucciones, el puntaje y colocamos al 
+        # final todas las preguntas.
         return '%s%s%s\n\n' % (self.instrucciones, texto, 
                                ''.join(lista).strip())
 
+    def get_respuestas(self):
+        """
+        Genera una lista de intancias del objeto Respuesta, 
+        correspondiente a las preguntas de la sección.
+        """
+        logging.debug('Entrando a Seccion.get_respuestas ...')
+        # Se genera la lista de instancias del objeto Respuesta. Si se 
+        # requiere que sean aleatorias, se reordenan.
+        lresp = []
+        # Vamos agregando la instancia de cada pregunta de la sección.
+        puntaje: int
+        filelist: List[str]
+        k: int   # Tamaño de la muestra.
+        for path in self.preguntas:
+            puntaje = path[0]
+            k = path[2]
+            filelist = Seccion.muestra_preguntas(path[1], k)
+            for filename in filelist:
+                resp = pregunta.get_respuesta(filename)
+                resp.set_puntaje(puntaje)
+                lresp.append(resp)
+
+        # Si las preguntas se requieren en orden aleatorio, entonces
+        # se reordenan igual las respuestas.
+        if self.aleatorias: 
+            logging.debug('Reordenando las respuestas.')
+            random.shuffle(lresp)
+
+        # Nada más que hacer.
+        return lresp
+
     @staticmethod
     def muestra_preguntas(path: str, muestra: int) -> List[str]:
-        """Escoje una pregunta de una dirección.
+        """Escoje una muestra de preguntas de una dirección.
 
         La dirección dada puede ser una carpeta o una pregunta.  Si es 
         un archivo (de tipo pregunta), simplemente devuelve el nombre 
@@ -187,7 +219,7 @@ class Seccion:
         # Es un archivo.
         if path.endswith(info.EXTENSION):
             if (muestra > 1):
-                logging.error('La carpeta no tiene la cantidad de preguntas requeridas')
+                logging.error('No es una carpeta. Sólo se agrega una pregunta.')
             return [path]
 
         # Debe ser una carpeta.

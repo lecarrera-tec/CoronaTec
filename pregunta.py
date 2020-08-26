@@ -6,10 +6,12 @@ from typing import List
 
 import parser
 import info
+from tipo import Tipo
+from respuesta import Respuesta
 
 def get_latex(filename: str) -> str:
-    """Función principal del módulo. Recibe como argumento la 
-    dirección de un archivo, y devuelve el texto de la pregunta.
+    """Recibe como argumento la dirección de un archivo, y devuelve el 
+    texto de la pregunta.
 
     Lo que hace es clasificar el tipo de pregunta, y llamar a la función
     correspondiente.
@@ -114,3 +116,81 @@ def latex_unica(lines: List[str], orden: str) -> str:
         lista.append('      \\item %s' % item)
     lista.append('    \\end{enumerate}\n')
     return ('%s\n' % ''.join(lista).strip())
+
+def get_respuesta(filename: str):
+    """Recibe como argumento la dirección de un archivo, y devuelve una
+    instancia de un objeto Respuesta.
+
+    Lo que hace es clasificar el tipo de pregunta, y llamar a la función
+    correspondiente.
+    """
+    try:
+        f = open(filename)
+    except:
+        logging.error('No se pudo abrir archivo "%s"' % filename) 
+        return ''
+
+    lines: List[str] = f.readlines()
+    f.close()
+    ignorar: bool = True
+    while ignorar:
+        l: str = lines.pop(0).strip()
+        ignorar = len(l) == 0 or l[0] == info.COMMENT
+
+    # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
+    assert(l.startswith(info.LTIPO))
+    l = l.strip(info.STRIP)
+    tipo: str = parser.derecha_igual(l, 'tipo')
+    if tipo == 'respuesta corta':
+        opcion: str = parser.derecha_igual(l, 'opcion')
+        if opcion == '' or opcion == 'entero':
+            return respuesta_corta_entera(lines)
+    elif tipo == 'seleccion unica':
+        orden: str = parser.derecha_igual(l, 'orden')
+        return respuesta_unica(lines, orden)
+
+    logging.critical('Tipo de pregunta desconocido: %s' % l)
+    return None
+
+def respuesta_corta_entera(lines: List[str]):
+    return None
+
+def respuesta_unica(lines: List[str], orden: str):
+    logging.debug('Entrando a "respuesta_unica"')
+    logging.debug('Orden : %s' % orden)
+    logging.debug('Texto : %s', ''.join(lines))
+    ignorar: bool = True
+    resp = Respuesta(Tipo.UNICA)
+    while ignorar:
+        l = lines.pop(0).strip()
+        ignorar = len(l) == 0 or l[0] == info.COMMENT
+    if l == info.VARIABLES:
+        # TODO Tenemos que ver cómo evaluar las variables.
+        continuar = True
+        while continuar:
+            l = lines.pop(0).strip()
+            continuar = l != info.PREGUNTA
+
+    # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
+    # debería de llamar a ninguna función random aquí.
+    assert(l == info.PREGUNTA)
+    l = lines.pop(0)
+    while not l.strip().startswith(info.LITEM):
+        l = lines.pop(0)
+    # Ahora siguen los items.
+    assert(l.strip().startswith(info.LITEM))
+    # TODO Hay que parsear cada item por si está parametrizado.
+    # TODO Hay que leer la opción de indice del item cuando corresponda.
+    # Se incluyen las opciones.
+    litems : List[int] = [0]
+    l = lines.pop(0)
+    while len(lines) > 0:
+        if l.strip().startswith(info.LITEM):
+            litems.append(litems[-1] + 1)
+        l = lines.pop(0)
+    # Desordenamos los items.
+    if orden == 'aleatorio':
+        resp.add_opcion(Tipo.ALEATORIO)
+        random.shuffle(litems)
+    resp.add_respuesta(litems.index(0))
+    return resp
