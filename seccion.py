@@ -146,7 +146,7 @@ class Seccion:
         for path in self.preguntas:
             puntaje = path[0]
             k = path[2]
-            filelist = Seccion.muestra_preguntas(path[1], k)
+            filelist = Seccion.muestraPreguntas(path[1], k)
             for filename in filelist:
                 texto = '  \\begin{ejer}[%d %s]\n' % (
                         puntaje, 'pts' if puntaje > 1 else 'pt')
@@ -189,7 +189,7 @@ class Seccion:
         for path in self.preguntas:
             puntaje = path[0]
             k = path[2]
-            filelist = Seccion.muestra_preguntas(path[1], k)
+            filelist = Seccion.muestraPreguntas(path[1], k)
             for filename in filelist:
                 resp = pregunta.get_respuesta(filename)
                 resp.set_puntaje(puntaje)
@@ -204,8 +204,15 @@ class Seccion:
         # Nada más que hacer.
         return lresp
 
+    def get_numPreguntas(self) -> int:
+        """ Devuelve el número de preguntas de la sección. """
+        resp: int = 0
+        for cada in self.preguntas:
+            resp += cada[2]
+        return resp
+
     @staticmethod
-    def muestra_preguntas(path: str, muestra: int) -> List[str]:
+    def muestraPreguntas(path: str, muestra: int) -> List[str]:
         """Escoje una muestra de preguntas de una dirección.
 
         La dirección dada puede ser una carpeta o una pregunta.  Si es 

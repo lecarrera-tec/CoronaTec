@@ -198,3 +198,12 @@ class PPP:
             for cada in self.secciones:
                 self.puntaje += cada.get_puntaje()
         return self.puntaje
+
+    def get_numPreguntas(self) -> List[int]:
+        """ 
+        Devuelve el número de preguntas por cada una de las secciones. 
+        """
+        lista: List[int] = []
+        for cada in self.secciones:
+            lista.append(cada.get_numPreguntas())
+        return lista
