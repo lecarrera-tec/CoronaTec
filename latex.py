@@ -1,6 +1,6 @@
 from typing import List
 
-def get_encabezado(examen) -> str:
+def get_encabezadoExamen(examen) -> str:
     """Se genera el encabezado del examen."""
     # Se comienza con el encabezado del archivo LaTeX
     texto: List[str] = [
@@ -38,20 +38,12 @@ def get_encabezado(examen) -> str:
     return ''.join(texto)
 
 
-def pre_latex(nombre : str, examen) -> List[str]:
+def get_inicioExamen(nombre : str, examen) -> List[str]:
     """Líneas previas antes de analizar cada una de las secciones. 
 
     Recibe como argumento el nombre del estudiante para incluirlo en el 
     título.
     """
-    # Vamos a capitalizar el nombre, es decir, la primera letra en
-    # mayúscula y el resto en minúscula.
-    texto: List[str] = nombre.split()
-    lista: List[str] = []
-    for palabra in texto:
-        lista.append(palabra.capitalize())
-    nombre = ' '.join(lista)
-
     texto = []
     # Se agrega el nombre al examen, se comienza el documento y se
     # imprime el puntaje total.
@@ -67,3 +59,33 @@ def pre_latex(nombre : str, examen) -> List[str]:
     texto.append('\n\\begin{center}\n  {\\Large %s}\\\\[1ex]' % examen.titulo)
     texto.append('{\\large %s}\n\\end{center}\n\n' % nombre)
     return texto
+
+def get_encabezadoInforme(numPreguntas: List[int]) -> str:
+    """ Encabezado para el informe de las notas. """
+    texto: List[str] = [
+        '\\documentclass[12pt]{article}\n\n',
+        '\\usepackage[scale=0.9,landscape]{geometry}\n',
+        '\\usepackage[utf8]{inputenc}\n',
+        '\\usepackage[T1]{fontenc}\n',
+        '\\usepackage{nicefrac}\n',
+        '\\usepackage{booktabs}\n\n',
+        '\\begin{document}\n'
+        '\\begin{center}\n'
+        '  \\begin{tabular}{cccc'
+    ]
+    # El encabezado de la tabla. 
+    # Se va a ordenar de manera distinta:
+    #   - # de carnet
+    #   - nombre
+    #   - nota del cuiz
+    #   - número de puntos
+    #   - puntaje por cada pregunta por sección.
+    for cada in numPreguntas:
+        texto.append('|%s' % (cada * 'r'))
+    texto.append('} \\\\ \\toprule \n')
+    texto.append('    ID & Nombre & \\textbf{Nota} & Pts')
+    for cada in numPreguntas:
+        for i in range(1,cada+1):
+            texto.append(' & %d' % i)
+    texto.append(' \\\\ \\midrule \n')
+    return ''.join(texto)

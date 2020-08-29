@@ -3,10 +3,11 @@
 import logging
 import random
 from typing import List
+import sys
 
 import parser
-import info
-from tipo import Tipo
+import Info
+import TPreg
 from respuesta import Respuesta
 
 def get_latex(filename: str) -> str:
@@ -28,11 +29,11 @@ def get_latex(filename: str) -> str:
     texto: str
     while ignorar:
         l: str = lines.pop(0).strip()
-        ignorar = len(l) == 0 or l[0] == info.COMMENT
+        ignorar = len(l) == 0 or l[0] == Info.COMMENT
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
-    assert(l.startswith(info.LTIPO))
-    l = l.strip(info.STRIP)
+    assert(l.startswith(Info.LTIPO))
+    l = l.strip(Info.STRIP)
     tipo: str = parser.derecha_igual(l, 'tipo')
     if tipo == 'respuesta corta':
         opcion: str = parser.derecha_igual(l, 'opcion')
@@ -71,27 +72,27 @@ def latex_unica(lines: List[str], orden: str) -> str:
     ignorar: bool = True
     while ignorar:
         l = lines.pop(0).strip()
-        ignorar = len(l) == 0 or l[0] == info.COMMENT
-    if l == info.VARIABLES:
+        ignorar = len(l) == 0 or l[0] == Info.COMMENT
+    if l == Info.VARIABLES:
         # TODO Tenemos que ver cómo evaluar las variables.
         continuar = True
         while continuar:
             l = lines.pop(0).strip()
-            continuar = l != info.PREGUNTA
+            continuar = l != Info.PREGUNTA
 
     # Deberíamos estar en la pregunta. Hay que buscar si se necesitan
     # variables.
-    assert(l == info.PREGUNTA)
+    assert(l == Info.PREGUNTA)
     l = lines.pop(0)
     texto: List[str] = []
-    while not l.strip().startswith(info.LITEM):
+    while not l.strip().startswith(Info.LITEM):
         # TODO falta revisar si los renglones tienen parámetros.
         texto.append('    %s\n' % l)
         l = lines.pop(0)
     lista.append('%s\n%s' % (''.join(texto).rstrip(), '    \\nopagebreak\n'))
     # Ahora siguen los items.
     texto = []
-    assert(l.strip().startswith(info.LITEM))
+    assert(l.strip().startswith(Info.LITEM))
     # TODO Hay que parsear cada item por si está parametrizado.
     # TODO Hay que leer la opción de indice del item cuando corresponda.
     # Primero se va a crear una lista de los items.
@@ -99,7 +100,7 @@ def latex_unica(lines: List[str], orden: str) -> str:
     item: str = ''
     l = lines.pop(0)
     while len(lines) > 0:
-        if l.strip().startswith(info.LITEM):
+        if l.strip().startswith(Info.LITEM):
             litems.append('%s\n      \\nopagebreak\n' % ''.join(texto).rstrip())
             texto = []
         else:
@@ -111,13 +112,13 @@ def latex_unica(lines: List[str], orden: str) -> str:
     if orden == 'aleatorio':
         random.shuffle(litems)
     # Construimos el latex
-    lista.append('    \\begin{enumerate}%s\n' % info.FORMATO_ITEM)
+    lista.append('    \\begin{enumerate}%s\n' % Info.FORMATO_ITEM)
     for item in litems:
         lista.append('      \\item %s' % item)
     lista.append('    \\end{enumerate}\n')
     return ('%s\n' % ''.join(lista).strip())
 
-def get_respuesta(filename: str):
+def get_respuesta(filename: str) -> Respuesta:
     """Recibe como argumento la dirección de un archivo, y devuelve una
     instancia de un objeto Respuesta.
 
@@ -128,18 +129,18 @@ def get_respuesta(filename: str):
         f = open(filename)
     except:
         logging.error('No se pudo abrir archivo "%s"' % filename) 
-        return ''
+        sys.exit()
 
     lines: List[str] = f.readlines()
     f.close()
     ignorar: bool = True
     while ignorar:
         l: str = lines.pop(0).strip()
-        ignorar = len(l) == 0 or l[0] == info.COMMENT
+        ignorar = len(l) == 0 or l[0] == Info.COMMENT
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
-    assert(l.startswith(info.LTIPO))
-    l = l.strip(info.STRIP)
+    assert(l.startswith(Info.LTIPO))
+    l = l.strip(Info.STRIP)
     tipo: str = parser.derecha_igual(l, 'tipo')
     if tipo == 'respuesta corta':
         opcion: str = parser.derecha_igual(l, 'opcion')
@@ -150,47 +151,48 @@ def get_respuesta(filename: str):
         return respuesta_unica(lines, orden)
 
     logging.critical('Tipo de pregunta desconocido: %s' % l)
-    return None
+    sys.exit()
 
 def respuesta_corta_entera(lines: List[str]):
-    return None
+    assert(False)
+    return Respuesta(TPreg.NINGUNA)
 
 def respuesta_unica(lines: List[str], orden: str):
     logging.debug('Entrando a "respuesta_unica"')
     logging.debug('Orden : %s' % orden)
     logging.debug('Texto : %s', ''.join(lines))
     ignorar: bool = True
-    resp = Respuesta(Tipo.UNICA)
+    resp = Respuesta(TPreg.UNICA)
     while ignorar:
         l = lines.pop(0).strip()
-        ignorar = len(l) == 0 or l[0] == info.COMMENT
-    if l == info.VARIABLES:
+        ignorar = len(l) == 0 or l[0] == Info.COMMENT
+    if l == Info.VARIABLES:
         # TODO Tenemos que ver cómo evaluar las variables.
         continuar = True
         while continuar:
             l = lines.pop(0).strip()
-            continuar = l != info.PREGUNTA
+            continuar = l != Info.PREGUNTA
 
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.
-    assert(l == info.PREGUNTA)
+    assert(l == Info.PREGUNTA)
     l = lines.pop(0)
-    while not l.strip().startswith(info.LITEM):
+    while not l.strip().startswith(Info.LITEM):
         l = lines.pop(0)
     # Ahora siguen los items.
-    assert(l.strip().startswith(info.LITEM))
+    assert(l.strip().startswith(Info.LITEM))
     # TODO Hay que parsear cada item por si está parametrizado.
     # TODO Hay que leer la opción de indice del item cuando corresponda.
     # Se incluyen las opciones.
     litems : List[int] = [0]
     l = lines.pop(0)
     while len(lines) > 0:
-        if l.strip().startswith(info.LITEM):
+        if l.strip().startswith(Info.LITEM):
             litems.append(litems[-1] + 1)
         l = lines.pop(0)
     # Desordenamos los items.
     if orden == 'aleatorio':
-        resp.add_opcion(Tipo.ALEATORIO)
+        resp.add_opcion(TPreg.ALEATORIO)
         random.shuffle(litems)
     resp.add_respuesta(litems.index(0))
     return resp

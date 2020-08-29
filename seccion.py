@@ -3,9 +3,10 @@ import os
 import random
 from typing import List, Tuple
 
-import info
+import Info
 import pregunta
 import parser
+from respuesta import Respuesta
 
 # TODO Revisar errores mientras se leen los archivos, manejar 
 # excepciones e informar al usario utilizando logging.
@@ -18,7 +19,7 @@ class Seccion:
       - instrucciones específicas (si las hubiera)
       - y lo importante, que es la dirección (path) de cada una de las 
         preguntas. Puede ser una carpeta o un archivo tipo 
-        info.EXTENSION.
+        Info.EXTENSION.
     """
     def __init__(self, f, dir_trabajo: str, aleatorio: bool = False):
         """Constructor a partir de archivo y el orden de las preguntas.
@@ -44,32 +45,32 @@ class Seccion:
         l : str
         while ignorar:
             l = f.readline().strip()
-            ignorar = len(l) == 0 or l[0] == info.COMMENT
+            ignorar = len(l) == 0 or l[0] == Info.COMMENT
 
         # Si tenemos un título
-        if l == info.TITULO:
+        if l == Info.TITULO:
             self.titulo: str = f.readline().strip()
             logging.info('<Titulo>: %s' % self.titulo)
             # y nos brincamos los comentarios y espacios en blanco
             ignorar = True
             while ignorar:
                 l = f.readline().strip()
-                ignorar = len(l) == 0 or l[0] == info.COMMENT
+                ignorar = len(l) == 0 or l[0] == Info.COMMENT
         else:
             self.titulo = ''
 
         # Tenemos instrucciones.
         lista: List[str] = []
-        if l == info.INSTRUCCIONES:
+        if l == Info.INSTRUCCIONES:
             l = f.readline()
-            while l.find(info.ABRIR) == -1:
+            while l.find(Info.ABRIR) == -1:
                 lista.append(l)
                 l = f.readline()
             self.instrucciones = '%s\n' % ''.join(lista)
 
         # Deberían de seguir las direcciones a los archivos de las 
         # preguntas.
-        assert(l.strip().startswith(info.PREGUNTAS))
+        assert(l.strip().startswith(Info.PREGUNTAS))
         # Vamos a guardar una lista de tuplas, donde el primer 
         # elemento es el puntaje, y el segundo la dirección.
         self.preguntas: List[Tuple[int, str, int]] = []
@@ -84,7 +85,7 @@ class Seccion:
             if len(l) == 0:
                 break
             # Si es un comentario, continuamos con la siguiente línea.
-            if l[0] == info.COMMENT:
+            if l[0] == Info.COMMENT:
                 continue
             # Buscamos los puntos de la pregunta, el tamaño de la 
             # muestra y el origen de la pregunta.
@@ -173,7 +174,7 @@ class Seccion:
         return '%s%s%s\n\n' % (self.instrucciones, texto, 
                                ''.join(lista).strip())
 
-    def get_respuestas(self):
+    def get_respuestas(self) -> List[Respuesta]:
         """
         Genera una lista de intancias del objeto Respuesta, 
         correspondiente a las preguntas de la sección.
@@ -181,7 +182,7 @@ class Seccion:
         logging.debug('Entrando a Seccion.get_respuestas ...')
         # Se genera la lista de instancias del objeto Respuesta. Si se 
         # requiere que sean aleatorias, se reordenan.
-        lresp = []
+        lresp: List[Respuesta] = []
         # Vamos agregando la instancia de cada pregunta de la sección.
         puntaje: int
         filelist: List[str]
@@ -221,10 +222,10 @@ class Seccion:
         manera aleatoria el número de archivos indicados.
 
         La extensión del archivo de tipo pregunta está definida en 
-        info.EXTENSION.
+        Info.EXTENSION.
         """
         # Es un archivo.
-        if path.endswith(info.EXTENSION):
+        if path.endswith(Info.EXTENSION):
             if (muestra > 1):
                 logging.error('No es una carpeta. Sólo se agrega una pregunta.')
             return [path]
@@ -236,7 +237,7 @@ class Seccion:
         # la dirección es una carpeta.
         lista: List[str] = []
         for me in os.listdir(path):
-            if me.endswith(info.EXTENSION):
+            if me.endswith(Info.EXTENSION):
                 lista.append('%s%s' % (path, me))
 
         if muestra > len(lista):

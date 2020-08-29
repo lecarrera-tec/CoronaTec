@@ -9,9 +9,9 @@ import logging
 from ppp import PPP
 from seccion import Seccion
 import latex
-import info
+import Info
 
-logging.basicConfig(filename='_generar.log', level=logging.INFO, filemode='w')
+logging.basicConfig(filename='_generar.log', level=logging.DEBUG, filemode='w')
 
 # Si no se tienen la cantidad de argumentos correcta, se sale.
 if len(sys.argv) < 3 or len(sys.argv) > 4:
@@ -22,15 +22,15 @@ if len(sys.argv) < 3 or len(sys.argv) > 4:
     sys.exit()
 
 # Índice de repetición del examen. Por default es 0.
-ind_repeticion: int = 0
+indRepeticion: int = 0
 if len(sys.argv) == 4:
-    ind_repeticion = int(sys.argv[3])
-    assert(ind_repeticion < len(info.BY_SHIFT))
+    indRepeticion = int(sys.argv[3])
+    assert(indRepeticion < len(Info.BY_SHIFT))
 
 # Se lee el archivo de la estructura general del examen
 # y se genera (casi todo) el encabezado.
 examen = PPP(sys.argv[1])
-encabezado: str = latex.get_encabezado(examen)
+encabezado: str = latex.get_encabezadoExamen(examen)
 
 # Vamos a guardar una lista de cada archivo .csv que existe, porque
 # suponemos que cada archivo es la lista de un grupo.
@@ -88,14 +88,17 @@ for path in lestudiantes:
         # ##-id-##, <apellidos/nombres>, xxxxx
         separar = linea.split(',')
         idstr = separar[0].strip()
-        nombre = separar[1].strip()
+        nombre = ' '.join([palabra.capitalize() 
+                             for palabra in separar[1].strip().split()])
     
         # Se inicializa la semilla usando el identificador multiplicado por
         # una constante, según el índice de repetición dado.
-        random.seed(info.BY_SHIFT[ind_repeticion] * int(idstr))
+        seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
+        logging.debug('random.seed: %d' % seed)
+        random.seed(seed)
     
         # Se comienza a generar el archivo.
-        tex: List[str] = latex.pre_latex(nombre, examen)
+        tex: List[str] = latex.get_inicioExamen(nombre, examen)
         tex.append('\\noindent\\rule{\\textwidth}{1pt}\\\\[1ex]\n')
         tex.append('\\noindent \\textbf{Instrucciones: }')
         tex.append('%s\\\\\\rule{\\textwidth}{1pt}\n\n' % examen.instrucciones)

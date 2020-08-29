@@ -3,7 +3,7 @@ import logging
 import sys
 
 from seccion import Seccion
-import info
+import Info
 import parser
 import latex
 
@@ -69,8 +69,8 @@ class PPP:
         ignorar: bool = True
         while ignorar:
             l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == info.COMMENT 
-        assert(l == info.ESCUELAS)
+            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
+        assert(l == Info.ESCUELAS)
         # Agregamos todas las líneas que no comiencen con comentario
         # hasta llegar a una línea en blanco.
         self.escuelas: List[str] = []
@@ -78,7 +78,7 @@ class PPP:
             l = finp.readline().strip()
             if len(l) == 0:
                 break
-            if l.startswith(info.COMMENT):
+            if l.startswith(Info.COMMENT):
                 continue
             self.escuelas.append(l)
         logging.info('<Escuelas>: %s' % ', '.join(self.escuelas))
@@ -87,8 +87,8 @@ class PPP:
         ignorar = True
         while ignorar:
             l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == info.COMMENT 
-        assert(l == info.SEMESTRE)
+            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
+        assert(l == Info.SEMESTRE)
 
         # Guardamos el texto del semestre.
         self.semestre = finp.readline().strip()
@@ -98,20 +98,20 @@ class PPP:
         ignorar = True
         while ignorar:
             l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == info.COMMENT 
-        assert(l == info.TIEMPO)
+            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
+        assert(l == Info.TIEMPO)
 
         # Guardamos el texto del tiempo.
         self.tiempo = finp.readline().strip()
-        logging.info('%s: %s' % (info.TIEMPO, self.semestre))
+        logging.info('%s: %s' % (Info.TIEMPO, self.semestre))
 
         # Ahora sigue el nombre de los cursos. Buscamos primero la 
         # etiqueta.
         ignorar = True
         while ignorar:
             l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == info.COMMENT 
-        assert(l == info.CURSOS)
+            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
+        assert(l == Info.CURSOS)
         # Agregamos todas las líneas que no comiencen con comentario
         # hasta llegar a una línea en blanco.
         self.cursos: List[str] = []
@@ -119,7 +119,7 @@ class PPP:
             l = finp.readline().strip()
             if len(l) == 0:
                 break
-            if l.startswith(info.COMMENT):
+            if l.startswith(Info.COMMENT):
                 continue
             self.cursos.append(l)
         logging.info('<Cursos>: %s' % ', '.join(self.cursos))
@@ -129,8 +129,8 @@ class PPP:
         ignorar = True
         while ignorar:
             l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == info.COMMENT 
-        assert(l == info.TITULO)
+            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
+        assert(l == Info.TITULO)
 
         # Guardamos el texto del titulo.
         self.titulo = finp.readline().strip()
@@ -140,16 +140,16 @@ class PPP:
         ignorar = True
         while ignorar:
             l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == info.COMMENT
+            ignorar = len(l) == 0 or l[0] == Info.COMMENT
         
         # Ahora revisamos si existe encabezado para LaTeX. Si no 
         # hubiera encabezado, observe que entonces la variable 
         # estaría en blanco.
         lista: List[str] = []
         continuar : bool
-        if l == info.ENCABEZADO:
+        if l == Info.ENCABEZADO:
             l = finp.readline()
-            while l.find(info.ABRIR) == -1:
+            while l.find(Info.ABRIR) == -1:
                 lista.append(l)
                 l = finp.readline()
             logging.info('<Encabezado>')
@@ -162,9 +162,9 @@ class PPP:
         # líneas de texto. Si no hubiera instrucciones, observe que
         # entonces la variable estaría en blanco.
         lista = []
-        if l.strip() == info.INSTRUCCIONES:
+        if l.strip() == Info.INSTRUCCIONES:
             l = finp.readline()
-            while l.find(info.ABRIR) == -1:
+            while l.find(Info.ABRIR) == -1:
                 lista.append(l)
                 l = finp.readline()
             logging.info('<Instrucciones>')
@@ -176,12 +176,12 @@ class PPP:
         # No queda de otra. Tienen que seguir las secciones. Una lista 
         # de instancias de la clase Seccion.
         l = l.strip()
-        assert(l.startswith(info.LSECCION))
+        assert(l.startswith(Info.LSECCION))
         counter = 0
         self.secciones = [];
         es_aleatorio: bool = False
-        while l.startswith(info.LSECCION):
-            l = l.strip(info.STRIP)
+        while l.startswith(Info.LSECCION):
+            l = l.strip(Info.STRIP)
             counter += 1
             logging.info('%d : Llamando a seccion ...' % counter)
             es_aleatorio = parser.derecha_igual(l, 'orden') == 'aleatorio'

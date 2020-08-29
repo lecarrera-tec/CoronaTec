@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 import logging
+import math
 import os
 import random
 import sys
-from typing import List
+from typing import List, Dict
 
-import info
+import Info
+import latex
 from ppp import PPP
+from respuesta import Respuesta
 from seccion import Seccion
 
 """
@@ -67,10 +70,10 @@ if len(sys.argv) < 4 or len(sys.argv) > 5:
 #-----------------------------------------------------------------------
 # B. Índice de repetición. 0 es el valor predeterminado.
 #-----------------------------------------------------------------------
-ind_repeticion: int = 0
+indRepeticion: int = 0
 if len(sys.argv) == 5:
-    ind_repeticion = int(sys.argv[4])
-    assert(ind_repeticion < len(info.BY_SHIFT))
+    indRepeticion = int(sys.argv[4])
+    assert(indRepeticion < len(Info.BY_SHIFT))
 
 #-----------------------------------------------------------------------
 # C. Estructura general del examen.
@@ -85,10 +88,13 @@ try:
     fresp = open(sys.argv[3])
 except:
     logging.critical('No se pudo abrir el archivo con las respuestas.')
+    sys.exit()
 
 # Separamos el archivo línea por línea, y lo cerramos.
 lineas: List[str] = fresp.readlines()
 fresp.close()
+
+totalPts: int = examen.get_puntaje()
 
 # Se elimina la primera línea, que es la información de las columnas
 # del archivo.
@@ -96,7 +102,7 @@ lineas.pop(0)
 texto: str
 cols: List[str]
 # Diccionario!!!
-todxs = {}
+todxs: Dict[int, List[str]] = {}
 for fila in lineas:
     # Eliminamos el final de línea y las comillas que pone Google por 
     # default.
@@ -106,11 +112,14 @@ for fila in lineas:
     # Dada una fila, separamos los elementos de cada columna.
     cols = texto.split(',')
     # Agregamos la llave y le asignamos las respuestas. Tiene la 
-    # característica que si aparece el mismo carnet, toma como 
-    # respuesta la versión más reciente, ya que google da las
-    # respuestas ordenadas por fecha.
+    # característica que si aparece el mismo carnet, toma como respuesta 
+    # la versión más reciente, ya que google da las respuestas ordenadas 
+    # por fecha.
     # Ignoramos el primer elemento (cols[0]) porque se refiere a la 
     # fecha y hora de envío de la prueba.
+    # TODO Especificar hora de finalización, para que cualquier 
+    # evalluación registrada después de dicha hora, se informe de
+    # alguna manera.
     todxs[int(cols[1])] = cols[2:]
 
 #-----------------------------------------------------------------------
@@ -143,9 +152,13 @@ else:
 carpeta: str    # Carpeta donde se guardan los informes y la nota.
 filename: str 
 lista: List[str]
-linea : str    # Un estudiante de la lista.
-idstr : str    # String del identificador del estudiante (# de carnet).
-separar : List[str]   # Separar info del estudiante.
+linea: str    # Un estudiante de la lista.
+idstr: str    # String del identificador del estudiante (# de carnet).
+separar: List[str]   # Separar info del estudiante.
+#@ Para construir el informe en latex. El encabezado es el mismo para
+#@ todos los grupos.
+numPreguntas: List[int] = examen.get_numPreguntas()
+encabezado: str = latex.get_encabezadoInforme(numPreguntas)
 for path in lestudiantes:
     logging.debug('PATH = %s\n' % path)
     # Carpeta donde se van a guardar los pdf's de los exámenes.
@@ -167,24 +180,32 @@ for path in lestudiantes:
     finput.close()
     
     # Ahora se trabaja con cada estudiante de la Lista.
+    llatex: List[str] = []
     for linea in Lista:
         logging.debug('Nueva respuesta.')
-        respuestas = []
+        respuestas: List[Respuesta] = []
         # Separamos el número de identificación del resto del nombre.
         # ##-id-##, <apellidos/nombres>, xxxxx
         separar = linea.split(',')
         idstr = separar[0].strip()
-        nombre = separar[1].strip()
+        nombre = ' '.join([palabra.capitalize() 
+                             for palabra in separar[1].strip().split()])
+        #@
+        izq: str = '    %s & %s' % (idstr, nombre)
+        der: List[str] = []
 
         # Localizo las respuestas del estudiante, y continúo si no está.
-        mias = todxs.get(int(idstr))
-        if mias == None:
-            # TODO Llenar la información en el archivo de notas.
+        mias: List[str] = todxs.get(int(idstr), [])
+        if len(mias) == 0:
+            llatex.append('%s 0 & 0%s \\\\\n' 
+                             % (izq, sum(numPreguntas) * ' & --'))
             continue
     
         # Se inicializa la semilla usando el identificador multiplicado 
         # por una constante, según el índice de repetición dado.
-        random.seed(info.BY_SHIFT[ind_repeticion] * int(idstr))
+        seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
+        logging.debug('random.seed: %d' % seed)
+        random.seed(seed)
     
         # Se comienzan a agregar las instancias de los objetos de tipo
         # Respuesta.
@@ -193,28 +214,35 @@ for path in lestudiantes:
 
         # Ahora probamos a calificar.
         assert(len(respuestas) == len(mias))
-        total: int = 0
+        total: float = 0.0
         for elem in mias:
             pts = respuestas.pop(0).calificar(elem.strip())
-            total += pts
-        print('Total de puntos = %d' % total)
+            if isinstance(pts[0], int) or pts[0].is_integer():
+                tempStr = '%d' % pts[0]
+            else:
+                tempStr = '%.2f' % 0.01 * math.floor(100 * pts[0])
+            der.append(' & $\\nicefrac{%s}{%d}$' % (tempStr, pts[1]))
+            total += pts[0]
+        llatex.append('%s & \\textbf{%.2f} & %d %s \\\\\n'
+                % (izq, 0.01 * math.ceil(1e4 * total / totalPts), 
+                    total, ''.join(der)))
+    llatex.append('    \\bottomrule\n')
+    llatex.append('  \\end{tabular}\n')
+    llatex.append('\\end{center}\n')
+    llatex.append('\\end{document}\n')
+    fout = open('%s.tex' % filename, 'w')
+    fout.write(encabezado)
+    fout.writelines(llatex)
+    fout.close()
     
-##    # Se imprimen las notas de los estudiantes.
-##    filename = idstr[-6:]
-##    fout = open('%s.tex' % filename, 'w')
-##    fout.write(encabezado)
-##    fout.writelines(tex)
-##    fout.close();
-##
-##    # Se genera el pdf.
-##    os.system('pdflatex %s' % filename)
-##    os.system('pdflatex %s' % filename)
-##    logging.debug('Fin de examen\n')
-##
-##    # Se mueve el pdf a la carpeta respectiva, y se eliminan el 
-##    # resto de los archivos.
-##    os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
-##    lista = os.listdir('./')
-##    for fname in lista:
-##        if fname.startswith(filename):
-##            os.remove(fname)
+    # Se genera el pdf.
+    os.system('pdflatex %s' % filename)
+    logging.debug('Fin de examen\n')
+
+    # Se mueve el pdf a la carpeta respectiva, y se eliminan el 
+    # resto de los archivos.
+    os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
+    lista = os.listdir('./')
+    for fname in lista:
+        if fname.startswith(filename):
+            os.remove(fname)
