@@ -16,7 +16,7 @@ def get_encabezadoExamen(examen) -> str:
         '\\pagestyle{fancy}\n',
         '\\fancyhf{}\n',
         '\\lhead{Tecnol\\\'ogico de Costa Rica}\n',
-        '\\rhead{P\'agina \\thepage~de \\pageref{LastPage}}\n',
+        '\\rhead{P\\\'agina \\thepage~de \\pageref{LastPage}}\n',
 
         '\\usepackage{amsmath,amsthm,amssymb}\n',
         '\\theoremstyle{definition}\n',

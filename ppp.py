@@ -4,7 +4,7 @@ import sys
 
 from seccion import Seccion
 import Info
-import parser
+import parserPPP
 import latex
 
 class PPP:
@@ -184,7 +184,7 @@ class PPP:
             l = l.strip(Info.STRIP)
             counter += 1
             logging.info('%d : Llamando a seccion ...' % counter)
-            es_aleatorio = parser.derecha_igual(l, 'orden') == 'aleatorio'
+            es_aleatorio = parserPPP.derecha_igual(l, 'orden') == 'aleatorio'
             self.secciones.append(
                     Seccion(finp, self.dir_trabajo, es_aleatorio))
             l = finp.readline().strip()

@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 import Info
 import pregunta
-import parser
+import parserPPP
 from respuesta import Respuesta
 
 # TODO Revisar errores mientras se leen los archivos, manejar 
@@ -90,7 +90,7 @@ class Seccion:
             # Buscamos los puntos de la pregunta, el tama\~no de la 
             # muestra y el origen de la pregunta.
             puntos = 1
-            texto = parser.derecha_igual(l, 'puntaje')
+            texto = parserPPP.derecha_igual(l, 'puntaje')
             if len(texto) > 0:
                 try:
                     puntos = int(texto)
@@ -102,7 +102,7 @@ class Seccion:
                     logging.warning(texto)
             # Buscamos si define el tama\~no de la muestra.
             muestra = 1
-            texto = parser.derecha_igual(l, 'muestra')
+            texto = parserPPP.derecha_igual(l, 'muestra')
             if len(texto) > 0:
                 try:
                     muestra = int(texto)
@@ -113,7 +113,7 @@ class Seccion:
                             'Por defecto queda de tama\~no 1')
                     logging.warning(texto)
             # Ahora seguimos con el origen de la pregunta.
-            texto = parser.derecha_igual(l, 'origen')
+            texto = parserPPP.derecha_igual(l, 'origen')
             if len(texto) == 0:
                 texto = '%s "%s".\n%s' % (
                         'No se pudo leer origen de pregunta en', l, 

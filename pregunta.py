@@ -5,7 +5,7 @@ import random
 from typing import List
 import sys
 
-import parser
+import parserPPP
 import Info
 import TPreg
 from respuesta import Respuesta
@@ -34,13 +34,13 @@ def get_latex(filename: str) -> str:
     # Debe comenzar con el tipo de la pregunta. Leemos cu\'al es.
     assert(l.startswith(Info.LTIPO))
     l = l.strip(Info.STRIP)
-    tipo: str = parser.derecha_igual(l, 'tipo')
+    tipo: str = parserPPP.derecha_igual(l, 'tipo')
     if tipo == 'respuesta corta':
-        opcion: str = parser.derecha_igual(l, 'opcion')
+        opcion: str = parserPPP.derecha_igual(l, 'opcion')
         if opcion == '' or opcion == 'entero':
             texto = latex_corta_entera(lines)
     elif tipo == 'seleccion unica':
-        orden: str = parser.derecha_igual(l, 'orden')
+        orden: str = parserPPP.derecha_igual(l, 'orden')
         texto = latex_unica(lines, orden)
 
     # Queda a\'un algo muy importante por hacer, y es modificar el path de 
@@ -140,13 +140,13 @@ def get_respuesta(filename: str) -> Respuesta:
     # Debe comenzar con el tipo de la pregunta. Leemos cu\'al es.
     assert(l.startswith(Info.LTIPO))
     l = l.strip(Info.STRIP)
-    tipo: str = parser.derecha_igual(l, 'tipo')
+    tipo: str = parserPPP.derecha_igual(l, 'tipo')
     if tipo == 'respuesta corta':
-        opcion: str = parser.derecha_igual(l, 'opcion')
+        opcion: str = parserPPP.derecha_igual(l, 'opcion')
         if opcion == '' or opcion == 'entero':
             return respuesta_corta_entera(lines)
     elif tipo == 'seleccion unica':
-        orden: str = parser.derecha_igual(l, 'orden')
+        orden: str = parserPPP.derecha_igual(l, 'orden')
         return respuesta_unica(lines, orden)
 
     logging.critical('Tipo de pregunta desconocido: %s' % l)
