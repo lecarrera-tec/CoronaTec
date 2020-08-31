@@ -5,7 +5,7 @@ import TPreg
 
 class Respuesta:
     """
-    Clase que almacena la información necesaria para evaluar las
+    Clase que almacena la informaci\'on necesaria para evaluar las
     respuestas.
     """
     def __init__(self, tipo_preg: int) -> None:
@@ -23,7 +23,7 @@ class Respuesta:
 
     def add_opcion(self, opcion: int) -> None:
         """ Agrega una opcion a la pregunta. """
-        # Verificamos que la opción agregada sea apropiada según el
+        # Verificamos que la opci\'on agregada sea apropiada seg\'un el
         # tipo de pregunta.
         if self.tipo_preg == TPreg.UNICA:
             assert(opcion & (TPreg.ALEATORIO + TPreg.CRECIENTE 
@@ -32,9 +32,9 @@ class Respuesta:
             assert(opcion & (TPreg.ENTERO + TPreg.FLOTANTE))
         else:
             assert(False)
-        # TPreg se define como *intFlag*, así que las opciones se pueden
+        # TPreg se define como *intFlag*, as\'i que las opciones se pueden
         # `sumar`. Con el operador binario `&` se puede extraer si la
-        # opción está definida o no.
+        # opci\'on est\'a definida o no.
         self.tipo_preg += opcion
 
     def add_respuesta(self, resp: Any) -> None:
@@ -60,7 +60,7 @@ class Respuesta:
         elif self.tipo_preg & TPreg.UNICA:
             logging.debug('  Tipo -> UNICA')
             if len(self.respuestas) > 1:
-                logging.error('  Más de una respuesta correcta en selección única.')
+                logging.error('  M\'as de una respuesta correcta en selecci\'on \'unica.')
             for opcion in self.respuestas:
                 # Lo que hacemos es que, con que acierte una, le damos
                 # los puntos de la pregunta.

@@ -17,11 +17,11 @@ logging.basicConfig(filename='_generar.log', level=logging.DEBUG, filemode='w')
 if len(sys.argv) < 3 or len(sys.argv) > 4:
     print('%s%s%s' % (
             'Se espera como argumentos el archivo ppp y la carpeta con las ',
-            'listas de los estudiantes.,\n y de manera opcional el índice',
-            'de repetición del examen'))
+            'listas de los estudiantes.,\n y de manera opcional el \'indice',
+            'de repetici\'on del examen'))
     sys.exit()
 
-# Índice de repetición del examen. Por default es 0.
+# \'Indice de repetici\'on del examen. Por default es 0.
 indRepeticion: int = 0
 if len(sys.argv) == 4:
     indRepeticion = int(sys.argv[3])
@@ -63,7 +63,7 @@ linea : str    # Un estudiante de la lista.
 idstr : str    # String del identificador del estudiante (# de carnet).
 separar : List[str]   # Separar info del estudiante.
 for path in lestudiantes:
-    # Carpeta donde se van a guardar los pdf's de los exámenes.
+    # Carpeta donde se van a guardar los pdf's de los ex\'amenes.
     lista = path.rsplit(sep='/', maxsplit=1)
     filename = lista[1].rsplit(sep='.', maxsplit=1)[0]
     carpeta = '%s/%s' % (lista[0], filename.upper())
@@ -84,7 +84,7 @@ for path in lestudiantes:
     # Ahora se trabaja con cada estudiante de la Lista.
     for linea in Lista:
         logging.debug('Nuevo examen.')
-        # Separamos el número de identificación del resto del nombre.
+        # Separamos el n\'umero de identificaci\'on del resto del nombre.
         # ##-id-##, <apellidos/nombres>, xxxxx
         separar = linea.split(',')
         idstr = separar[0].strip()
@@ -92,7 +92,7 @@ for path in lestudiantes:
                              for palabra in separar[1].strip().split()])
     
         # Se inicializa la semilla usando el identificador multiplicado por
-        # una constante, según el índice de repetición dado.
+        # una constante, seg\'un el \'indice de repetici\'on dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
         logging.debug('random.seed: %d' % seed)
         random.seed(seed)
@@ -103,18 +103,20 @@ for path in lestudiantes:
         tex.append('\\noindent \\textbf{Instrucciones: }')
         tex.append('%s\\\\\\rule{\\textwidth}{1pt}\n\n' % examen.instrucciones)
     
-        # Si es sólo una sección y no tiene título, entonces no agregamos
-        # la etiqueta de sección en LaTeX. En caso contrario, se agrega
+        # Si es s\'olo una secci\'on y no tiene t\'itulo, entonces no agregamos
+        # la etiqueta de secci\'on en LaTeX. En caso contrario, se agrega
         # la etiqueta para cada una de las secciones, aunque no tengan 
-        # título.
+        # t\'itulo.
         seccion = examen.secciones[0]
         logging.debug('Se tienen %d secciones en total' % len(examen.secciones))
         if len(examen.secciones) > 1 or len(seccion.titulo) > 0:
+            tex.append('  \\newpage\n')
             tex.append('  \\section{%s}\n\n' % seccion.titulo)
             tex.append(seccion.get_latex())
     
         # Ahora se trabaja con el resto de las secciones
         for seccion in examen.secciones[1:]:
+            tex.append('  \\newpage\n')
             tex.append('  \\section{%s}\n\n' % seccion.titulo)
             tex.append(seccion.get_latex())
     

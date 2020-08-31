@@ -5,7 +5,7 @@ def get_encabezadoExamen(examen) -> str:
     # Se comienza con el encabezado del archivo LaTeX
     texto: List[str] = [
         '\\documentclass[12pt]{article}\n\n',
-        '\\usepackage[scale=0.85,top=1in]{geometry}\n',
+        '\\usepackage[scale=0.85,top=1in,papersize={8.5in,15in}]{geometry}\n',
         '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
         '\\usepackage{paralist}\n',
@@ -15,8 +15,8 @@ def get_encabezadoExamen(examen) -> str:
         '\\usepackage{fancyhdr}\n',
         '\\pagestyle{fancy}\n',
         '\\fancyhf{}\n',
-        '\\lhead{Tecnológico de Costa Rica}\n',
-        '\\rhead{Página \\thepage~de \\pageref{LastPage}}\n',
+        '\\lhead{Tecnol\\\'ogico de Costa Rica}\n',
+        '\\rhead{P\'agina \\thepage~de \\pageref{LastPage}}\n',
 
         '\\usepackage{amsmath,amsthm,amssymb}\n',
         '\\theoremstyle{definition}\n',
@@ -24,14 +24,14 @@ def get_encabezadoExamen(examen) -> str:
     
     # Se define el estilo de la pregunta, dependiendo si hay solo una o
     # varias secciones. Si son varias secciones, entonces para cada
-    # sección se tiene una enumeración nueva.
+    # secci\'on se tiene una enumeraci\'on nueva.
     if len(examen.secciones) > 1:
         texto.append('\\newtheorem{ejer}{}[section]\n\n')
     else:
         texto.append('\\newtheorem{ejer}{}\n\n')
     
     # Se agrega el encabezado dado por el usuario, el nombre del curso 
-    # al título de la prueba, y el título de la prueba como autor. Aquí 
+    # al t\'itulo de la prueba, y el t\'itulo de la prueba como autor. Aqu\'i 
     # acaba el encabezado, porque cada examen es a partir de ahora 
     # distinto.
     texto.append(examen.encabezado)
@@ -39,16 +39,16 @@ def get_encabezadoExamen(examen) -> str:
 
 
 def get_inicioExamen(nombre : str, examen) -> List[str]:
-    """Líneas previas antes de analizar cada una de las secciones. 
+    """L\'ineas previas antes de analizar cada una de las secciones. 
 
     Recibe como argumento el nombre del estudiante para incluirlo en el 
-    título.
+    t\'itulo.
     """
     texto = []
     # Se agrega el nombre al examen, se comienza el documento y se
     # imprime el puntaje total.
     texto.append('\\begin{document}\n\n')
-    texto.append('\\noindent \\textsc{Tecnológico de Costa Rica} \hfill \\textsc{%s}\\\\\n' % examen.semestre)
+    texto.append('\\noindent \\textsc{Tecnol\\\'ogico de Costa Rica} \hfill \\textsc{%s}\\\\\n' % examen.semestre)
     texto.append('\\textsc{%s} \hfill \\textsc{Tiempo: %s}\\\\\n' % (examen.cursos[0], examen.tiempo))
     for temp in examen.cursos[1:]:
         texto.append('\\textsc{%s}}\\\\[1ex]\n' % temp)
@@ -78,8 +78,8 @@ def get_encabezadoInforme(numPreguntas: List[int]) -> str:
     #   - # de carnet
     #   - nombre
     #   - nota del cuiz
-    #   - número de puntos
-    #   - puntaje por cada pregunta por sección.
+    #   - n\'umero de puntos
+    #   - puntaje por cada pregunta por secci\'on.
     for cada in numPreguntas:
         texto.append('|%s' % (cada * 'r'))
     texto.append('} \\\\ \\toprule \n')

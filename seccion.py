@@ -12,27 +12,27 @@ from respuesta import Respuesta
 # excepciones e informar al usario utilizando logging.
 
 class Seccion:
-    """Parseado de sección de pruebas de preguntas parametrizadas.
+    """Parseado de secci\'on de pruebas de preguntas parametrizadas.
 
     Guarda:
-      - el título de la sección
-      - instrucciones específicas (si las hubiera)
-      - y lo importante, que es la dirección (path) de cada una de las 
+      - el t\'itulo de la secci\'on
+      - instrucciones espec\'ificas (si las hubiera)
+      - y lo importante, que es la direcci\'on (path) de cada una de las 
         preguntas. Puede ser una carpeta o un archivo tipo 
         Info.EXTENSION.
     """
     def __init__(self, f, dir_trabajo: str, aleatorio: bool = False):
         """Constructor a partir de archivo y el orden de las preguntas.
 
-        Se supone que la última línea que se leyó del archivo es 
-        justamente la etiqueta para la sección, y por eso estamos acá.
+        Se supone que la \'ultima l\'inea que se ley\'o del archivo es 
+        justamente la etiqueta para la secci\'on, y por eso estamos ac\'a.
 
-        Aquí se definen:
-          - titulo: titulo de la sección, si tiene.
+        Aqu\'i se definen:
+          - titulo: titulo de la secci\'on, si tiene.
           - instrucciones: si son dadas por el usuario.
-          - puntaje: puntaje total de la sección
+          - puntaje: puntaje total de la secci\'on
           - preguntas: tuplas [int, str, int], formadas por el puntaje,
-                       el origen y el tamaño de la muestra de la 
+                       el origen y el tama\~no de la muestra de la 
                        pregunta.
           - aleatorias: Si el orden de las preguntas debe ser aleatorio 
                         o no.
@@ -47,7 +47,7 @@ class Seccion:
             l = f.readline().strip()
             ignorar = len(l) == 0 or l[0] == Info.COMMENT
 
-        # Si tenemos un título
+        # Si tenemos un t\'itulo
         if l == Info.TITULO:
             self.titulo: str = f.readline().strip()
             logging.info('<Titulo>: %s' % self.titulo)
@@ -68,26 +68,26 @@ class Seccion:
                 l = f.readline()
             self.instrucciones = '%s\n' % ''.join(lista)
 
-        # Deberían de seguir las direcciones a los archivos de las 
+        # Deber\'ian de seguir las direcciones a los archivos de las 
         # preguntas.
         assert(l.strip().startswith(Info.PREGUNTAS))
         # Vamos a guardar una lista de tuplas, donde el primer 
-        # elemento es el puntaje, y el segundo la dirección.
+        # elemento es el puntaje, y el segundo la direcci\'on.
         self.preguntas: List[Tuple[int, str, int]] = []
-        # Guardamos cada línea, hasta que encontremos la primera 
-        # línea en blanco: esto señala el final de la sección.
+        # Guardamos cada l\'inea, hasta que encontremos la primera 
+        # l\'inea en blanco: esto se\~nala el final de la secci\'on.
         texto: str
         puntos: int
         muestra: int
         while True:
             l = f.readline().strip()
-            # Línea en blanco, terminamos.
+            # L\'inea en blanco, terminamos.
             if len(l) == 0:
                 break
-            # Si es un comentario, continuamos con la siguiente línea.
+            # Si es un comentario, continuamos con la siguiente l\'inea.
             if l[0] == Info.COMMENT:
                 continue
-            # Buscamos los puntos de la pregunta, el tamaño de la 
+            # Buscamos los puntos de la pregunta, el tama\~no de la 
             # muestra y el origen de la pregunta.
             puntos = 1
             texto = parser.derecha_igual(l, 'puntaje')
@@ -100,7 +100,7 @@ class Seccion:
                             'No se pudo leer puntaje en', l, 
                             'Por defecto queda en 1 pt')
                     logging.warning(texto)
-            # Buscamos si define el tamaño de la muestra.
+            # Buscamos si define el tama\~no de la muestra.
             muestra = 1
             texto = parser.derecha_igual(l, 'muestra')
             if len(texto) > 0:
@@ -109,8 +109,8 @@ class Seccion:
                 except:
                     muestra = 1
                     texto = '%s "%s".\n%s' % (
-                            'No se pudo leer tamaño de la muestra en', l, 
-                            'Por defecto queda de tamaño 1')
+                            'No se pudo leer tama\~no de la muestra en', l, 
+                            'Por defecto queda de tama\~no 1')
                     logging.warning(texto)
             # Ahora seguimos con el origen de la pregunta.
             texto = parser.derecha_igual(l, 'origen')
@@ -125,24 +125,24 @@ class Seccion:
             logging.info('Se agrega pregunta: %s' % str(self.preguntas[-1]))
 
     def get_puntaje(self) -> int:
-        """Devuelve el puntaje total de la sección."""
+        """Devuelve el puntaje total de la secci\'on."""
         if self.puntaje == 0:
             for preg in self.preguntas:
                 self.puntaje += preg[0]
         return self.puntaje
 
     def get_latex(self) -> str:
-        """Genera el código LaTeX de la sección."""
+        """Genera el c\'odigo LaTeX de la secci\'on."""
         logging.debug('Entrando a Seccion.get_latex ...')
         # Primero vamos a generar una lista de preguntas completas. Si 
         # se requiere que sean aleatorias, se construyen, se reordenan, 
         # se unen, y al final se agregan a la parte inicial de la 
-        # sección.
+        # secci\'on.
         lista: List[str] = []
-        # Vamos agregando el texto de cada pregunta de la sección.
+        # Vamos agregando el texto de cada pregunta de la secci\'on.
         puntaje: int
         filelist: List[str]
-        k: int   # Tamaño de la muestra.
+        k: int   # Tama\~no de la muestra.
         texto: str
         for path in self.preguntas:
             puntaje = path[0]
@@ -154,7 +154,8 @@ class Seccion:
                 lista.append('%s%s%s' % (
                     texto, 
                     pregunta.get_latex(filename),
-                    '\\end{ejer}\n\\bigskip\n\\pagebreak[2]\n'
+                    #'\\end{ejer}\n\\bigskip\n\\pagebreak[3]\n'
+                    '\\end{ejer}\n\\newpage\n\n'
                 ))
 
         # Si las preguntas se requieren en orden aleatorio, entonces
@@ -167,7 +168,7 @@ class Seccion:
         texto = '%s%d%s' % (
                 '  \\noindent\\textbf{Puntaje:} ', 
                 self.get_puntaje(),
-                'pts\n\\nopagebreak\n'
+                ' pts\n\\nopagebreak\n'
         )
         # Concatenamos las instrucciones, el puntaje y colocamos al 
         # final todas las preguntas.
@@ -177,16 +178,16 @@ class Seccion:
     def get_respuestas(self) -> List[Respuesta]:
         """
         Genera una lista de intancias del objeto Respuesta, 
-        correspondiente a las preguntas de la sección.
+        correspondiente a las preguntas de la secci\'on.
         """
         logging.debug('Entrando a Seccion.get_respuestas ...')
         # Se genera la lista de instancias del objeto Respuesta. Si se 
         # requiere que sean aleatorias, se reordenan.
         lresp: List[Respuesta] = []
-        # Vamos agregando la instancia de cada pregunta de la sección.
+        # Vamos agregando la instancia de cada pregunta de la secci\'on.
         puntaje: int
         filelist: List[str]
-        k: int   # Tamaño de la muestra.
+        k: int   # Tama\~no de la muestra.
         for path in self.preguntas:
             puntaje = path[0]
             k = path[2]
@@ -202,11 +203,11 @@ class Seccion:
             logging.debug('Reordenando las respuestas.')
             random.shuffle(lresp)
 
-        # Nada más que hacer.
+        # Nada m\'as que hacer.
         return lresp
 
     def get_numPreguntas(self) -> int:
-        """ Devuelve el número de preguntas de la sección. """
+        """ Devuelve el n\'umero de preguntas de la secci\'on. """
         resp: int = 0
         for cada in self.preguntas:
             resp += cada[2]
@@ -214,27 +215,27 @@ class Seccion:
 
     @staticmethod
     def muestraPreguntas(path: str, muestra: int) -> List[str]:
-        """Escoje una muestra de preguntas de una dirección.
+        """Escoje una muestra de preguntas de una direcci\'on.
 
-        La dirección dada puede ser una carpeta o una pregunta.  Si es 
+        La direcci\'on dada puede ser una carpeta o una pregunta.  Si es 
         un archivo (de tipo pregunta), simplemente devuelve el nombre 
         del archivo. Si es una carpeta, entonces de la carpeta escoge de 
-        manera aleatoria el número de archivos indicados.
+        manera aleatoria el n\'umero de archivos indicados.
 
-        La extensión del archivo de tipo pregunta está definida en 
+        La extensi\'on del archivo de tipo pregunta est\'a definida en 
         Info.EXTENSION.
         """
         # Es un archivo.
         if path.endswith(Info.EXTENSION):
             if (muestra > 1):
-                logging.error('No es una carpeta. Sólo se agrega una pregunta.')
+                logging.error('No es una carpeta. S\'olo se agrega una pregunta.')
             return [path]
 
         # Debe ser una carpeta.
         if not path.endswith('/'):
             path = '%s/' % path
         # Generando la lista de archivos de tipo pregunta. Se asume que
-        # la dirección es una carpeta.
+        # la direcci\'on es una carpeta.
         lista: List[str] = []
         for me in os.listdir(path):
             if me.endswith(Info.EXTENSION):
@@ -249,5 +250,5 @@ class Seccion:
             idx.sort()
             return [lista[i] for i in idx]
         else:
-            # El tamaño de la muestra es el tamaño de la lista.
+            # El tama\~no de la muestra es el tama\~no de la lista.
             return lista

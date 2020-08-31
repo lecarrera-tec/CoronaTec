@@ -1,17 +1,17 @@
 """
 Tipo de pregunta, con las posibles opciones.
 """
-# Pregunta de selección única
+# Pregunta de selecci\'on \'unica
 UNICA: int = 1
-# Selección única, orden aleatorio.
+# Selecci\'on \'unica, orden aleatorio.
 ALEATORIO: int = 2
-# Selección única, orden creciente.
+# Selecci\'on \'unica, orden creciente.
 CRECIENTE: int = 4
-# Selección única, orden dado.
+# Selecci\'on \'unica, orden dado.
 INDICES: int = 8
-# Selección única, TODO Es posible eliminar la pregunta???
+# Selecci\'on \'unica, TODO Es posible eliminar la pregunta???
 NINGUNA: int = 16
-# Selección única, se acepta cualquier respuesta.
+# Selecci\'on \'unica, se acepta cualquier respuesta.
 # Incluido cuando hay error en la respuesta.
 TODAS: int = 32
 

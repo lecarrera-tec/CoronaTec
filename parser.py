@@ -3,7 +3,7 @@ from typing import List
 def derecha_igual(expresion : str, izq : str) -> str:
     """Extrae el expresion a la derecha de un igual.
 
-    La expresión puede estar formada por varios iguales separados por 
+    La expresi\'on puede estar formada por varios iguales separados por 
     comas. Se busca el igual con el respectivo lado izquierdo.
     """
     # Separamos el expresion en cada una de las opciones.
@@ -24,5 +24,5 @@ def derecha_igual(expresion : str, izq : str) -> str:
         # derecho del igual.
         temp = elem[idx+1:].strip()
         return temp
-    # No se encontró nada.
+    # No se encontr\'o nada.
     return ''

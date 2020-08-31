@@ -11,10 +11,10 @@ import TPreg
 from respuesta import Respuesta
 
 def get_latex(filename: str) -> str:
-    """Recibe como argumento la dirección de un archivo, y devuelve el 
+    """Recibe como argumento la direcci\'on de un archivo, y devuelve el 
     texto de la pregunta.
 
-    Lo que hace es clasificar el tipo de pregunta, y llamar a la función
+    Lo que hace es clasificar el tipo de pregunta, y llamar a la funci\'on
     correspondiente.
     """
     try:
@@ -31,7 +31,7 @@ def get_latex(filename: str) -> str:
         l: str = lines.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
 
-    # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
+    # Debe comenzar con el tipo de la pregunta. Leemos cu\'al es.
     assert(l.startswith(Info.LTIPO))
     l = l.strip(Info.STRIP)
     tipo: str = parser.derecha_igual(l, 'tipo')
@@ -43,9 +43,9 @@ def get_latex(filename: str) -> str:
         orden: str = parser.derecha_igual(l, 'orden')
         texto = latex_unica(lines, orden)
 
-    # Queda aún algo muy importante por hacer, y es modificar el path de 
+    # Queda a\'un algo muy importante por hacer, y es modificar el path de 
     # las figuras que se incluyan: \includegraphics[opciones]{path}
-    # Primero comenzamos extrayendo el path hasta el folder donde está
+    # Primero comenzamos extrayendo el path hasta el folder donde est\'a
     # el archivo.
     idx: int = filename.rfind('/')
     path: str = filename[:idx]
@@ -58,7 +58,6 @@ def get_latex(filename: str) -> str:
         idx = texto.find('{', idx)
         assert(idx != -1)
         texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
-
     return texto
 
 def latex_corta_entera(lines: List[str]) -> str:
@@ -74,27 +73,27 @@ def latex_unica(lines: List[str], orden: str) -> str:
         l = lines.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
     if l == Info.VARIABLES:
-        # TODO Tenemos que ver cómo evaluar las variables.
+        # TODO Tenemos que ver c\'omo evaluar las variables.
         continuar = True
         while continuar:
             l = lines.pop(0).strip()
             continuar = l != Info.PREGUNTA
 
-    # Deberíamos estar en la pregunta. Hay que buscar si se necesitan
+    # Deber\'iamos estar en la pregunta. Hay que buscar si se necesitan
     # variables.
     assert(l == Info.PREGUNTA)
     l = lines.pop(0)
     texto: List[str] = []
     while not l.strip().startswith(Info.LITEM):
-        # TODO falta revisar si los renglones tienen parámetros.
-        texto.append('    %s\n' % l)
+        # TODO falta revisar si los renglones tienen par\'ametros.
+        texto.append('    %s' % l)
         l = lines.pop(0)
     lista.append('%s\n%s' % (''.join(texto).rstrip(), '    \\nopagebreak\n'))
     # Ahora siguen los items.
     texto = []
     assert(l.strip().startswith(Info.LITEM))
-    # TODO Hay que parsear cada item por si está parametrizado.
-    # TODO Hay que leer la opción de indice del item cuando corresponda.
+    # TODO Hay que parsear cada item por si est\'a parametrizado.
+    # TODO Hay que leer la opci\'on de indice del item cuando corresponda.
     # Primero se va a crear una lista de los items.
     litems: List[str] = []
     item: str = ''
@@ -106,7 +105,7 @@ def latex_unica(lines: List[str], orden: str) -> str:
         else:
             texto.append('%s' % l)
         l = lines.pop(0)
-    # Falta agregar a la lista el último item
+    # Falta agregar a la lista el \'ultimo item
     litems.append('%s\n      \\nopagebreak\n' % ''.join(texto).rstrip())
     # Desordenamos los items.
     if orden == 'aleatorio':
@@ -119,10 +118,10 @@ def latex_unica(lines: List[str], orden: str) -> str:
     return ('%s\n' % ''.join(lista).strip())
 
 def get_respuesta(filename: str) -> Respuesta:
-    """Recibe como argumento la dirección de un archivo, y devuelve una
+    """Recibe como argumento la direcci\'on de un archivo, y devuelve una
     instancia de un objeto Respuesta.
 
-    Lo que hace es clasificar el tipo de pregunta, y llamar a la función
+    Lo que hace es clasificar el tipo de pregunta, y llamar a la funci\'on
     correspondiente.
     """
     try:
@@ -138,7 +137,7 @@ def get_respuesta(filename: str) -> Respuesta:
         l: str = lines.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
 
-    # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
+    # Debe comenzar con el tipo de la pregunta. Leemos cu\'al es.
     assert(l.startswith(Info.LTIPO))
     l = l.strip(Info.STRIP)
     tipo: str = parser.derecha_igual(l, 'tipo')
@@ -167,22 +166,22 @@ def respuesta_unica(lines: List[str], orden: str):
         l = lines.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
     if l == Info.VARIABLES:
-        # TODO Tenemos que ver cómo evaluar las variables.
+        # TODO Tenemos que ver c\'omo evaluar las variables.
         continuar = True
         while continuar:
             l = lines.pop(0).strip()
             continuar = l != Info.PREGUNTA
 
-    # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
-    # debería de llamar a ninguna función random aquí.
+    # Deber\'iamos estar en la pregunta. Nos la brincamos, porque no se
+    # deber\'ia de llamar a ninguna funci\'on random aqu\'i.
     assert(l == Info.PREGUNTA)
     l = lines.pop(0)
     while not l.strip().startswith(Info.LITEM):
         l = lines.pop(0)
     # Ahora siguen los items.
     assert(l.strip().startswith(Info.LITEM))
-    # TODO Hay que parsear cada item por si está parametrizado.
-    # TODO Hay que leer la opción de indice del item cuando corresponda.
+    # TODO Hay que parsear cada item por si est\'a parametrizado.
+    # TODO Hay que leer la opci\'on de indice del item cuando corresponda.
     # Se incluyen las opciones.
     litems : List[int] = [0]
     l = lines.pop(0)
