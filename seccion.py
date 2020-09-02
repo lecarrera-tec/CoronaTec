@@ -149,8 +149,8 @@ class Seccion:
             k = path[2]
             filelist = Seccion.muestraPreguntas(path[1], k)
             for filename in filelist:
-                texto = '  \\begin{ejer}[%d %s]\n' % (
-                        puntaje, 'pts' if puntaje > 1 else 'pt')
+                texto = '  \\begin{ejer}~\\textbf{[%d %s]}\n' % (
+                        puntaje, 'puntos' if puntaje > 1 else 'punto')
                 lista.append('%s%s%s' % (
                     texto, 
                     pregunta.get_latex(filename),
@@ -164,16 +164,9 @@ class Seccion:
             logging.debug('Reordenando las preguntas.')
             random.shuffle(lista)
 
-        # Construimos el texto del puntaje total.
-        texto = '%s%d%s' % (
-                '  \\noindent\\textbf{Puntaje:} ', 
-                self.get_puntaje(),
-                ' pts\n\\nopagebreak\n'
-        )
-        # Concatenamos las instrucciones, el puntaje y colocamos al 
+        # Concatenamos las instrucciones y colocamos al 
         # final todas las preguntas.
-        return '%s%s%s\n\n' % (self.instrucciones, texto, 
-                               ''.join(lista).strip())
+        return '%s%s\n\n' % (self.instrucciones, ''.join(lista).strip())
 
     def get_respuestas(self) -> List[Respuesta]:
         """

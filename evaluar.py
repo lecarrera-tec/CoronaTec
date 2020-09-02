@@ -12,6 +12,9 @@ import latex
 from ppp import PPP
 from respuesta import Respuesta
 from seccion import Seccion
+import tabla
+
+import xlsxwriter
 
 """
 Funci\'on que realiza la evaluaci\'on de la prueba. 
@@ -155,11 +158,9 @@ lista: List[str]
 linea: str    # Un estudiante de la lista.
 idstr: str    # String del identificador del estudiante (# de carnet).
 separar: List[str]   # Separar info del estudiante.
-#@ Para construir el informe en latex. El encabezado es el mismo para
-#@ todos los grupos.
 numPreguntas: List[int] = examen.get_numPreguntas()
-encabezado: str = latex.get_encabezadoInforme(numPreguntas)
 for path in lestudiantes:
+    encabezado: str = latex.get_encabezadoInforme(numPreguntas)
     logging.debug('PATH = %s\n' % path)
     # Carpeta donde se van a guardar los pdf's de los ex\'amenes.
     lista = path.rsplit(sep='/', maxsplit=1)
@@ -167,7 +168,13 @@ for path in lestudiantes:
     carpeta = '%s/%s' % (lista[0], filename.upper())
     if not os.path.exists(carpeta):
         os.mkdir(carpeta)
-    
+
+    #@ Para construir el archivo de notas.
+    notasBook = xlsxwriter.Workbook('%s/%s_notas.xlsx' % (carpeta, filename))
+    notasSheet = notasBook.add_worksheet()
+    bold = notasBook.add_format({'bold': 1})
+    tabla.encabezadoNotas(notasSheet, numPreguntas)
+
     # Se lee el archivo de los estudiantes.
     try:
         finput = open(path, 'r')
@@ -180,8 +187,9 @@ for path in lestudiantes:
     finput.close()
     
     # Ahora se trabaja con cada estudiante de la Lista.
-    llatex: List[str] = []
+    irow: int = 0
     for linea in Lista:
+        irow = irow + 1
         logging.debug('Nueva respuesta.')
         respuestas: List[Respuesta] = []
         # Separamos el n\'umero de identificaci\'on del resto del nombre.
@@ -191,14 +199,19 @@ for path in lestudiantes:
         nombre = ' '.join([palabra.capitalize() 
                              for palabra in separar[1].strip().split()])
         #@
-        izq: str = '    %s & %s' % (idstr, nombre)
-        der: List[str] = []
+        notasSheet.write(irow, 0, idstr)
+        notasSheet.write(irow, 1, nombre)
 
-        # Localizo las respuestas del estudiante, y contin\'uo si no est\'a.
+        # Localizo las respuestas del estudiante, y contin\'uo si no 
+        # est\'a.
         mias: List[str] = todxs.get(int(idstr), [])
         if len(mias) == 0:
-            llatex.append('%s 0 & 0%s \\\\\n' 
-                             % (izq, sum(numPreguntas) * ' & --'))
+            tabla.notasNull(notasSheet, numPreguntas, irow)
+            #@ Se suman los puntos ;)
+            notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1, 
+                                chr(ord('E') + sum(numPreguntas) - 1), irow + 1))
+            #@ y se calcula la nota
+            notasSheet.write(irow, 2, '= 100 * D%d / %d' % (irow + 1, totalPts), bold)
             continue
     
         # Se inicializa la semilla usando el identificador multiplicado 
@@ -215,34 +228,17 @@ for path in lestudiantes:
         # Ahora probamos a calificar.
         assert(len(respuestas) == len(mias))
         total: float = 0.0
+        icol: int = 3
         for elem in mias:
+            icol += 1
             pts = respuestas.pop(0).calificar(elem.strip())
-            if isinstance(pts[0], int) or pts[0].is_integer():
-                tempStr = '%d' % pts[0]
-            else:
-                tempStr = '%.2f' % 0.01 * math.floor(100 * pts[0])
-            der.append(' & $\\nicefrac{%s}{%d}$' % (tempStr, pts[1]))
+            #@ Se escribe el puntaje obtenido en el excel.
+            notasSheet.write(irow, icol, pts[0])
             total += pts[0]
-        llatex.append('%s & \\textbf{%.2f} & %d %s \\\\\n'
-                % (izq, 0.01 * math.ceil(1e4 * total / totalPts), 
-                    total, ''.join(der)))
-    llatex.append('    \\bottomrule\n')
-    llatex.append('  \\end{tabular}\n')
-    llatex.append('\\end{center}\n')
-    llatex.append('\\end{document}\n')
-    fout = open('%s.tex' % filename, 'w')
-    fout.write(encabezado)
-    fout.writelines(llatex)
-    fout.close()
-    
-    # Se genera el pdf.
-    os.system('pdflatex %s' % filename)
+        #@ Se suman los puntos
+        notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1, 
+                            chr(ord('E') + sum(numPreguntas) - 1), irow + 1))
+        #@ y se calcula la nota
+        notasSheet.write(irow, 2, '= 100 * D%d / %d' % (irow + 1, totalPts), bold)
+    notasBook.close()
     logging.debug('Fin de examen\n')
-
-    # Se mueve el pdf a la carpeta respectiva, y se eliminan el 
-    # resto de los archivos.
-    os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
-    lista = os.listdir('./')
-    for fname in lista:
-        if fname.startswith(filename):
-            os.remove(fname)

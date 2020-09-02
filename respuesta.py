@@ -64,8 +64,9 @@ class Respuesta:
             for opcion in self.respuestas:
                 # Lo que hacemos es que, con que acierte una, le damos
                 # los puntos de la pregunta.
-                logging.debug('  Opcion: %d -- Respuesta: %d (' % (opcion, ord(texto) - ord('A')))
-                if (ord(texto) - ord('A')) == opcion:
+                logging.debug('  Opcion: %d -- Respuesta: %d (' % 
+                        (opcion, -1 if len(texto) == 0 else ord(texto) - ord('A')))
+                if len(texto) > 0 and ((ord(texto) - ord('A')) == opcion):
                     puntos = 1.0 * self.puntaje
                     break
         return (puntos, self.puntaje)

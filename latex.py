@@ -5,7 +5,7 @@ def get_encabezadoExamen(examen) -> str:
     # Se comienza con el encabezado del archivo LaTeX
     texto: List[str] = [
         '\\documentclass[12pt]{article}\n\n',
-        '\\usepackage[scale=0.85,top=1in,papersize={8.5in,15in}]{geometry}\n',
+        '\\usepackage[scale=0.85,top=1in,papersize={8.5in,20in}]{geometry}\n',
         '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
         '\\usepackage{paralist}\n',
@@ -15,7 +15,7 @@ def get_encabezadoExamen(examen) -> str:
         '\\usepackage{fancyhdr}\n',
         '\\pagestyle{fancy}\n',
         '\\fancyhf{}\n',
-        '\\lhead{Tecnol\\\'ogico de Costa Rica}\n',
+        '\\lhead{Instituto Tecnol\\\'ogico de Costa Rica}\n',
         '\\rhead{P\\\'agina \\thepage~de \\pageref{LastPage}}\n',
 
         '\\usepackage{amsmath,amsthm,amssymb}\n',
@@ -48,7 +48,7 @@ def get_inicioExamen(nombre : str, examen) -> List[str]:
     # Se agrega el nombre al examen, se comienza el documento y se
     # imprime el puntaje total.
     texto.append('\\begin{document}\n\n')
-    texto.append('\\noindent \\textsc{Tecnol\\\'ogico de Costa Rica} \hfill \\textsc{%s}\\\\\n' % examen.semestre)
+    texto.append('\\noindent \\textsc{Instituto Tecnol\\\'ogico de Costa Rica} \hfill \\textsc{%s}\\\\\n' % examen.semestre)
     texto.append('\\textsc{%s} \hfill \\textsc{Tiempo: %s}\\\\\n' % (examen.cursos[0], examen.tiempo))
     for temp in examen.cursos[1:]:
         texto.append('\\textsc{%s}}\\\\[1ex]\n' % temp)
