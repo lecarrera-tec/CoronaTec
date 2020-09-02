@@ -135,6 +135,9 @@ label_file_respuestas.grid(column=0, row=8, columnspan = 3, sticky="w")
 #campo de texto para mostrar la ruta seleccionada
 entry_file_respuestas = tk.Entry(master=frame_generar, width = 80)
 entry_file_respuestas.grid(column = 2, row = 9 , padx = 5, sticky="e")
+#boton para abrir el archivo
+button_open_file_respuestas = tk.Button(master=frame_generar, text="Respuestas .csv", command = lambda: open_file_dir(entry_file_respuestas,[("Respuestas .csv", "*.csv")]))
+button_open_file_respuestas.grid(column=1, row=9, padx = 5)
 #boton de evaluar
 button_evaluar = tk.Button(master=frame_generar, text="Evaluar", command = call_evaluar )
 button_evaluar.grid(column = 2, row = 10 , padx = 5, pady= 5, sticky="e")
