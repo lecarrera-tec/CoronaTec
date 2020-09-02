@@ -133,12 +133,10 @@ for path in lestudiantes:
         # Se genera el pdf.
         os.system('pdflatex %s' % filename)
         os.system('pdflatex %s' % filename)
+        os.system('pdfcrop -margins 20 %s.pdf temp.pdf' % filename)
         logging.debug('Fin de examen\n')
 
         # Se mueve el pdf a la carpeta respectiva, y se eliminan el 
         # resto de los archivos.
-        os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
-        lista = os.listdir('./')
-        for fname in lista:
-            if fname.startswith(filename):
-                os.remove(fname)
+        os.replace('temp.pdf', '%s/%s.pdf' % (carpeta, filename))
+        os.system('rm %s.*' % filename)

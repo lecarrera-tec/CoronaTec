@@ -5,7 +5,7 @@ def get_encabezadoExamen(examen) -> str:
     # Se comienza con el encabezado del archivo LaTeX
     texto: List[str] = [
         '\\documentclass[12pt]{article}\n\n',
-        '\\usepackage[scale=0.85,top=1in,papersize={8.5in,20in}]{geometry}\n',
+        '\\usepackage[scale=0.85,top=1in,papersize={8.5in,30in}]{geometry}\n',
         '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
         '\\usepackage{paralist}\n',
