@@ -34,14 +34,14 @@ logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
 #
 # A. Se determina si el n\'umero de argumentos dados es el requerido.
 #
-# B. Se lee el \'indice de repetici\'on del examen, si es que se incluy\'o.
-#    Si no, 0 es el valor predeterminado.
+# B. Se lee el \'indice de repetici\'on del examen, si es que se 
+#    incluy\'o. Si no, 0 es el valor predeterminado.
 #
 # C. Se lee la estructura general de la prueba.
 #
-# D. Se genera un diccionario con las respuestas. La clave es el n\'umero 
-#    de carnet, y el valor respectivo corresponde a las respuestas como 
-#    una lista de strings.
+# D. Se genera un diccionario con las respuestas. La clave es el 
+#    n\'umero de carnet, y el valor respectivo corresponde a las 
+#    respuestas como una lista de strings.
 #
 # E. El usuario pas\'o un solo archivo `.csv` o una carpeta donde debe
 #    haber uno o m\'as archivos `.csv`. Se genera una lista del path a 
@@ -99,31 +99,28 @@ fresp.close()
 
 totalPts: int = examen.get_puntaje()
 
-# Se elimina la primera l\'inea, que es la informaci\'on de las columnas
-# del archivo.
-lineas.pop(0)
+# Se descartan la l\'ineas iniciales en caso de ser necesario.
+for i in range(Info.CSV_IROW)
+    lineas.pop(0)
 texto: str
 cols: List[str]
 # Diccionario!!!
-todxs: Dict[int, List[str]] = {}
+todxs: Dict[str, List[str]] = {}
 for fila in lineas:
-    # Eliminamos el final de l\'inea y las comillas que pone Google por 
-    # default.
+    # Se eliminan espacios en blanco y las comillas, en caso que hubieran.
     texto = fila.rstrip().replace('"', '')
     if len(texto) == 0:
         continue
     # Dada una fila, separamos los elementos de cada columna.
-    cols = texto.split(',')
+    cols = texto.split(Info.CSV_SEP)
     # Agregamos la llave y le asignamos las respuestas. Tiene la 
-    # caracter\'istica que si aparece el mismo carnet, toma como respuesta 
-    # la versi\'on m\'as reciente, ya que google da las respuestas ordenadas 
-    # por fecha.
-    # Ignoramos el primer elemento (cols[0]) porque se refiere a la 
-    # fecha y hora de env\'io de la prueba.
-    # TODO Especificar hora de finalizaci\'on, para que cualquier 
-    # evalluaci\'on registrada despu\'es de dicha hora, se informe de
-    # alguna manera.
-    todxs[int(cols[1])] = cols[2:]
+    # caracter\'istica que si aparece el mismo carnet una segunda vez,
+    # la respuesta es la versi\'on m\'as reciente. No pareciera que
+    # importe.
+    # Ignoramos las primeras columnas, damos el \'indice de la columna
+    # de la llave, y la columna inicial de las respuestas (y asumimos
+    # que las respuestas son hasta el final).
+    todxs[cols[Info.CSV_IKEY]] = cols[Info.CSV_ICOL:]
 
 #-----------------------------------------------------------------------
 # E. Se genera la lista con las listas de los grupos dados.
@@ -159,10 +156,12 @@ linea: str    # Un estudiante de la lista.
 idstr: str    # String del identificador del estudiante (# de carnet).
 separar: List[str]   # Separar info del estudiante.
 numPreguntas: List[int] = examen.get_numPreguntas()
+todasResp = []
 for path in lestudiantes:
     encabezado: str = latex.get_encabezadoInforme(numPreguntas)
     logging.debug('PATH = %s\n' % path)
-    # Carpeta donde se van a guardar los pdf's de los ex\'amenes.
+    # Carpeta donde se van a guardar las notas y el informe
+    # (es la misma carpeta donde se generaron los ex\'amenes en pdf)
     lista = path.rsplit(sep='/', maxsplit=1)
     filename = lista[1].rsplit(sep='.', maxsplit=1)[0]
     carpeta = '%s/%s' % (lista[0], filename.upper())
@@ -204,8 +203,8 @@ for path in lestudiantes:
 
         # Localizo las respuestas del estudiante, y contin\'uo si no 
         # est\'a.
-        mias: List[str] = todxs.get(int(idstr), [])
-        if len(mias) == 0:
+        misResp: List[str] = todxs.get(idstr, [])
+        if len(misResp) == 0:
             tabla.notasNull(notasSheet, numPreguntas, irow)
             #@ Se suman los puntos ;)
             notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1, 
@@ -226,12 +225,16 @@ for path in lestudiantes:
             respuestas += seccion.get_respuestas()
 
         # Ahora probamos a calificar.
-        assert(len(respuestas) == len(mias))
+        assert(len(respuestas) == len(misResp))
+        unir = []
+        for i in range(len(misResp)):
+            unir.append((misResp[i], respuestas[i]))
+        todasResp.append((idstr[-6], unir))
         total: float = 0.0
         icol: int = 3
-        for elem in mias:
+        for elem, resp in unir:
             icol += 1
-            pts = respuestas.pop(0).calificar(elem.strip())
+            pts = resp.calificar(elem.strip())
             #@ Se escribe el puntaje obtenido en el excel.
             notasSheet.write(irow, icol, pts[0])
             total += pts[0]
@@ -241,4 +244,21 @@ for path in lestudiantes:
         #@ y se calcula la nota
         notasSheet.write(irow, 2, '= 100 * D%d / %d' % (irow + 1, totalPts), bold)
     notasBook.close()
+    #< Para construir el archivo del informe
+    infoBook = xlsxwriter.Workbook('%s/%s_informe.xlsx' % (carpeta, filename))
+    infoSheet = infoBook.add_worksheet()
+    infoSheet.set_column('A:Z', 10)
+    todasResp.sort(key=lambda x: x[0])
+    irow = 0
+    for resps in todasResp:
+        print(resps)
+        infoSheet.write(irow, 0, resps[0])
+        infoSheet.write(irow+1, 0, 'Correcta')
+        icol = 0
+        for m, r in resps[1]:
+            infoSheet.write(irow, icol, m)
+            infoSheet.write(irow+1, icol, r)
+            icol += 1
+        irow += 3
+    infoBook.close()
     logging.debug('Fin de examen\n')

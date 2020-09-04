@@ -70,3 +70,8 @@ class Respuesta:
                     puntos = 1.0 * self.puntaje
                     break
         return (puntos, self.puntaje)
+
+    def textoResp(self) -> str:
+        if self.tipo_preg & TPreg.UNICA:
+            opcion = self.respuestas[0]
+            return chr(ord('A') + opcion)
