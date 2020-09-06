@@ -75,3 +75,4 @@ class Respuesta:
         if self.tipo_preg & TPreg.UNICA:
             opcion = self.respuestas[0]
             return chr(ord('A') + opcion)
+        return ''

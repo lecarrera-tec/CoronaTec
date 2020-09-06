@@ -7,7 +7,7 @@
 \theoremstyle{definition}
 \newtheorem{funcion}{}[section]
 
-\title{Prueba de Preguntas Parametrizadas}
+\title{Banco de Preguntas}
 \author{Luis Ernesto Carrera Retana}
 
 \begin{document}
@@ -18,14 +18,13 @@
 
 Este proyecto consta de los siguientes programas:
 \begin{itemize}
-  \item \verb|generar| Esta es la función que genera las pruebas. Requiere dos archivos como argumentos: el primero es el archivo \verb|ppp| donde se guarda la información general de la prueba, y el segundo la carpeta con la listas de los grupos de las personas estudiantes (cada uno de ellos descargado del tec digital y convertido a CSV). En esta misma carpeta guarda las evaluaciones.
+  \item \verb|generar| Esta es la función que genera las pruebas. Requiere dos archivos como argumentos: el primero es el archivo \verb|ppp| donde se guarda la información general de la prueba, y el segundo la carpeta con las listas de los grupos de las personas estudiantes (cada uno de ellos descargado del tec digital y convertido a CSV) o un solo archivo csv. En esta misma carpeta guarda las evaluaciones.
 
-  \item \verb|evaluar| Esta es la función que realiza la evaluación. Requiere el archivo \verb|ppp|, la carpeta con las listas de los estudiantes, y el archivo de las respuestas descargado de Google Forms como CSV.
-
-  \item \verb|vista_previa| Esta función recibe como argumento la dirección del archivo de una pregunta, y de manera opcional el número de ejemplos por generar, para generar un pdf de la pregunta. Esto permite revisar que la pregunta esté bien definida, y ver si genera los resultados esperados.
+  \item \verb|evaluar| Esta es la función que realiza la evaluación. Requiere el archivo \verb|ppp|, la carpeta con las listas de los estudiantes, y el archivo de las respuestas descargado de Microsoft Forms, y convertido a .csv, con `;' como separador entre columnas.
 \end{itemize}
 
 \subsection{Modificando el \LaTeX}
+El encabezado predeterminado se puede visualizar en el archivo \verb|latex.py|.
 
 \section{Estructura del archivo general}
 \begin{verbatim}
@@ -63,29 +62,52 @@ __Instrucciones del examen__
 \end{verbatim}
 
 \begin{itemize}
-  \item Tanto el nombre del curso como el título suponemos que es solamente una línea de texto debajo de la etiqueta respectiva.
+  \item Tanto el nombre del curso como el título debe ser solamente \textbf{una} línea de texto debajo de la etiqueta respectiva.
   \item Las instrucciones pueden abarcar varios renglones e incluir líneas en blanco, para que \LaTeX\ separe los párrafos. 
-  \item En las instrucciones \emph{no} debe aparecer el símbolo de abrir etiquetas (ver \verb|info.abrir|) como primer carácter del párrafo, porque es la forma de determinar que allí finalizan.
-  \item No debe haber espacios en blanco entre las direcciones de las preguntas, pero sí se permiten comentarios.
+  \item En las instrucciones \emph{no} debe aparecer el símbolo de abrir etiquetas (ver \verb|abrir| en \verb|Info.py|) como primer carácter del párrafo, porque es la forma de determinar que allí finalizan.
+  \item No debe haber espacios en blanco entre las especificaciones de las preguntas, pero sí se permiten comentarios.
   \item El \verb|origen| de la pregunta puede ser un archivo con extensión \verb|.tex| o una carpeta.
-  \item Si la dirección es una carpeta, entonces el puntaje para cualquiera de las preguntas es el mismo, y se toma de acá. Si el puntaje no aparece, entonces es 1~pt por default.
-  \item Las preguntas finalizan con una línea en blanco o con el final del archivo.
+  \item Si la dirección es una carpeta, entonces el puntaje para cualquiera de las preguntas es el mismo, y se toma de acá. Si el puntaje no aparece, entonces el predeterminado es 1~punto.
+  \item La muestra se refiere al n\'umero de preguntas que se toma de la carpeta. Si no aparece, el predeterminado es 1.
+  \item Las preguntas finalizan con una línea en blanco.
 \end{itemize}
 
 \section{Estructura del archivo para cada pregunta}
 
 \begin{verbatim}
-<tipo = __tipo__[, __opcion__ = __str__]>
-
-<variables>
-  __nombre__ = __definicion__
+<tipo = seleccion unica[, orden = aleatorio]>
 
 <pregunta>
   __texto de la pregunta__
 
-<item[, __opciones__]>
+<item>
   __respuesta o distractor__
+
 \end{verbatim}
+
+Se asume que la respuesta correcta es el primero de los items. \textbf{Se debe dejar una l\'inea en blanco al final de cada item, incluyendo el \'ultimo}.
+
+
+\end{document}
+
+
+\section{Pregunta}
+
+\subsection{Tipos de pregunta}
+\begin{itemize}
+  \item \verb|seleccion unica|
+
+    Varias opciones, indicadas por \verb|<item>|. Al finalizar las opciones, entonces en la etiqueta  \verb|<resp>| aparece el índice de la respuesta correcta. Si no viene la respuesta correcta, entonces se asume que el primer item es el correcto.
+
+    Para saber cómo ordenar, entonces se puede agregar a la etiqueta de \\[1ex]
+    \verb|<tipo = seleccion unica, opciones = <opc>>|, donde para \verb|<opc>| se tienen:
+    \begin{description}
+      \item [\texttt{fijas}:]   Mantiene el orden dado por el usuario.
+      \item [\texttt{indices}:] Cada \verb|<item>| trae el índice que le corresponde.
+      \item [\texttt{ordenar}:] Ordena las opciones de menor a mayor.
+      \item [\texttt{random}:]  Ordena las opciones de forma aleatoria.
+    \end{description}
+\end{itemize}
 
 \subsection{Selección única}
 Las opciones para selección única son las siguientes:
@@ -184,24 +206,7 @@ En el caso de un solo argumento, entonces la sucesión comienza en 0 y termina e
 Si lo que se quiere es tomar un elemento aleatorio de la sucesión simple, entonces mejor utilizar las funciones \verb|randrange| o \verb|randint|. Para el caso en que se concatenan dos sucesiones, entonces utilizar \verb|choice|.
 
 
-\end{document}
+  \item \verb|vista_previa| Esta función recibe como argumento la dirección del archivo de una pregunta, y de manera opcional el número de ejemplos por generar, para generar un pdf de la pregunta. Esto permite revisar que la pregunta esté bien definida, y ver si genera los resultados esperados.
 
-
-\section{Pregunta}
-
-\subsection{Tipos de pregunta}
-\begin{itemize}
-  \item \verb|seleccion unica|
-
-    Varias opciones, indicadas por \verb|<item>|. Al finalizar las opciones, entonces en la etiqueta  \verb|<resp>| aparece el índice de la respuesta correcta. Si no viene la respuesta correcta, entonces se asume que el primer item es el correcto.
-
-    Para saber cómo ordenar, entonces se puede agregar a la etiqueta de \\[1ex]
-    \verb|<tipo = seleccion unica, opciones = <opc>>|, donde para \verb|<opc>| se tienen:
-    \begin{description}
-      \item [\texttt{fijas}:]   Mantiene el orden dado por el usuario.
-      \item [\texttt{indices}:] Cada \verb|<item>| trae el índice que le corresponde.
-      \item [\texttt{ordenar}:] Ordena las opciones de menor a mayor.
-      \item [\texttt{random}:]  Ordena las opciones de forma aleatoria.
-    \end{description}
-\end{itemize}
-
+<variables>
+  __nombre__ = __definicion__

@@ -139,4 +139,6 @@ for path in lestudiantes:
         # Se mueve el pdf a la carpeta respectiva, y se eliminan el 
         # resto de los archivos.
         os.replace('temp.pdf', '%s/%s.pdf' % (carpeta, filename))
-        os.system('rm %s.*' % filename)
+        for file in os.listdir():
+            if file.startswith(filename):
+                os.remove(file)

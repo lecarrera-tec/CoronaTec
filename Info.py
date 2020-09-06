@@ -6,9 +6,9 @@ Cuando la clave puede incluir opciones, se utiliza la letra L al inicio
 para aclarar que es la parte izquierda (Left) del texto.
 """
 CSV_SEP: str = ';'
-CSV_ICOL: int = 7
-CSV_IROW: int = 0
-CSV_IKEY: int = 6
+CSV_ICOL: int = 5
+CSV_IROW: int = 1
+CSV_IKEY: int = -1
 
 COMMENT: str = '%'
 ABRIR: str = '<'

@@ -5,7 +5,7 @@ def get_encabezadoExamen(examen) -> str:
     # Se comienza con el encabezado del archivo LaTeX
     texto: List[str] = [
         '\\documentclass[12pt]{article}\n\n',
-        '\\usepackage[scale=0.85,top=1in,papersize={8.5in,30in}]{geometry}\n',
+        '\\usepackage[scale=0.85,top=1in,papersize={8.5in,30in},head=14.5pt]{geometry}\n',
         '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
         '\\usepackage{paralist}\n',
@@ -20,15 +20,8 @@ def get_encabezadoExamen(examen) -> str:
 
         '\\usepackage{amsmath,amsthm,amssymb}\n',
         '\\theoremstyle{definition}\n',
+        '\\newtheorem{ejer}{}\n\n',
     ]
-    
-    # Se define el estilo de la pregunta, dependiendo si hay solo una o
-    # varias secciones. Si son varias secciones, entonces para cada
-    # secci\'on se tiene una enumeraci\'on nueva.
-    if len(examen.secciones) > 1:
-        texto.append('\\newtheorem{ejer}{}[section]\n\n')
-    else:
-        texto.append('\\newtheorem{ejer}{}\n\n')
     
     # Se agrega el encabezado dado por el usuario, el nombre del curso 
     # al t\'itulo de la prueba, y el t\'itulo de la prueba como autor. Aqu\'i 

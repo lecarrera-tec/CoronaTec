@@ -5,7 +5,7 @@ import math
 import os
 import random
 import sys
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 import Info
 import latex
@@ -28,7 +28,6 @@ es para que genere un examen diferente con el mismo n\'umero de carnet.
 """
 
 logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
-
 
 # Estructura de la funci\'on.
 #
@@ -100,7 +99,7 @@ fresp.close()
 totalPts: int = examen.get_puntaje()
 
 # Se descartan la l\'ineas iniciales en caso de ser necesario.
-for i in range(Info.CSV_IROW)
+for i in range(Info.CSV_IROW):
     lineas.pop(0)
 texto: str
 cols: List[str]
@@ -119,8 +118,12 @@ for fila in lineas:
     # importe.
     # Ignoramos las primeras columnas, damos el \'indice de la columna
     # de la llave, y la columna inicial de las respuestas (y asumimos
-    # que las respuestas son hasta el final).
-    todxs[cols[Info.CSV_IKEY]] = cols[Info.CSV_ICOL:]
+    # que las respuestas son hasta el final, al menos que la \'ultima 
+    # columna sea la que corresponda al # de carnet).
+    if Info.CSV_IKEY == -1:
+        todxs[cols[Info.CSV_IKEY]] = cols[Info.CSV_ICOL:-1]
+    else:
+        todxs[cols[Info.CSV_IKEY]] = cols[Info.CSV_ICOL:]
 
 #-----------------------------------------------------------------------
 # E. Se genera la lista con las listas de los grupos dados.
@@ -149,18 +152,21 @@ else:
 #-----------------------------------------------------------------------
 # E. Se trabaja grupo por grupo.
 #-----------------------------------------------------------------------
-carpeta: str    # Carpeta donde se guardan los informes y la nota.
+carpeta: str    # Carpeta donde se guardan los reportes y la nota.
 filename: str 
 lista: List[str]
 linea: str    # Un estudiante de la lista.
 idstr: str    # String del identificador del estudiante (# de carnet).
 separar: List[str]   # Separar info del estudiante.
 numPreguntas: List[int] = examen.get_numPreguntas()
-todasResp = []
+todasResp: List[Tuple[str, List[Tuple[str, Respuesta]]]]
+todosPuntos: List[Tuple[str, List[Tuple[float, int]]]] 
 for path in lestudiantes:
+    todasResp = []
+    todosPuntos = []
     encabezado: str = latex.get_encabezadoInforme(numPreguntas)
     logging.debug('PATH = %s\n' % path)
-    # Carpeta donde se van a guardar las notas y el informe
+    # Carpeta donde se van a guardar las notas y el reporte
     # (es la misma carpeta donde se generaron los ex\'amenes en pdf)
     lista = path.rsplit(sep='/', maxsplit=1)
     filename = lista[1].rsplit(sep='.', maxsplit=1)[0]
@@ -172,7 +178,7 @@ for path in lestudiantes:
     notasBook = xlsxwriter.Workbook('%s/%s_notas.xlsx' % (carpeta, filename))
     notasSheet = notasBook.add_worksheet()
     bold = notasBook.add_format({'bold': 1})
-    tabla.encabezadoNotas(notasSheet, numPreguntas)
+    tabla.encabezadoNotas(notasSheet, sum(numPreguntas))
 
     # Se lee el archivo de los estudiantes.
     try:
@@ -201,11 +207,12 @@ for path in lestudiantes:
         notasSheet.write(irow, 0, idstr)
         notasSheet.write(irow, 1, nombre)
 
-        # Localizo las respuestas del estudiante, y contin\'uo si no 
-        # est\'a.
+        # Localizo las respuestas del estudiante
         misResp: List[str] = todxs.get(idstr, [])
+        # Si no tiene respuestas, lleno el excel de ceros, y calculo
+        # la suma y la nota igual. Sigo con el siguiente.
         if len(misResp) == 0:
-            tabla.notasNull(notasSheet, numPreguntas, irow)
+            tabla.notasNull(notasSheet, sum(numPreguntas), irow)
             #@ Se suman los puntos ;)
             notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1, 
                                 chr(ord('E') + sum(numPreguntas) - 1), irow + 1))
@@ -226,39 +233,58 @@ for path in lestudiantes:
 
         # Ahora probamos a calificar.
         assert(len(respuestas) == len(misResp))
-        unir = []
+        unir: List[Tuple[str,Respuesta]] = []
+        puntos: List[Tuple[float, int]] = []
         for i in range(len(misResp)):
             unir.append((misResp[i], respuestas[i]))
-        todasResp.append((idstr[-6], unir))
-        total: float = 0.0
+        todasResp.append((idstr[-6:], unir))
         icol: int = 3
         for elem, resp in unir:
             icol += 1
             pts = resp.calificar(elem.strip())
+            puntos.append(pts)
             #@ Se escribe el puntaje obtenido en el excel.
             notasSheet.write(irow, icol, pts[0])
-            total += pts[0]
+        todosPuntos.append((idstr[-6:], puntos))
         #@ Se suman los puntos
         notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1, 
                             chr(ord('E') + sum(numPreguntas) - 1), irow + 1))
         #@ y se calcula la nota
         notasSheet.write(irow, 2, '= 100 * D%d / %d' % (irow + 1, totalPts), bold)
     notasBook.close()
-    #< Para construir el archivo del informe
-    infoBook = xlsxwriter.Workbook('%s/%s_informe.xlsx' % (carpeta, filename))
+    #< Para construir el archivo del reporte
+    infoBook = xlsxwriter.Workbook('%s/%s_reporte.xlsx' % (carpeta, filename))
     infoSheet = infoBook.add_worksheet()
+    bold = infoBook.add_format({'bold': 1})
     infoSheet.set_column('A:Z', 10)
     todasResp.sort(key=lambda x: x[0])
+    todosPuntos.sort(key=lambda x: x[0])
     irow = 0
-    for resps in todasResp:
-        print(resps)
+    assert(len(todasResp) == len(todosPuntos))
+    for i in range(len(todasResp)):
+        resps = todasResp[i]
+        puntos = todosPuntos[i][1]
         infoSheet.write(irow, 0, resps[0])
-        infoSheet.write(irow+1, 0, 'Correcta')
-        icol = 0
-        for m, r in resps[1]:
-            infoSheet.write(irow, icol, m)
-            infoSheet.write(irow+1, icol, r)
+        infoSheet.write(irow+2, 0, 'Correcta')
+        icol = 1
+        for j in range(len(resps[1])):
+            temp = resps[1][j]
+            infoSheet.write(irow,   icol, temp[0])
+            infoSheet.write(irow+1, icol, puntos[j][0])
+            infoSheet.write(irow+2, icol, temp[1].textoResp())
+            infoSheet.write(irow+3, icol, puntos[j][1])
             icol += 1
-        irow += 3
+        #@ Se suman los puntos
+        infoSheet.write(irow+1, icol, '=SUM(B%d:%c%d)' % (irow + 2, 
+                            chr(ord('A') + icol - 1), irow + 2))
+        #@ y se calcula la nota
+        infoSheet.write(irow+1, icol+1, '= 100 * %c%d / %c%d' % 
+                          (chr(ord('A') + icol), irow+2, 
+                              chr(ord('A') + icol), irow+4), bold)
+        infoSheet.write(irow+3, icol, '=SUM(B%d:%c%d)' % (irow+4, 
+                            chr(ord('A') + icol - 1), irow + 4))
+        infoSheet.write(irow+3, icol+1, 100)
+
+        irow += 5
     infoBook.close()
     logging.debug('Fin de examen\n')
