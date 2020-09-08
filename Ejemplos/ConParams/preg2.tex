@@ -1,0 +1,24 @@
+<tipo = seleccion unica, orden = aleatorio>
+
+<variables>
+ls = [*range(-9,-abs(k)), *range(-abs(k)+1,-1), *range(2,abs(k)), *range(abs(k)+1,10)]
+a = choice(ls)
+left = txtFrac(k-1,a)
+right = txtFrac(k+1,a)
+
+<pregunta>
+Ahora considere la serie de potencias:
+\[ \sum_{n=0}^\infty ( @|a|x @|'%+d' % -k| )^n \]
+El radio de convergencia de dicha serie est\'a dado por:
+
+<item>
+$x \in \bigg]@|left|, @|right|\bigg[$
+
+<item>
+$x \in \bigg[@|left|, @|right|\bigg[$
+
+<item>
+$x \in \bigg[@|left|, @|right|\bigg]$
+
+<item>
+$x \in \bigg]@|left|, @|right|\bigg]$

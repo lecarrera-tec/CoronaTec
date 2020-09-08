@@ -111,8 +111,12 @@ for path in lestudiantes:
         logging.debug('Se tienen %d secciones en total' % len(examen.secciones))
         if len(examen.secciones) > 1 or len(seccion.titulo) > 0:
             tex.append('  \\newpage\n')
-            tex.append('  \\section{%s {\\normalsize (total de la secci\\\'on %d puntos)}}\n\n' % (seccion.titulo,seccion.get_puntaje()))
-            tex.append(seccion.get_latex())
+            tex.append('  \\section{%s {\\normalsize (total de la secci\\\'on %d puntos)}}\n\n' 
+                                    % (seccion.titulo, seccion.get_puntaje()))
+        else:
+            # Solamente se tiene una secci\'on sin titulo.
+            tex.append('  \\newpage\n')
+        tex.append(seccion.get_latex())
     
         # Ahora se trabaja con el resto de las secciones
         for seccion in examen.secciones[1:]:
