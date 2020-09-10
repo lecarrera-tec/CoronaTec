@@ -24,10 +24,12 @@ TITULO: str = '%sTitulo%s' % (ABRIR, CERRAR)
 INSTRUCCIONES: str = '%sInstrucciones%s' % (ABRIR, CERRAR)
 ENCABEZADO: str = '%sEncabezado%s' % (ABRIR, CERRAR)
 
-# Como la secci\'on puede tener opciones, solamente nos 
+# Como la sección puede tener opciones, solamente nos 
 # preocupamos por el lado izquierdo.
 LSECCION: str = '%sSeccion' % ABRIR
 PREGUNTAS: str = '%sPreguntas%s' % (ABRIR, CERRAR)
+INICIO_BLOQUE: str = '%sbloque%s' % (ABRIR, CERRAR)
+FIN_BLOQUE: str = '%s/bloque%s' % (ABRIR, CERRAR)
 
 LTIPO: str = '%stipo' % ABRIR
 VARIABLES: str = '%svariables%s' % (ABRIR, CERRAR)
@@ -42,6 +44,6 @@ FORMATO_ITEM: str = '[A)]'
 # para eliminar
 STRIP: str = ' \t\n%s%s' % (ABRIR, CERRAR)
 
-# Constante que se multiplica por el n\'umero de identificaci\'on para 
+# Constante que se multiplica por el número de identificación para 
 # generar la semilla.
 BY_SHIFT: List[int] = [99929, 9929, 929, 29, 99829, 9829, 829]

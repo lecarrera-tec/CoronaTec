@@ -4,6 +4,9 @@
 \usepackage{amsmath,amsthm}
 \usepackage[spanish]{babel}
 
+\usepackage{multicol}
+\usepackage{paralist}
+
 \theoremstyle{definition}
 \newtheorem{funcion}{}[section]
 
@@ -24,7 +27,9 @@ Este proyecto consta de los siguientes programas:
 
   \item \verb|evaluar| Esta es la función que realiza la evaluación. Requiere el archivo \verb|ppp|, la carpeta con las listas de los estudiantes, y el archivo de las respuestas descargado de Microsoft Forms, y convertido a .csv, con `;' como separador entre columnas.
 
-  \item \verb|visualizar| Esta función recibe como argumento la dirección del archivo de una pregunta, y de manera opcional el número de ejemplos por generar, para generar un pdf de la pregunta. Esto permite revisar que la pregunta esté bien definida, y ver si genera los resultados esperados.
+  \item \verb|visualizar| Esta función recibe como argumento la dirección del archivo de una pregunta, el número de ejemplos por generar, para generar un pdf de la pregunta. Esto permite revisar que la pregunta esté bien definida, y ver si genera los resultados esperados.
+
+    Si la pregunta requiere de paquetes adicionales, de manera opcional se puede pasar como argumento un \emph{encabezado} de la pregunta que debe iniciar desde \verb|\documentclass...| y llegar hasta \verb|\begin{document}|. Debe incluir un ambiente de tipo \emph{ejer}, porque cada pregunta se encierra entre un \verb|\begin{ejer}| \dots \verb|\end{ejer}|. Puede ver la variable \verb|encabezado| en el archivo \verb|visualizar.py| como referencia.
 \end{itemize}
 
 \subsection{Requisitos}
@@ -36,8 +41,9 @@ Este proyecto consta de los siguientes programas:
 \end{itemize}
 
 \subsection{Modificando el \LaTeX}
-El encabezado predeterminado se puede visualizar en el archivo \verb|latex.py|.
+El encabezado predeterminado se puede visualizar en el archivo \verb|latex.py|. Recuerde respaldar cualquier cambio que haga, porque cada versi\'on nueva va a borrar los cambios que usted haya realizado.
 
+\newpage
 \section{Estructura del archivo general}
 \begin{verbatim}
 <Escuelas>
@@ -69,11 +75,14 @@ __Instrucciones del examen__
   __Opcional si es sólo una sección__
 
   <Preguntas>
+    <bloque>
     [puntaje = __int__,] origen = __string__[, muestra = __int__]
+    </bloque>
 <Fin>
 \end{verbatim}
 
 \begin{itemize}
+  \item Todo texto entre \verb|[ ... ]|, a excepci\'on de las listas de python, se refiere a argumentos opcionales.
   \item Tanto el nombre del curso como el título deben ser solamente \textbf{una} línea de texto debajo de la etiqueta respectiva.
   \item Las instrucciones pueden abarcar varios renglones e incluir líneas en blanco, para que \LaTeX\ separe los párrafos. 
   \item En las instrucciones \emph{no} debe aparecer el símbolo de abrir etiquetas (ver \verb|abrir| en \verb|Info.py|) como primer carácter del párrafo, porque es la forma de determinar que allí finalizan.
@@ -82,12 +91,28 @@ __Instrucciones del examen__
   \item Si la dirección es una carpeta, entonces el puntaje para cualquiera de las preguntas es el mismo, y se toma de acá. Si el puntaje no aparece, entonces el predeterminado es 1~punto.
   \item La muestra se refiere al n\'umero de preguntas que se toma de la carpeta. Si no aparece, el predeterminado es 1.
   \item Las preguntas finalizan con una línea en blanco.
+  \item De manera opcional, se pueden encerrar varias preguntas entre \verb|<bloque>| y \verb|</bloque>|. El efecto es que no va a separar las preguntas con una nueva p\'agina, y va a mantener las variables entre las preguntas.
 \end{itemize}
 
-\section{Estructura del archivo para cada pregunta}
+\section{Preguntas}
+
+\subsection{Encabezado}
+No es una pregunta. Es m\'as bien como un texto para un grupo de preguntas. Lo ideal es que vaya al inicio de un bloque. Se distingue en el archivo \verb|.ppp| porque tiene un puntaje de 0.
 
 \begin{verbatim}
-<tipo = seleccion unica[, orden = aleatorio]>
+<tipo = encabezado[, cifras = __cifras significativas__]>
+
+<variables>
+__nombre_de_variable__ = __expresion__
+
+<pregunta>
+__texto de la pregunta__
+\end{verbatim}
+
+\subsection{Selecci\'on \'unica}
+
+\begin{verbatim}
+<tipo = seleccion unica>
 
 <variables>
 __nombre_de_variable__ = __expresion__
@@ -106,6 +131,36 @@ __respuesta o distractor__
 \end{enumerate}
 
 
+%% \subsection{Selección única}
+%% Las opciones para selección única son las siguientes:
+%% \begin{itemize}
+%%   \item \verb|<tipo = seleccion unica, orden = aleatorio>|
+%%   \item \verb|<tipo = seleccion unica, orden = creciente>|
+%%   \item \verb|<tipo = seleccion unica, orden = fijo>|
+%%   \item \verb|<tipo = seleccion unica, orden = indice>|
+%% \end{itemize}
+%% 
+\subsection{Respuesta corta}
+
+Tiene dos posibilidades principales.
+
+\subsubsection{Entero}
+
+\noindent \verb|<tipo = respuesta corta[, respuesta = entero]>| \\[1ex]
+Se puede especificar que la respuesta es de tipo entero, pero si no se especifica nada, de tipo entero es la opción predeterminada para los tipos de respuesta corta.
+
+
+\subsubsection{Flotante}
+
+\noindent \verb|<tipo = respuesta corta, respuesta = flotante[, cifras = __cifras__]>| \\[1ex]
+Respuesta corta de tipo flotante. \verb|cifras| es el n\'umero de cifras que se utilizan para imprimir las expresiones de tipo flotante en la pregunta.
+
+Aunque se asume que la primera respuesta es la correcta, se puede especificar m\'as de una respuesta, mediante: \\[1ex]
+\verb|<item, error = __error__[, factor = __porcentaje de la pregunta]>| \\
+\verb|__respuesta__| \\[1ex]
+Si no se da un factor, entonces se toma 1 como factor. Se utiliza para ir relajando el error, pero castigar entonces el puntaje de la pregunta. Cada radio del error debe ser mayor, y cada puntaje no debe ser mayor al anterior, porque se toma como correcto el primero que se encuentre.
+
+
 \section{Funciones}
 
 Se tienen dos tipos de funciones. Las funciones que \'unicamente se pueden llamar para definir variables, y las funciones generales que se pueden llamar en las variables, en la pregunta, y en los \'itemes.
@@ -118,9 +173,8 @@ En las variables se define de manera normal. En la pregunta y los items cualquie
   \item \verb|@[__expr__]|
   \item Una \verb|@| seguida de cualquier s\'imbolo, que es el mismo que se utiliza para cerrar, por ejemplo podr\'ia ser \verb/@|__expr__|/. 
 \end{itemize}
-!`El \'unico requisito, es que el s\'imbolo para cerrar \textbf{no} debe aparecer en la expresi\'on a evaluar!
 
-Bueno, no es el \'unico. Toda a expresi\'on a evaluar debe estar contenida en una sola l\'inea.
+!`El \'unico requisito, es que el s\'imbolo para cerrar \textbf{no} debe aparecer en la expresi\'on a evaluar! Bueno, no es el \'unico. Toda expresi\'on a evaluar debe estar contenida en una sola l\'inea.
 
 Si el resultado de una @-expresi\'on es un \verb|string| o un entero, entonces se concatena al texto; si es un punto flotante, entonces se trabaja de manera predeterminada con 3 cifras significativas, y se imprime el n\'umero en notaci\'on decimal o en notaci\'on cient\'ifica, dependiendo de c\'omo se permita saber de la forma m\'as clara que se tienen 3 cifras significativas. Si el resultado de la @-expresi\'on es otra cosa, entonces se deja que python lo convierta a texto, y se concatena.
 
@@ -140,200 +194,14 @@ Estas funciones \'unicamente est\'an disponibles para definir variables:
 \end{funcion}
 
 \begin{funcion}
-  \verb|choice(<seq>)| \\[1ex]
+  \verb|choice(__seq__)| \\[1ex]
   Un elemento \verb|n| seleccionado al azar de la sucesión no vacía \verb|seq|.
 \end{funcion}
 
 \begin{funcion}
-  \verb|shuffle(<seq>)| \\[1ex]
-  Reordena \emph{in situ} la sucesión \verb|seq|.
-\end{funcion}
-
-\begin{funcion}
   \verb|sample(<list>, k)| \\[1ex]
-  Toma una muestra de tamaño \verb|k| de la lista \verb|list|. \verb|k| debe ser menor o igual al tamaño de la lista. La muestra no está ordenada con respecto a la lista.
+  Toma una muestra de tamaño \verb|k| de la lista \verb|list|. \verb|k| debe ser menor o igual al tamaño de la lista. La muestra no está ordenada con respecto a la lista. Si \verb|k| es el mismo tama\~no de la lista, entonces devuelve una permutaci\'on de la lista.
 \end{funcion}
-
-\subsection{¿Cómo construir una sucesión?}
-
-Las sucesiones se definen mediante una de las siguientes formas:
-\begin{itemize}
-  \item \verb|range(<stop>)|
-  \item \verb|range(<start>, <stop>)|
-  \item \verb|range(<start>, <stop>, <step>)|
-\end{itemize}
-
-En el caso de un solo argumento, entonces la sucesión comienza en 0 y termina en \verb|stop - 1|. Si tiene dos argumentos, entonces comienza en \verb|start| y finaliza en \verb|stop-1|. Con tres argumentos la función \verb|range| define la sucesión \verb|start|, \verb|start + step|, \verb|start + 2*step|, \dots, \verb|start + k*step|, donde \verb|start + k*step < stop <= start + (k+1)*step|.
-
-\begin{enumerate}
-  \item Si la sucesión está dada por los $j$ elementos $0, 1, 2, \dots, j - 1$, se construye con \verb|xs = range(j)|.
-  \item Si la sucesión está dada por los $j$ elementos: $i, i+1, i+2, \dots, i + j - 1$, se construye con \verb|xs = range(i, i+j)|.
-  \item Para una sucesión aritmética de $k$ elementos $i, i + d, i + 2d, \dots, i + (k-1)d$, se construye con \verb|xs = range(i, j, d)|, donde $i + (k-1)d < j \leq i + kd$.
-  \item Para concatenar dos o m\'as sucesiones:\\[1ex]
-    \verb|xs = [*range(<start>,<stop>[,<step>]), *range(<start>,<stop>[,<step>])]|.
-\end{enumerate}
-
-Si lo que se quiere es tomar un elemento aleatorio de una sucesión simple, entonces mejor utilizar las funciones \verb|randrange| o \verb|randint|. Para el caso en que se concatenan dos o m\'as sucesiones, entonces se puede utilizar \verb|choice|.
-
-\subsection{Funciones generales}
-Lo que se tiene es un subconjunto de funciones de python, y algunas programadas espec\'ificamente para la generaci\'on de pruebas.
-
-\begin{funcion}
-  \verb|+ - * / //| \\[1ex]
-  Suma, resta, multiplicaci\'on, divisi\'on normal (con punto flotante como respuesta) y divisi\'on entera.
-\end{funcion}
-
-\begin{funcion}
-  \verb|range(stop)| \\[1ex]
-  \verb|range(start, stop[, step])| 
-\end{funcion}
-
-\begin{funcion}
-  \verb|__exp_True__ if __exp_bool__ else __exp_False__| \\[1ex]
-  Un \verb|if| en un s\'olo rengl\'on. En las expresiones booleanas se puede utilizar \verb|not|, \verb|or| y \verb|and| seg\'un se necesite.
-\end{funcion}
-
-\begin{funcion}
-  \verb|round(__numero__[, __dig__])| \\[1ex]
-  Redondea un n\'umero, y se puede especificar el n\'umero de d\'igitos a utilizar. 0 es el valor predeterminado.
-\end{funcion}
-
-\begin{funcion}
-  \verb|pow(a, b)| \quad
-  $a^b$
-\end{funcion}
-
-\begin{funcion}
-  \verb|abs(a)| \quad
-  $|a|$
-\end{funcion}
-
-\begin{funcion}
-  \verb|binomial(a,b)| \quad $\ds\binom{a}{b}$
-\end{funcion}
-
-\begin{funcion}
-  \verb|factorial(a)| \quad
-  $a!$
-\end{funcion}
-
-\begin{funcion}
-  \verb|gcd(a,b)| \quad
-  M\'aximo com\'un divisor de $a$ y $b$.
-\end{funcion}
-
-\begin{funcion}
-  \verb|sqrt(a)| \quad
-  $\sqrt{a}$ como punto flotante.
-\end{funcion}
-
-\begin{funcion}
-  \verb|factores(a)| \\[1ex]
-  Factorizaci\'on de $a$. Por ejemplo \verb|factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txtFrac(a, b[, conSigno=False])| \\[1ex]
-  Simplifica y escribe la fracci\'on respectiva en \LaTeX usando \verb|dfrac|. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la fracci\'on si es positiva.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txtRaiz(a[, n=2[, conSigno=False]])| \\[1ex]
-  Simplifica y escribe la ra\'iz respectiva en \LaTeX. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la ra\'iz si es positiva.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txtCoef(a[, conSigno=False])| \\[1ex]
-  Coeficiente que precede a una variable. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|. De manera similar ocurre si $a=-1$. En caso contrario imprime el valor.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txtExpo(n)| \\[1ex]
-  Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
-\end{funcion}
-
-
-\end{document}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\section{Pregunta}
-
-\subsection{Tipos de pregunta}
-\begin{itemize}
-  \item \verb|seleccion unica|
-
-    Varias opciones, indicadas por \verb|<item>|. Al finalizar las opciones, entonces en la etiqueta  \verb|<resp>| aparece el índice de la respuesta correcta. Si no viene la respuesta correcta, entonces se asume que el primer item es el correcto.
-
-    Para saber cómo ordenar, entonces se puede agregar a la etiqueta de \\[1ex]
-    \verb|<tipo = seleccion unica, opciones = <opc>>|, donde para \verb|<opc>| se tienen:
-    \begin{description}
-      \item [\texttt{fijas}:]   Mantiene el orden dado por el usuario.
-      \item [\texttt{indices}:] Cada \verb|<item>| trae el índice que le corresponde.
-      \item [\texttt{ordenar}:] Ordena las opciones de menor a mayor.
-      \item [\texttt{random}:]  Ordena las opciones de forma aleatoria.
-    \end{description}
-\end{itemize}
-
-\subsection{Selección única}
-Las opciones para selección única son las siguientes:
-\begin{itemize}
-  \item \verb|<tipo = seleccion unica, orden = aleatorio>|
-  \item \verb|<tipo = seleccion unica, orden = creciente>|
-  \item \verb|<tipo = seleccion unica, orden = fijo>|
-  \item \verb|<tipo = seleccion unica, orden = indice>|
-\end{itemize}
-
-\subsection{Respuesta corta}
-
-Tiene dos posibilidades principales.
-
-\subsection{Entero}
-
-\noindent \verb|<tipo = respuesta corta[, opcion = entero]>|
-Se puede especificar que la respuesta es de tipo entero, pero si no se especifica nada, de tipo entero es la opción predeterminada para los tipos de respuesta corta.
-
-
-\section{Funciones}
-
-\subsection{random}
-\noindent \verb|import random|
-
-\subsubsection{Enteros}
-
-\begin{funcion}
-  \verb|seed(a=<int>)| \\[1ex]
-  Inicializa el generador de números aleatorios.
-\end{funcion}
-
-\begin{funcion}
-  \verb|randrange(stop)| \\
-  \verb|randrange(start, stop[, step])| \\[1ex]
-  Un elemento \verb|n| seleccionado al azar tal que \verb|start<=n<stop|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|randint(a,b)| \\[1ex]
-  Un elemento \verb|n| seleccionado al azar tal que \verb|a<=n<=b|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|choice(<seq>)| \\[1ex]
-  Un elemento \verb|n| seleccionado al azar de la sucesión no vacía \verb|seq|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|shuffle(<seq>)| \\[1ex]
-  Reordena \emph{in situ} la sucesión \verb|seq|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|sample(<list>, k)| \\[1ex]
-  Toma una muestra de tamaño \verb|k| de la lista \verb|list|. \verb|k| debe ser menor o igual al tamaño de la lista. La muestra no está ordenada con respecto a la lista.
-\end{funcion}
-
-\subsubsection{Punto flotante}
 
 \begin{funcion}
   \verb|random()| \\[1ex]
@@ -350,7 +218,174 @@ Se puede especificar que la respuesta es de tipo entero, pero si no se especific
   Un elemento \verb|x| que sigue una distribución gaussiana con media \verb|mu| y desviación estándar \verb|sigma|.
 \end{funcion}
 
+\subsection{¿Cómo construir una sucesión?}
 
+En python las sucesiones para la funci\'on \verb|choice| o \verb|sample| se pueden definir mediante una de las siguientes formas:
+\begin{itemize}
+  \item \verb|range(<stop>)|
+  \item \verb|range(<start>, <stop>[, <step>])|
+\end{itemize}
+
+%En el caso de un solo argumento, entonces la sucesión comienza en 0 y termina en \verb|stop - 1|. Si tiene dos argumentos, entonces comienza en \verb|start| y finaliza en \verb|stop-1|. Con tres argumentos la función \verb|range| define la sucesión \verb|start|, \verb|start + step|, \verb|start + 2*step|, \dots, \verb|start + k*step|, donde \verb|start + k*step < stop <= start + (k+1)*step|.
+
+\begin{enumerate}
+  \item Si la sucesión está dada por los $j$ elementos $0, 1, 2, \dots, j - 1$, se construye con \verb|xs = range(j)|.
+  \item Si la sucesión está dada por los $j$ elementos: $i, i+1, i+2, \dots, i + j - 1$, se construye con \verb|xs = range(i, i+j)|.
+  \item Para una sucesión aritmética de $k$ elementos $i, i + d, i + 2d, \dots, i + (k-1)d$, se construye con \verb|xs = range(i, j, d)|, donde $i + (k-1)d < j \leq i + kd$.
+  \item Para concatenar dos o m\'as sucesiones:\\[1ex]
+    \verb|xs = [*range(<start>,<stop>[,<step>]), *range(<start>,<stop>[,<step>])]|.
+\end{enumerate}
+
+Si lo que se quiere es tomar un elemento aleatorio de una sucesión simple, entonces mejor utilizar las funciones \verb|randrange| o \verb|randint|. 
+
+\subsection{Funciones generales}
+Lo que se tiene es un subconjunto de funciones de python, y algunas programadas espec\'ificamente para la generaci\'on de pruebas.
+
+%% \item \verb|range(stop)| \\[1ex]
+%%   \verb|range(start, stop[, step])| 
+
+\begin{funcion}
+  Funciones de matem\'atica:
+  \begin{enumerate}[a)]
+    \item \verb|+ - * / // %| \\[1ex]
+  Suma, resta, multiplicaci\'on, divisi\'on normal (con punto flotante como respuesta), divisi\'on entera y residuo
+
+    \item \verb|degrees(x)|; \verb|radians(x)|; \verb|pi|
+
+      Conversi\'on de radianes a grados; conversi\'on de grados a radianes, $\pi$.
+
+\item \verb|acos(x)|;
+      \verb|acosh(x)|;
+      \verb|asin(x)|;
+      \verb|asinh(x)|;
+      \verb|atan(x)|;
+      \verb|atan2(y, x)|;
+      \verb|atanh(x)|;
+      \verb|cos(x)|;
+      \verb|cosh(x)|;
+      \verb|sin(x)|;
+      \verb|sinh(x)|;
+      \verb|tan(x)|;
+      \verb|tanh(x)|
+
+      Funciones trigonom\'etricas y sus inversas (en radianes).
+
+\item \verb|isqrt(x)|; \verb|sqrt(x)|; \verb|exp(x)|; \verb|log(x)|; \verb|log10(x)|
+
+  Parte entera de la ra\'iz de \verb|x|; funciones en punto flotante para la ra\'iz, exponencial, logaritmo natural y logaritmo en base 10.
+
+    \item \verb|erf(x)|; \verb|erfc(x)|; \verb|gamma(x)|
+
+      Funciones de error y funci\'on gamma.
+
+    \item \verb|fmod(x, y)|; \verb|modf(x)|
+      
+      Funci\'on residuo para variables de tipo flotante; parte decimal y parte entera de $x$.
+
+\item \verb|round(__numero__[, __dig__])| \\[1ex]
+  Redondea un n\'umero, y se puede especificar el n\'umero de d\'igitos a utilizar. 0 es el valor predeterminado.
+
+    \item \verb|ceil(x)|;
+      \verb|floor(x)|;
+      \verb|trunc(x)|
+
+      Funciones de manejo de decimales.
+
+    \item \verb|factorial(a)|; \verb|comb(n, r)|; \verb|perm(n, r)|
+
+      Factorial, combinaciones y permutaciones.
+
+    \item \verb|hypot(x, y)|; \verb|dist(xs, ys)|
+
+      $\sqrt{x^2+y^2}$ y distancia entre los vectores $n$-dimensionales  \verb|xs| y \verb|ys|
+
+    \item \verb|sum(xs)|; \verb|prod(xs)|
+
+      Suma y producto de los elementos de la secuencia \verb|xs|.
+
+  \end{enumerate}
+\end{funcion}
+
+\begin{funcion} \verb|__exp_True__ if __exp_bool__ else __exp_False__| \\[1ex]
+  Un \verb|if| en un s\'olo rengl\'on. En las expresiones booleanas se puede utilizar \verb|not|, \verb|or| y \verb|and| seg\'un se necesite.
+\end{funcion}
+
+\begin{funcion}
+  \verb|pow(a, b)| \quad
+  $a^b$
+\end{funcion}
+
+\begin{funcion}
+  \verb|gcd(a,b)| \quad
+  M\'aximo com\'un divisor de $a$ y $b$.
+\end{funcion}
+
+\begin{funcion}
+  \verb|factores(a)| \\[1ex]
+  Factorizaci\'on de $a$. Por ejemplo \verb|factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
+\end{funcion}
+
+\begin{funcion}
+  \verb|txtFrac(a, b[, conSigno=False])| \\[1ex]
+  Simplifica y escribe la fracci\'on respectiva en \LaTeX\ usando \verb|dfrac|. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la fracci\'on si es positiva.
+\end{funcion}
+
+\begin{funcion}
+  \verb|txtRaiz(a[, n=2[, conSigno=False]])| \\[1ex]
+  Simplifica y escribe la ra\'iz respectiva en \LaTeX. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la ra\'iz si es positiva.
+\end{funcion}
+
+\begin{funcion}
+  \verb|txtCoef(a[, conSigno=False])| \\[1ex]
+  Coeficiente que precede a una variable entera. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|). De manera similar ocurre si $a=-1$. En caso contrario imprime el valor.
+\end{funcion}
+
+\begin{funcion}
+  \verb|txtConSigno(n)| \\[1ex]
+  Imprime el n\'umero entero con signo.
+\end{funcion}
+
+\begin{funcion}
+  \verb|txtExpo(n)| \\[1ex]
+  Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
+\end{funcion}
+
+\subsection{Trabajando con sucesiones}
+
+En python las sucesiones son 0 indexadas. As\'i, si \verb|xs| es una sucesi\'on, entonces \verb|xs[0]| es el primer elemento. El tama\~no de una sucesi\'on se da por \verb|len(xs)|. El \'ultimo elemento ser\'ia \verb|xs[-1]|. Un subconjunto: \verb|xs[i:j]| va a ser los elementos que hay desde \verb|xs[i]| hasta \verb|xs[j-1]|.
+
+\subsection{Formato de texto}
+
+\begin{itemize}
+  \item Si \verb|num| es un entero, se puede imprimir el entero con signo como: \verb|'%+d' % num|
+  \item Si \verb|x| es un n\'umero con decimales:
+    \begin{itemize}
+      \item \verb|'%f' % x| imprime el n\'umero con 6 decimales de manera predeterminada.
+      \item \verb|'%.nf' % x|, donde \verb|n| es un entero positivo, imprime el n\'umero con \verb|n| decimales de forma predeterminada.
+      \item \verb|'%e' % x| imprime el n\'umero en notaci\'on cient\'ifica con 6 decimales de forma predeterminada.
+      \item \verb|'%.ne' % x|, donde \verb|n| es un entero positivo, imprime el n\'umero en notaci\'on cient\'ifica con \verb|n| decimales de forma predeterminada.
+    \end{itemize}
+\end{itemize}
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Funciones}
 
 <variables>
   __nombre__ = __definicion__
+
+    Varias opciones, indicadas por \verb|<item>|. Al finalizar las opciones, entonces en la etiqueta  \verb|<resp>| aparece el índice de la respuesta correcta. Si no viene la respuesta correcta, entonces se asume que el primer item es el correcto.
+
+    Para saber cómo ordenar, entonces se puede agregar a la etiqueta de \\[1ex]
+    \verb|<tipo = seleccion unica, opciones = <opc>>|, donde para \verb|<opc>| se tienen:
+    \begin{description}
+      \item [\texttt{fijas}:]   Mantiene el orden dado por el usuario.
+      \item [\texttt{indices}:] Cada \verb|<item>| trae el índice que le corresponde.
+      \item [\texttt{ordenar}:] Ordena las opciones de menor a mayor.
+      \item [\texttt{random}:]  Ordena las opciones de forma aleatoria.
+    \end{description}
+\end{itemize}
+

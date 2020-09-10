@@ -5,6 +5,7 @@ from typing import Any, List, Dict
 
 from diccionarios import DGlobal, DFunciones, DFunRandom
 from fmate import digSignif
+from ftexto import txtFloat
 
 def derechaIgual(expresion : str, izq : str) -> str:
     """Extrae el expresión a la derecha de un igual.
@@ -78,6 +79,7 @@ def evaluarParam(linea: str, dLocal: Dict[str, Any], dparams: Dict[str, Any]) ->
         return
     logging.debug('Evaluar: `%s`' % lista[1].strip())
     resultado: Any = eval(lista[1].strip(), DGlobal, dLocal)
+    logging.debug('Evaluado: `%s`' % str(resultado))
     dparams[nombreVariable] = resultado
     dLocal[nombreVariable] = resultado
 
@@ -135,18 +137,8 @@ def update(linea: str, dLocal: Dict[str, Any], cifras: int = 3) -> str:
         elif isinstance(expr, int):
             unir.append('%d%s' % (expr, texpr[fin+1:]))
         elif isinstance(expr, float):
-            unir.append('%s%s' % (f2str(expr, cifras), texpr[fin+1:]))
+            unir.append('%s%s' % (txtFloat(expr, cifras), texpr[fin+1:]))
         # No tenemos idea de qué tipo es.
         else:
             unir.append('%s%s' % (str(expr), texpr[fin+1:]))
     return ''.join(unir)
-
-def f2str(numero: float, cifras: int) -> str:
-    numero = digSignif(numero, cifras)
-    if numero < pow(10, -2*cifras-1) or numero >= pow(10, cifras - 1):
-        ftxt = '%.2e'
-    elif numero >= 1:
-        ftxt = '%%.%df' % (cifras - int(log10(numero)) - 1)
-    else:
-        ftxt = '%%.%df' % (cifras + int(-log10(numero)))
-    return ftxt % numero

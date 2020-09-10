@@ -1,0 +1,12 @@
+<tipo = respuesta corta>
+
+<variables>
+% El orden de la lista es Ingles, Aleman, Frances 
+idx = choice([0,1,2])
+resp = [si, sa, sf]
+
+<pregunta>
+?`Cu\'antos estudian solo @|lista[idx]|?
+
+<item>
+@|resp[idx]|

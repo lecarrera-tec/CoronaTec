@@ -1,7 +1,7 @@
-import math
+from math import gcd, log10
 from typing import List, Tuple
 
-import fmate
+from fmate import factores
 
 def txtFraccion(num: int, den: int, conSigno: bool = False) -> str:
     """Texto en LaTeX de una fracci\'on. 
@@ -30,7 +30,7 @@ def txtFraccion(num: int, den: int, conSigno: bool = False) -> str:
     if den < 0:
         signo *= -1
         den = abs(den)
-    factor: int = math.gcd(num, den)
+    factor: int = gcd(num, den)
     num = num // factor
     den = den // factor
     texto: str
@@ -73,7 +73,7 @@ def txtRaiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
         arg = abs(arg)
         signo = -1
 
-    lfact: List[Tuple[int, int]] = fmate.factores(arg)
+    lfact: List[Tuple[int, int]] = factores(arg)
     afuera: int = 1
     adentro: int = 1
     for primo, numRep in lfact:
@@ -138,3 +138,15 @@ def txtExpo(expo: int) -> str:
         return ''
     else:
         return '^{%d}' % expo
+
+def txtConSigno(numero: int) -> str:
+    return '%+d' % numero
+
+def txtFloat(numero: float, cifras: int) -> str:
+    if numero < pow(10, -2*cifras-1) or numero >= pow(10, cifras - 1):
+        ftxt = '%%.%de' % (cifras - 1)
+    elif numero >= 1:
+        ftxt = '%%.%df' % (cifras - int(log10(numero)) - 1)
+    else:
+        ftxt = '%%.%df' % (cifras + int(-log10(numero)))
+    return ftxt % numero

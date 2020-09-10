@@ -41,12 +41,14 @@ def factores(numero: int) -> List[Tuple[int, int]]:
     return factores
 
 def digSignif(numero: float, digitos: int):
-    exp: int = 0
-    while numero >= 10:
-        exp += 1
-        numero /= 10
-    while numero < 1:
-        exp -= 1
-        numero *= 10
+    exp: int = math.ceil(math.log10(numero)) - 1
+    pot10: int = pow(10, exp)
+    numero /= pot10
+    assert(1 <= numero and numero < 10)
     numero = round(numero, digitos - 1)
-    return numero * pow(10, exp)
+    return numero * pot10
+
+def mantisa(numero: float) -> Tuple[float, int]:
+    exp: int = math.ceil(math.log10(numero)) - 1
+    numero /= pow(10, exp)
+    return (numero, exp)

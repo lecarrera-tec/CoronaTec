@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Tuple
 import Info
 import pregunta
 import parserPPP
+import TPreg
 from respuesta import Respuesta
 
 # TODO Revisar errores mientras se leen los archivos, manejar 
@@ -21,10 +22,11 @@ class Seccion:
         predeterminado es que no.
     instrucciones : str
         Texto de las instrucciones específicas de la sección.
-    preguntas : [(int, str, int)]
+    preguntas : [(int, str, int, bool)]
         Una lista de tuplas. La información de la tupla corresponde
-        al puntaje de la pregunta, el path, y el número de muestras
-        que se extrae en caso de que sea una carpeta.
+        al puntaje de la pregunta, el path, el número de muestras que se 
+        extrae en caso de que sea una carpeta, y si está contenida en
+        un bloque o no.
     puntaje : int
         Puntaje total de la sección.
     titulo : str
@@ -84,12 +86,14 @@ class Seccion:
         assert(l.strip().startswith(Info.PREGUNTAS))
         # Vamos a guardar una lista de tuplas, donde el primer 
         # elemento es el puntaje, y el segundo la dirección.
-        self.preguntas: List[Tuple[int, str, int]] = []
+        self.preguntas: List[Tuple[int, str, int, bool]] = []
         # Guardamos cada línea, hasta que encontremos la primera 
         # línea en blanco: esto señala el final de la sección.
         texto: str
         puntos: int
         muestra: int
+        # El usuario puede definir bloques, para no hacer página nueva.
+        bloque: bool = False
         while True:
             l = f.readline().strip()
             # Línea en blanco, terminamos.
@@ -97,6 +101,17 @@ class Seccion:
                 break
             # Si es un comentario, continuamos con la siguiente línea.
             if l[0] == Info.COMMENT:
+                continue
+            # Inicio de bloque. Solamente en caso de las preguntas no
+            # estén en orden aleatorio.
+            if l == Info.INICIO_BLOQUE:
+                assert(not bloque)
+                assert(not self.aleatorias)
+                bloque = True
+                continue
+            elif l == Info.FIN_BLOQUE:
+                assert(bloque)
+                bloque = False
                 continue
             # Buscamos los puntos de la pregunta, el tamaño de la 
             # muestra y el origen de la pregunta.
@@ -132,7 +147,7 @@ class Seccion:
                 logging.error(texto)
                 continue
             self.preguntas.append(
-                    (puntos, '%s%s' % (dir_trabajo, texto), muestra))
+                    (puntos, '%s%s' % (dir_trabajo, texto), muestra, bloque))
             logging.info('Se agrega pregunta: %s' % str(self.preguntas[-1]))
 
     def get_puntaje(self) -> int:
@@ -156,27 +171,40 @@ class Seccion:
         # sección.
         lista: List[str] = []
         # Vamos agregando el texto de cada pregunta de la sección.
-        puntaje: int
         filelist: List[str]
-        k: int   # Tamaño de la muestra.
         texto: str
-        for path in self.preguntas:
-            # Si el orden es aleatorio, se borran las variables ya
+        puntaje: int
+        origen: str
+        muestras: int
+        bloque: bool
+        for puntaje,origen,muestras,bloque in self.preguntas:
+            # Si no estamos en un bloque, se borran las variables ya
             # definidas.
-            if self.aleatorias:
+            if not bloque:
                 dParams = {}
-            puntaje = path[0]
-            k = path[2]
-            filelist = Seccion.muestraPreguntas(path[1], k)
+            # Extraemos las preguntas.
+            filelist = Seccion.muestraPreguntas(origen, muestras)
+            # El puntaje de la pregunta es 0. Entonces debe corresponder
+            # a un archivo de encabezado. Por eso no va entre 
+            # \begin{ejer} y \end{ejer}. Solo se puede extraer un 
+            # archivo, no debemos estar en una secci\'on aleatoria y
+            # debemos estar en un bloque.
+            if puntaje == 0:
+                assert(muestras == 1)
+                assert(not self.aleatorias)
+                assert(bloque)
+                lista.append('%s\n\\bigskip\n\n'
+                        % pregunta.get_latex(filelist[0], dParams))
+                continue
             for filename in filelist:
                 texto = '  \\begin{ejer}~\\textbf{[%d %s]}\n' % (
                         puntaje, 'puntos' if puntaje > 1 else 'punto')
-                lista.append('%s%s%s' % (
-                    texto, 
-                    pregunta.get_latex(filename, dParams),
-                    #'\\end{ejer}\n\\bigskip\n\\pagebreak[3]\n'
-                    '\\end{ejer}\n\\newpage\n\n'
-                ))
+                if bloque:
+                    origen = '\\end{ejer}\n\n'
+                else:
+                    origen = '\\end{ejer}\n\\newpage\n\n'
+                lista.append('%s%s%s' % (texto, 
+                                pregunta.get_latex(filename, dParams), origen))
 
         # Si las preguntas se requieren en orden aleatorio, entonces
         # las reordenamos
@@ -203,21 +231,22 @@ class Seccion:
         # requiere que sean aleatorias, se reordenan.
         lresp: List[Respuesta] = []
         # Vamos agregando la instancia de cada pregunta de la sección.
-        puntaje: int
         filelist: List[str]
-        k: int   # Tamaño de la muestra.
-        for path in self.preguntas:
-            # Si el orden es aleatorio, se borran las variables ya
+        puntaje: int
+        origen: str
+        muestras: int
+        bloque: bool
+        for puntaje,origen,muestras,bloque in self.preguntas:
+            # Si no estamos en un bloque, se borran las variables ya
             # definidas.
-            if self.aleatorias:
+            if not bloque:
                 dParams = {}
-            puntaje = path[0]
-            k = path[2]
-            filelist = Seccion.muestraPreguntas(path[1], k)
+            filelist = Seccion.muestraPreguntas(origen, muestras)
             for filename in filelist:
                 resp = pregunta.get_respuesta(filename, dParams)
                 resp.set_puntaje(puntaje)
-                lresp.append(resp)
+                if not (resp.tipoPreg & TPreg.ENCABEZADO):
+                    lresp.append(resp)
 
         # Si las preguntas se requieren en orden aleatorio, entonces
         # se reordenan igual las respuestas.

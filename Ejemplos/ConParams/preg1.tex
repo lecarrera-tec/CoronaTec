@@ -1,4 +1,4 @@
-<tipo = seleccion unica, orden = aleatorio>
+<tipo = seleccion unica>
 
 <variables>
 ls = [*range(-9,0), *range(1,10)]
@@ -6,7 +6,7 @@ k = choice(ls)
 
 <pregunta>
 El radio de converencia de la serie de potencias:
-\[ \sum_{n=0}^\infty ( x @|'%+d' % -k| )^n \]
+\[ \sum_{n=0}^\infty ( x @|txtConSigno(-k)| )^n \]
 est\'a dado por:
 
 <item>

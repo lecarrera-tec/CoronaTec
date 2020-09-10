@@ -9,7 +9,7 @@ import parserPPP
 import Info
 import TPreg
 from respuesta import Respuesta
-from diccionarios import DFunRandom, DFunciones
+from diccionarios import DFunRandom, DFunciones, DGlobal
 
 def get_latex(filename: str, dParams: Dict[str, Any]) -> str:
     """Genera el código LaTeX de la pregunta.
@@ -34,12 +34,15 @@ def get_latex(filename: str, dParams: Dict[str, Any]) -> str:
         logging.error('No se pudo abrir archivo "%s"' % filename) 
         return ''
 
-    lines: List[str] = f.readlines()
+    # Se obtienen todas las lineas del archivo y se cierra.
+    lineas: List[str] = f.readlines()
     f.close()
-    ignorar: bool = True
     texto: str
+
+    # Se ignoran los comentarios.
+    ignorar: bool = True
     while ignorar:
-        l: str = lines.pop(0).strip()
+        l: str = lineas.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
@@ -47,11 +50,11 @@ def get_latex(filename: str, dParams: Dict[str, Any]) -> str:
     l = l.strip(Info.STRIP)
     tipo: str = parserPPP.derechaIgual(l, 'tipo')
     if tipo == 'respuesta corta':
-        opcion: str = parserPPP.derechaIgual(l, 'opcion')
-        if opcion == '' or opcion == 'entero':
-            texto = latex_corta_entera(l, lines, dParams)
+        texto = latex_corta(l, lineas, dParams)
     elif tipo == 'seleccion unica':
-        texto = latex_unica(l, lines, dParams)
+        texto = latex_unica(l, lineas, dParams)
+    elif tipo == 'encabezado':
+        texto = latex_encabezado(l, lineas, dParams)
 
     # Queda aún algo muy importante por hacer, y es modificar el path 
     # de las figuras que se incluyan: \includegraphics[opciones]{path}
@@ -70,10 +73,7 @@ def get_latex(filename: str, dParams: Dict[str, Any]) -> str:
         texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
     return texto
 
-def latex_corta_entera(l: str, lines: List[str], dParams: Dict[str, Any]) -> str:
-    return ''
-
-def latex_unica(l: str, lines: List[str], dParams: Dict[str, Any]) -> str:
+def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
     """LaTeX de pregunta de selección única.
 
     Argumentos
@@ -91,20 +91,20 @@ def latex_unica(l: str, lines: List[str], dParams: Dict[str, Any]) -> str:
     """
 
     # TODO Faltan leer los parámetros de la pregunta que se encuentran
-    # en ``l``
+    # en ``l``. Asumimos que el orden es aleatorio.
     orden = 'aleatorio'
     logging.debug('Entrando a "latex_unica"')
-    logging.debug('Texto : %s', ''.join(lines))
+    logging.debug('Texto : %s', ''.join(lineas))
     lista: List[str] = []
     ignorar: bool = True
     while ignorar:
-        l = lines.pop(0).strip()
+        l = lineas.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
     # Definiendo diccionario.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if l == Info.VARIABLES:
         while True:
-            l = lines.pop(0).strip()
+            l = lineas.pop(0).strip()
             if l == Info.PREGUNTA:
                 break
             elif len(l) == 0 or l[0] == Info.COMMENT:
@@ -117,23 +117,22 @@ def latex_unica(l: str, lines: List[str], dParams: Dict[str, Any]) -> str:
     # Redefinimos el diccionario, eliminando las preguntas que generan
     # números aleatorios.
     dLocal = {**dParams, **DFunciones}
-    l = lines.pop(0)
+    l = lineas.pop(0)
     texto: List[str] = []
     while not l.strip().startswith(Info.LITEM):
         # Agregamos la l\'inea de texto actualizando las @-expresiones.
         texto.append('    %s' % parserPPP.update(l, dLocal))
-        l = lines.pop(0)
+        l = lineas.pop(0)
     lista.append('%s\n%s' % (''.join(texto).rstrip(), '    \\nopagebreak\n'))
     # Ahora siguen los items.
     texto = []
     assert(l.strip().startswith(Info.LITEM))
-    # TODO Hay que parsear cada item por si está parametrizado.
     # TODO Hay que leer la opción de indice del item cuando 
     # corresponda. Primero se va a crear una lista de los items.
     litems: List[str] = []
     item: str = ''
-    while len(lines) > 0:
-        l = lines.pop(0)
+    while len(lineas) > 0:
+        l = lineas.pop(0)
         # Un nuevo item. Finalizamos el anterior.
         if l.strip().startswith(Info.LITEM):
             # TODO falta revisar opciones como \'indice.
@@ -153,25 +152,171 @@ def latex_unica(l: str, lines: List[str], dParams: Dict[str, Any]) -> str:
     lista.append('    \\end{enumerate}\n')
     return ('%s\n' % ''.join(lista).strip())
 
-def get_respuesta(filename: str, dParams: Dict[str, Any]) -> Respuesta:
-    """
-    Recibe como argumento la dirección de un archivo, y devuelve una
-    instancia de un objeto Respuesta.
+def latex_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
+    """LaTeX de pregunta de respuesta corta.
 
-    Lo que hace es clasificar el tipo de pregunta, y llamar a la 
-    función correspondiente.
+    Argumentos
+    ---------
+    l:
+        Primera línea. Para leer las opciones específicas.
+    linea:
+        Resto de las líneas de texto.
+    dParams:
+        Diccionario de variables definidas por el usuario.
+    cifras:
+        N\'umero de cifras significativas a utilizar.
+
+    Devuelve
+    --------
+    Texto LaTeX de la pregunta, con los parámetros ya sustituidos.
     """
+
+    logging.debug('Entrando a "latex_corta"')
+    logging.debug('Texto : %s', ''.join(lineas))
+
+    # Definiendo el n\'umero de cifras significativas en 3.
+    cifras: int = 3
+    # Buscando si el usuario lo defini\'o.
+    texto: str = parserPPP.derechaIgual(l, 'cifras')
+    if len(texto) > 0:
+        try:
+            cifras = int(texto)
+        except:
+            logging.error('No se pudo leer `cifras` en `%s`.' % l)
+            logging.error('Se utilizan 3 de forma predeterminada.')
+            cifras = 3
+
+    # Aqu\'i se guarda l\'inea a l\'inea de la pregunta.
+    lista: List[str] = []
+
+    # Se ignoran los comentarios.
+    ignorar: bool = True
+    while ignorar:
+        l = lineas.pop(0).strip()
+        ignorar = len(l) == 0 or l[0] == Info.COMMENT
+    # Definiendo diccionario y se eval\'uan las variables.
+    dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
+    if l == Info.VARIABLES:
+        while True:
+            l = lineas.pop(0).strip()
+            if l == Info.PREGUNTA:
+                break
+            elif len(l) == 0 or l[0] == Info.COMMENT:
+                continue
+            parserPPP.evaluarParam(l, dLocal, dParams)
+
+    # Deberíamos estar en la pregunta. Hay que buscar si se necesitan
+    # variables.
+    assert(l == Info.PREGUNTA)
+    # Redefinimos el diccionario, eliminando las preguntas que generan
+    # números aleatorios.
+    dLocal = {**dParams, **DFunciones}
+    l = lineas.pop(0)
+    ltexto: List[str] = []
+    while not l.strip().startswith(Info.LITEM):
+        # Se agrega la l\'inea de texto actualizando las @-expresiones.
+        ltexto.append('    %s' % parserPPP.update(l, dLocal, cifras))
+        l = lineas.pop(0)
+    lista.append('%s\n%s' % (''.join(ltexto).rstrip(), '    \\nopagebreak\n'))
+    lista.append('    \\underline{\\hspace*{0.25\\textwidth}}\n\n')
+    return ('%s\n' % ''.join(lista).strip())
+
+def latex_encabezado(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
+    """LaTeX de encabezado
+
+    Argumentos
+    ---------
+    l:
+        Primera línea. Para leer las opciones específicas.
+    linea:
+        Resto de las líneas de texto.
+    dParams:
+        Diccionario de variables definidas por el usuario.
+    cifras:
+        N\'umero de cifras significativas a utilizar.
+
+    Devuelve
+    --------
+    Texto LaTeX del encabezado, con los parámetros ya sustituidos.
+    """
+
+    logging.debug('Entrando a "latex_encabezado"')
+    logging.debug('Texto : %s', ''.join(lineas))
+
+    # Definiendo el n\'umero de cifras significativas en 3.
+    cifras: int = 3
+    # Buscando si el usuario lo defini\'o.
+    texto: str = parserPPP.derechaIgual(l, 'cifras')
+    if len(texto) > 0:
+        try:
+            cifras = int(texto)
+        except:
+            logging.error('No se pudo leer `cifras` en `%s`.' % l)
+            logging.error('Se utilizan 3 de forma predeterminada.')
+            cifras = 3
+
+    # Se ignoran los comentarios.
+    ignorar: bool = True
+    while ignorar:
+        l = lineas.pop(0).strip()
+        ignorar = len(l) == 0 or l[0] == Info.COMMENT
+    # Definiendo diccionario y se eval\'uan las variables.
+    dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
+    if l == Info.VARIABLES:
+        while True:
+            l = lineas.pop(0).strip()
+            if l == Info.PREGUNTA:
+                break
+            elif len(l) == 0 or l[0] == Info.COMMENT:
+                continue
+            parserPPP.evaluarParam(l, dLocal, dParams)
+
+    # Deberíamos estar en el encabezado. Hay que buscar si se necesitan
+    # variables.
+    assert(l == Info.PREGUNTA)
+    # Redefinimos el diccionario, eliminando las preguntas que generan
+    # números aleatorios.
+    dLocal = {**dParams, **DFunciones}
+    ltexto: List[str] = []
+    while len(lineas) > 0:
+        l = lineas.pop(0)
+        # Se agrega la l\'inea de texto actualizando las @-expresiones.
+        ltexto.append('    %s' % parserPPP.update(l, dLocal, cifras))
+    return ('%s\n' % ''.join(ltexto).strip())
+
+def get_respuesta(filename: str, dParams: Dict[str, Any]) -> Respuesta:
+    """ Constructor de la respuesta.
+
+    Lo que hace es clasificar el tipo de pregunta, y llamar a la función 
+    correspondiente.
+
+    Argumentos
+    ----------
+    filename:
+        Nombre del archivo donde se encuentra la pregunta.
+    dParams:
+        Diccionario de los parámetros definidos por el usuario.
+
+    Devuelve
+    --------
+        Objeto de tipo Respuesta de la pregunta, con los parámetros ya 
+        sustituidos.
+    """
+
+    # Se abre el archivo, se leen y guardan las l\'ineas y se cierra
+    # el archivo.
     try:
         f = open(filename)
     except:
         logging.error('No se pudo abrir archivo "%s"' % filename) 
         sys.exit()
-
-    lines: List[str] = f.readlines()
+    lineas: List[str] = f.readlines()
     f.close()
+
+    # Ignorando comentarios y l\'ineas en blanco.
     ignorar: bool = True
     while ignorar:
-        l: str = lines.pop(0).strip()
+        l: str = lineas.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
@@ -179,22 +324,143 @@ def get_respuesta(filename: str, dParams: Dict[str, Any]) -> Respuesta:
     l = l.strip(Info.STRIP)
     tipo: str = parserPPP.derechaIgual(l, 'tipo')
     if tipo == 'respuesta corta':
-        opcion: str = parserPPP.derechaIgual(l, 'opcion')
-        if opcion == '' or opcion == 'entero':
-            return respuesta_corta_entera(lines)
+        return respuesta_corta(l, lineas, dParams)
     elif tipo == 'seleccion unica':
-        orden: str = parserPPP.derechaIgual(l, 'orden')
-        return respuesta_unica(l, lines, dParams)
+        return respuesta_unica(l, lineas, dParams)
 
-    logging.critical('Tipo de pregunta desconocido: %s' % l)
-    sys.exit()
-
-def respuesta_corta_entera(lines: List[str]):
-    assert(False)
+    logging.error('Tipo de pregunta desconocido: %s' % l)
     return Respuesta(TPreg.NINGUNA)
 
-def respuesta_unica(
-            l: str, lines: List[str], dParams: Dict[str, Any]) -> Respuesta:
+def respuesta_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respuesta:
+    """Objeto Respuesta de pregunta de respuesta corta.
+
+    Argumentos
+    ---------
+    l:
+        Primera línea. Para leer las opciones específicas.
+    linea:
+        Resto de las líneas de texto.
+    dParams:
+        Diccionario de variables definidas por el usuario.
+
+    Devuelve
+    --------
+        Objeto de tipo Respuesta de la pregunta, con los parámetros ya 
+        sustituidos.
+    """
+
+    logging.debug('Entrando a "respuesta_corta"')
+    logging.debug('Texto : %s', ''.join(lineas))
+
+    # Definiendo el n\'umero de cifras significativas en 3.
+    cifras: int = 3
+    # Buscando si el usuario lo defini\'o.
+    texto: str = parserPPP.derechaIgual(l, 'cifras')
+    if len(texto) > 0:
+        try:
+            cifras = int(texto)
+        except:
+            logging.error('No se pudo leer `cifras` en `%s`.' % l)
+            logging.error('Se utilizan 3 de forma predeterminada.')
+            cifras = 3
+
+    resp = Respuesta(TPreg.RESP_CORTA)
+    # Ver si la respuesta es un entero, o de tipo flotante. El tipo
+    # entero es el predeterminado.
+    texto = parserPPP.derechaIgual(l, 'respuesta')
+    esEntero: bool
+    if len(texto) == 0 or texto == 'entero':
+        esEntero = True
+        resp.add_opcion(TPreg.ENTERO)
+    elif texto == 'flotante':
+        esEntero = False
+        resp.add_opcion(TPreg.FLOTANTE)
+    else:
+        logging.critical('Tipo de respuesta desconocido: `%s`', texto)
+        esEntero = True
+        resp.add_opcion(TPreg.ENTERO)
+
+    # Se ignoran los comentarios.
+    ignorar: bool = True
+    while ignorar:
+        l = lineas.pop(0).strip()
+        ignorar = len(l) == 0 or l[0] == Info.COMMENT
+
+    # Se leen los par\'ametros.
+    dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
+    if l == Info.VARIABLES:
+        while True:
+            l = lineas.pop(0).strip()
+            if l == Info.PREGUNTA:
+                break
+            elif len(l) == 0 or l[0] == Info.COMMENT:
+                continue
+            else:
+                parserPPP.evaluarParam(l, dLocal, dParams)
+
+    # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
+    # debería de llamar a ninguna función random aquí.
+    assert(l == Info.PREGUNTA)
+    l = lineas.pop(0)
+    while not l.strip().startswith(Info.LITEM):
+        l = lineas.pop(0)
+
+    # Ahora siguen los items.
+    entero: int
+    flotante: float
+    error: float
+    # Se redefine el diccionario para eliminar las funciones random.
+    dLocal = {**dParams, **DFunciones}
+    assert(l.strip().startswith(Info.LITEM))
+    # Puede haber respuestas cortas con varias respuestas posibles de 
+    # tal manera que el radio del error aceptable se aumenta, y se
+    # disminuye el factor del puntaje obtenido.
+    while True:
+        if l.strip().startswith(Info.LITEM):
+            l = l.strip(Info.STRIP)
+            if esEntero:
+                # No hay que leer opciones. Se obtiene la siguiente
+                # l\'inea y se lee la expresi\'on.
+                l = lineas.pop(0).strip()
+                try:
+                    entero = eval(l, DGlobal, dLocal)
+                except:
+                    logging.error('No se pudo evaluar expresion: `%s`' % l)
+                    entero = 0
+                resp.add_respuesta(entero)
+            else:
+                # Es de tipo flotante. Hay que leer error aceptable y
+                # factor del puntaje.
+                texto = parserPPP.derechaIgual(l, 'error')
+                try:
+                    error = float(texto)
+                except:
+                    logging.error('No se pudo leer error: `%s`' % l)
+                    error = 0.01
+                texto = parserPPP.derechaIgual(l, 'factor')
+                if len(texto) == 0:
+                    factor = 1.0
+                else:
+                    try:
+                        factor = float(texto)
+                    except:
+                        logging.error('No se pudo leer factor: `%s`' % l)
+                        factor = 1.0
+                # Ya se puede leer la siguiente l\'inea y evaluar la 
+                # expresi\'on.
+                l = lineas.pop(0).strip()
+                try:
+                    flotante = eval(l, DGlobal, dLocal)
+                except:
+                    logging.error('No se pudo evaluar expresion: `%s`' % l)
+                    flotante = 0.0
+                resp.add_respuesta((flotante, error, factor))
+        if len(lineas) == 0:
+            break
+        l = lineas.pop(0)
+    return resp
+
+def respuesta_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respuesta:
     """Objeto Respuesta de pregunta de selección única.
 
     Argumentos
@@ -208,24 +474,24 @@ def respuesta_unica(
 
     Devuelve
     --------
-    Objeto de tipo Respuesta de la pregunta, con los parámetros ya 
-    sustituidos.
+        Objeto de tipo Respuesta de la pregunta, con los parámetros ya 
+        sustituidos.
     """
 
     logging.debug('Entrando a "respuesta_unica"')
-    logging.debug('Texto : %s', ''.join(lines))
+    logging.debug('Texto : %s', ''.join(lineas))
     # TODO Se tienen que extraer las opciones de la pregunta.
     orden = parserPPP.derechaIgual(l, 'orden')
 
     ignorar: bool = True
     resp = Respuesta(TPreg.UNICA)
     while ignorar:
-        l = lines.pop(0).strip()
+        l = lineas.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if l == Info.VARIABLES:
         while True:
-            l = lines.pop(0).strip()
+            l = lineas.pop(0).strip()
             if l == Info.PREGUNTA:
                 break
             elif len(l) == 0 or l[0] == Info.COMMENT:
@@ -236,19 +502,18 @@ def respuesta_unica(
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.
     assert(l == Info.PREGUNTA)
-    l = lines.pop(0)
+    l = lineas.pop(0)
     while not l.strip().startswith(Info.LITEM):
-        l = lines.pop(0)
+        l = lineas.pop(0)
     # Ahora siguen los items.
     assert(l.strip().startswith(Info.LITEM))
     # TODO Hay que leer la opción de indice del item cuando 
     # corresponda. Se incluyen las opciones.
     litems : List[int] = [0]
-    l = lines.pop(0)
-    while len(lines) > 0:
+    while len(lineas) > 0:
+        l = lineas.pop(0)
         if l.strip().startswith(Info.LITEM):
             litems.append(litems[-1] + 1)
-        l = lines.pop(0)
     # Desordenamos los items.
     if orden == 'aleatorio':
         resp.add_opcion(TPreg.ALEATORIO)
