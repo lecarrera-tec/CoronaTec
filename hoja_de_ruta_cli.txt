@@ -14,27 +14,27 @@
            [el problema que tiene es que habría que incluir cada una de las carpetas,
            [y podría pasar que haya dos figuras con el mismo nombre en carpetas
            [distintas.
-  - Programar la revisión. Los argumentos deberían de ser el archivo .ppp,
-    la carpeta con las listas de los estudiantes, y el archivo CSV generado
-    por google forms. Generar una interfaz. Se podría utilizar inicialmente
-    diccionarios, donde la llave sea el número de carnet del estudiante.
+    Listo! [Programar la revisión. Los argumentos deberían de ser el archivo .ppp,
+           [la carpeta con las listas de los estudiantes, y el archivo CSV generado
+           [por google forms. Generar una interfaz. Se podría utilizar inicialmente
+           [diccionarios, donde la llave sea el número de carnet del estudiante.
   - Probar con un cuiz real. Incluir la opción de que haya que anular una
     pregunta mediante dos opciones: *cualquiera*, se le dan los puntos, 
     y *ninguna*, se elimina la pregunta (equivalente a poner 0 puntos en el
     valor de la pregunta).
 
-* Respuesta corta, sin parámetros, banco de preguntas.
-  - respuesta entera;
-  - respuesta con punto flotante. Incluir error relativo, error nominal.
+Listo! [* Respuesta corta, sin parámetros, banco de preguntas.
+       [  - respuesta entera;
+       [  - respuesta con punto flotante. Incluir error relativo, error nominal.
 
-* Respuesta corta, preguntas parametrizadas.
-  - Generar diccionario para variables enteras.
-  - Definir e implementar @|   | para incluir los valores de los parámetros
-    en las preguntas y los ítemes.
-  - Implementar algunas funciones. Lo importante es la estructura para incluir
-    funciones nuevas.
-  - Generar diccionario para variables de punto flotante. Definir el número
-    de dígitos que se van a utilizar para mostrar valores.
+Listo! [* Respuesta corta, preguntas parametrizadas.
+       [  - Generar diccionario para variables enteras.
+       [  - Definir e implementar @|   | para incluir los valores de los parámetros
+       [    en las preguntas y los ítemes.
+       [  - Implementar algunas funciones. Lo importante es la estructura para incluir
+       [    funciones nuevas.
+       [  - Generar diccionario para variables de punto flotante. Definir el número
+       [    de dígitos que se van a utilizar para mostrar valores.
 
 * Selección única, parametrizadas.
   - Items en orden fijo

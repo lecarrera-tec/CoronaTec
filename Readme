@@ -1,19 +1,6 @@
-Proyecto que genera Pruebas de Preguntas Parametrizadas.
+Proyecto que genera Pruebas a partir de un banco de preguntas parametrizadas.
 
-El archivo *principal.py* es un script, que recibe como argumentos de
-entrada la estructura del examen (extensión .ppp, aunque es cualquier
-archivo de texto), y un archivo para la lista de estudiantes, que espera
-el número de carnet separado por una coma del nombre; el archivo CSV que 
-genera el tec digital cuando uno descarga las notas de los estudiantes.
-
-Genera un pdf para cada estudiante.
-
-Características:
-- Un archivo de texto contiene la estructura general de la prueba.
-- Las preguntas que se especifican en la prueba pueden consistir de un 
-  archivo o de una carpeta. Si es una carpeta, se toma un archivo .tex 
-  al azar de la pregunta.
-- Cada pregunta (parametrizada o no) se trabaja en un archivo individual.
+Las preguntas pueden ser de selecci\'on \'unica o respuesta corta.
 
 Ver documentacion.pdf
 

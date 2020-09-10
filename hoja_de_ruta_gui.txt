@@ -1,9 +1,9 @@
-* Una aplicaci\'on para cada una de las tres funciones b\'asicas:
-  - generar : se le solicita al usuario el archivo principal y la carpeta con
-              las listas de los estudiantes.
-  - evaluar : se le solicita al usuario el archivo principal, la carpeta con
-              las listas de los estudiantes y el archivo CSV generado por
-              google forms.
+Listo! [* Una aplicaci\'on para cada una de las tres funciones b\'asicas:
+       [  - generar : se le solicita al usuario el archivo principal y la carpeta con
+       [              las listas de los estudiantes.
+       [  - evaluar : se le solicita al usuario el archivo principal, la carpeta con
+       [              las listas de los estudiantes y el archivo CSV generado por
+       [              google forms.
   - vista_previa : se le solicita al usuario el archivo de la pregunta y el
                    n\'umero de ejemplos por generar.
 
