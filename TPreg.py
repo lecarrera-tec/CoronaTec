@@ -10,7 +10,7 @@ CRECIENTE: int = 4
 INDICES: int = 8
 # Selecci\'on \'unica, se acepta cualquier respuesta.
 # Incluido cuando hay error en la respuesta.
-TODAS: int = 16
+TODOS: int = 16
 
 # Pregunta de respuesta corta
 RESP_CORTA: int = 64

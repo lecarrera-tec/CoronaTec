@@ -15,6 +15,7 @@ encabezado: str = """
 \\usepackage[utf8]{inputenc}
 \\usepackage[T1]{fontenc}
 \\usepackage{paralist}
+\\usepackage{graphicx}
 \\usepackage{amsmath,amsthm,amssymb}
 \\theoremstyle{definition}
 \\newtheorem{ejer}{}\n

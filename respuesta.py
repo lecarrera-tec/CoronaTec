@@ -57,7 +57,7 @@ class Respuesta:
         # tipo de pregunta.
         if self.tipoPreg == TPreg.UNICA:
             assert(opcion & (TPreg.ALEATORIO + TPreg.CRECIENTE 
-                    + TPreg.INDICES + TPreg.TODAS))
+                    + TPreg.INDICES + TPreg.TODOS))
         elif self.tipoPreg == TPreg.RESP_CORTA:
             assert(opcion & (TPreg.ENTERO + TPreg.FLOTANTE))
         else:
@@ -90,8 +90,8 @@ class Respuesta:
         """
         logging.debug('Calificar: %s' % texto)
         puntos: float = 0
-        if self.tipoPreg & TPreg.TODAS:
-            logging.debug('  Tipo -> TODAS')
+        if self.tipoPreg & TPreg.TODOS:
+            logging.debug('  Tipo -> TODOS')
             puntos = 1.0 * self.puntaje
         elif self.tipoPreg & TPreg.UNICA:
             logging.debug('  Tipo -> UNICA')

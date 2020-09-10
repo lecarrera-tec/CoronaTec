@@ -112,7 +112,7 @@ __texto de la pregunta__
 \subsection{Selecci\'on \'unica}
 
 \begin{verbatim}
-<tipo = seleccion unica>
+<tipo = seleccion unica[, opcion = (__indice__ | todos)]>
 
 <variables>
 __nombre_de_variable__ = __expresion__
@@ -126,7 +126,9 @@ __respuesta o distractor__
 \end{verbatim}
 
 \begin{enumerate}
-  \item Se asume que la respuesta correcta es el primero de los items. \textbf{Se debe dejar una l\'inea en blanco al final de cada item}.
+  \item Es opcional especificar el \'indice de la respuesta (0-indexado); sino se asume que la respuesta correcta es el primero de los items (\verb|__indice__ == 0|).
+  \item Para el caso en que haya habido un error, se puede poner \verb|opcion = todos|, es decir, que toda respuesta es correcta.
+  \item \textbf{Se debe dejar una l\'inea en blanco al final de cada item}.
   \item Las variable son opcionales.
 \end{enumerate}
 
@@ -134,8 +136,8 @@ __respuesta o distractor__
 %% \subsection{Selección única}
 %% Las opciones para selección única son las siguientes:
 %% \begin{itemize}
-%%   \item \verb|<tipo = seleccion unica, orden = aleatorio>|
-%%   \item \verb|<tipo = seleccion unica, orden = creciente>|
+%%   \item \verb|<tipo = seleccion unica[, orden = aleatorio][, opcion = __indice__]>|
+%%   \item \verb|<tipo = seleccion unica, orden = creciente[, opcion = __indice__>]|
 %%   \item \verb|<tipo = seleccion unica, orden = fijo>|
 %%   \item \verb|<tipo = seleccion unica, orden = indice>|
 %% \end{itemize}
