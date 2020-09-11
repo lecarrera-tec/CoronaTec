@@ -112,6 +112,9 @@ class Seccion:
             elif l == Info.FIN_BLOQUE:
                 assert(bloque)
                 bloque = False
+                # Hay que avisar que imprima una p\'agina nueva, por si
+                # las preguntas quedan entre dos bloques.
+                self.preguntas.append((0, '', 0, False))
                 continue
             # Buscamos los puntos de la pregunta, el tamaño de la 
             # muestra y el origen de la pregunta.
@@ -182,6 +185,11 @@ class Seccion:
             # definidas.
             if not bloque:
                 dParams = {}
+                # Estamos al final de un bloque. Se agrega una nueva
+                # p\'agina.
+                if puntaje == 0 and len(origen) == 0 and muestras == 0:
+                    lista.append('\n\\newpage\n\n')
+                    continue
             # Extraemos las preguntas.
             filelist = Seccion.muestraPreguntas(origen, muestras)
             # El puntaje de la pregunta es 0. Entonces debe corresponder

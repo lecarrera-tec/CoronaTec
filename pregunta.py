@@ -217,8 +217,7 @@ def latex_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
         # Se agrega la línea de texto actualizando las @-expresiones.
         ltexto.append('    %s' % parserPPP.update(l, dLocal, cifras))
         l = lineas.pop(0)
-    lista.append('%s\n%s' % (''.join(ltexto).rstrip(), '    \\nopagebreak\n'))
-    lista.append('    \\underline{\\hspace*{0.25\\textwidth}}\n\n')
+    lista.append('%s\n\n' % ''.join(ltexto).rstrip())
     return ('%s\n' % ''.join(lista).strip())
 
 def latex_encabezado(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
@@ -494,14 +493,13 @@ def respuesta_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respu
 
     # El índice de la opción.
     opcion: str = parserPPP.derechaIgual(l, 'opcion')
-    if len(opcion) == 0:
-        indice = 0
-    elif opcion == 'todos':
+    indice = 0
+    if opcion == 'todos':
         resp.add_opcion(TPreg.TODOS)
         # Aunque podríamos terminar acá, se necesitan leer las
-        # variables, porque sino cambiaríamos la semilla del aleatorio
-        # para el resto de las preguntas.
-    else:
+        # variables y reordenar los items, porque sino cambiaríamos la 
+        # semilla del aleatorio para el resto de las preguntas.
+    elif len(opcion) > 0:
         try:
             indice = int(opcion)
         except:
@@ -513,6 +511,8 @@ def respuesta_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respu
         l = lineas.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
+
+    # Se leen las variables
     if l == Info.VARIABLES:
         while True:
             l = lineas.pop(0).strip()
@@ -522,10 +522,6 @@ def respuesta_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respu
                 continue
             else:
                 parserPPP.evaluarParam(l, dLocal, dParams)
-
-    # Ahora sí podemos terminar.
-    if opcion == 'todos':
-        return resp
 
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.

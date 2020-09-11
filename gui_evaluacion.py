@@ -43,7 +43,7 @@ def call_visualizar():
         print(cant_muestras)
         showerror(title="ERROR", message= "La cantidad de muestras debe ser un número")
         return
-    command_line = 'python visualizar.py "' + pregunta_path + '" "' + str(cant_muestras) + '" "' + encabezado_path + '"'
+    command_line = ' '.join(['python visualizar.py', pregunta_path, str(cant_muestras), encabezado_path])
     print(command_line)
     os.system(command_line)
 

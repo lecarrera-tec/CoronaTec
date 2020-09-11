@@ -55,10 +55,10 @@ class Respuesta:
 
         # Verificamos que la opción agregada sea apropiada según el
         # tipo de pregunta.
-        if self.tipoPreg == TPreg.UNICA:
+        if self.tipoPreg & TPreg.UNICA:
             assert(opcion & (TPreg.ALEATORIO + TPreg.CRECIENTE 
                     + TPreg.INDICES + TPreg.TODOS))
-        elif self.tipoPreg == TPreg.RESP_CORTA:
+        elif self.tipoPreg & TPreg.RESP_CORTA:
             assert(opcion & (TPreg.ENTERO + TPreg.FLOTANTE))
         else:
             assert(False)
@@ -129,6 +129,8 @@ class Respuesta:
         """ Devuelve el texto de la respuesta correcta. """
 
         if self.tipoPreg & TPreg.UNICA:
+            if self.tipoPreg & TPreg.TODOS:
+                return '*'
             opcion = self.respuestas[0]
             return chr(ord('A') + opcion)
         elif self.tipoPreg & TPreg.RESP_CORTA:
