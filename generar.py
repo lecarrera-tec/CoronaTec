@@ -94,7 +94,7 @@ for path in lestudiantes:
         # Se inicializa la semilla usando el identificador multiplicado por
         # una constante, seg\'un el \'indice de repetici\'on dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
-        logging.debug('random.seed: %d' % seed)
+        logging.debug('numero de carnet: %s' % idstr)
         random.seed(seed)
     
         # Se comienza a generar el archivo.

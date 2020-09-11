@@ -36,7 +36,8 @@ class Respuesta:
             Tipo de pregunta de la respuesta.
         """
 
-        assert(tipoPreg == TPreg.UNICA or tipoPreg == TPreg.RESP_CORTA)
+        assert(tipoPreg == TPreg.UNICA or tipoPreg == TPreg.RESP_CORTA
+                or tipoPreg == TPreg.ENCABEZADO)
         self.tipoPreg: int = tipoPreg
         # Las respuestas son una lista abierta de cualquier tipo.
         self.respuestas: List[Any] = []
@@ -90,7 +91,9 @@ class Respuesta:
         """
         logging.debug('Calificar: %s' % texto)
         puntos: float = 0
-        if self.tipoPreg & TPreg.TODOS:
+        if len(texto) == 0:
+            puntos = 0.0
+        elif self.tipoPreg & TPreg.TODOS:
             logging.debug('  Tipo -> TODOS')
             puntos = 1.0 * self.puntaje
         elif self.tipoPreg & TPreg.UNICA:
@@ -135,7 +138,7 @@ class Respuesta:
             return chr(ord('A') + opcion)
         elif self.tipoPreg & TPreg.RESP_CORTA:
             if self.tipoPreg & TPreg.ENTERO:
-                return str(self.respuestas[0][0])
+                return str(self.respuestas[0])
             elif self.tipoPreg & TPreg.FLOTANTE:
                 cifras: int = int(ceil(-log10(self.respuestas[0][1])))
                 return txtFloat(self.respuestas[0][0], cifras)

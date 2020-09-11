@@ -106,7 +106,8 @@ cols: List[str]
 # Diccionario!!!
 todxs: Dict[str, List[str]] = {}
 for fila in lineas:
-    # Se eliminan espacios en blanco y las comillas, en caso que hubieran.
+    # Se eliminan espacios en blanco y las comillas, en caso que 
+    # hubieran.
     texto = fila.rstrip().replace('"', '')
     if len(texto) == 0:
         continue
@@ -223,7 +224,7 @@ for path in lestudiantes:
         # Se inicializa la semilla usando el identificador multiplicado 
         # por una constante, según el índice de repetición dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
-        logging.debug('random.seed: %d' % seed)
+        logging.debug('numero de carnet: %s' % idstr)
         random.seed(seed)
     
         # Se comienzan a agregar las instancias de los objetos de tipo

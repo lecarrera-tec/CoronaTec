@@ -115,6 +115,7 @@ class Seccion:
                 # Hay que avisar que imprima una p\'agina nueva, por si
                 # las preguntas quedan entre dos bloques.
                 self.preguntas.append((0, '', 0, False))
+                logging.info('Se agrega pregunta: %s' % str(self.preguntas[-1]))
                 continue
             # Buscamos los puntos de la pregunta, el tamaño de la 
             # muestra y el origen de la pregunta.
@@ -184,10 +185,11 @@ class Seccion:
             # Si no estamos en un bloque, se borran las variables ya
             # definidas.
             if not bloque:
-                dParams = {}
                 # Estamos al final de un bloque. Se agrega una nueva
                 # p\'agina.
                 if puntaje == 0 and len(origen) == 0 and muestras == 0:
+                    logging.debug('Borrando parámetros anteriores')
+                    dParams = {}
                     lista.append('\n\\newpage\n\n')
                     continue
             # Extraemos las preguntas.
@@ -213,6 +215,9 @@ class Seccion:
                     origen = '\\end{ejer}\n\\newpage\n\n'
                 lista.append('%s%s%s' % (texto, 
                                 pregunta.get_latex(filename, dParams), origen))
+            if not bloque:
+                logging.debug('Borrando parámetros anteriores')
+                dParams = {}
 
         # Si las preguntas se requieren en orden aleatorio, entonces
         # las reordenamos
@@ -238,7 +243,7 @@ class Seccion:
         # Se genera la lista de instancias del objeto Respuesta. Si se 
         # requiere que sean aleatorias, se reordenan.
         lresp: List[Respuesta] = []
-        # Vamos agregando la instancia de cada pregunta de la sección.
+        # Vamos agregando la instancia de cada respuesta de la sección.
         filelist: List[str]
         puntaje: int
         origen: str
@@ -248,13 +253,21 @@ class Seccion:
             # Si no estamos en un bloque, se borran las variables ya
             # definidas.
             if not bloque:
-                dParams = {}
+                # Estamos al final de un bloque. Seguimos.
+                if puntaje == 0 and len(origen) == 0 and muestras == 0:
+                    logging.debug('Borrando parámetros anteriores')
+                    dParams = {}
+                    continue
+            # Extraemos las preguntas.
             filelist = Seccion.muestraPreguntas(origen, muestras)
             for filename in filelist:
                 resp = pregunta.get_respuesta(filename, dParams)
                 resp.set_puntaje(puntaje)
                 if not (resp.tipoPreg & TPreg.ENCABEZADO):
                     lresp.append(resp)
+            if not bloque:
+                logging.debug('Borrando parámetros anteriores')
+                dParams = {}
 
         # Si las preguntas se requieren en orden aleatorio, entonces
         # se reordenan igual las respuestas.

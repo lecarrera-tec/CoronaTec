@@ -46,7 +46,8 @@ def derechaIgual(expresion : str, izq : str) -> str:
     # No se encontró nada.
     return ''
 
-def evaluarParam(linea: str, dLocal: Dict[str, Any], dparams: Dict[str, Any]) -> None:
+def evaluarParam(linea: str, dLocal: Dict[str, Any], 
+                                            dparams: Dict[str, Any]) -> None:
     """Función que evalúa las variables dadas por el usuario.
 
     Observe que la función no devuelve nada. Simplemente actualiza los

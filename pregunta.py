@@ -326,11 +326,16 @@ def get_respuesta(filename: str, dParams: Dict[str, Any]) -> Respuesta:
         return respuesta_corta(l, lineas, dParams)
     elif tipo == 'seleccion unica':
         return respuesta_unica(l, lineas, dParams)
+    elif tipo == 'encabezado':
+        return respuesta_encabezado(l, lineas, dParams)
 
     logging.error('Tipo de pregunta desconocido: %s' % l)
     return Respuesta(TPreg.NINGUNA)
 
-def respuesta_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respuesta:
+def respuesta_corta(
+        l: str, 
+        lineas: List[str], 
+        dParams: Dict[str, Any]) -> Respuesta:
     """Objeto Respuesta de pregunta de respuesta corta.
 
     Argumentos
@@ -351,6 +356,9 @@ def respuesta_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respu
     logging.debug('Entrando a "respuesta_corta"')
     logging.debug('Texto : %s', ''.join(lineas))
 
+    # Se inicializa el objeto Respuesta.
+    resp = Respuesta(TPreg.RESP_CORTA)
+
     # Definiendo el número de cifras significativas en 3.
     cifras: int = 3
     # Buscando si el usuario lo definió.
@@ -360,10 +368,7 @@ def respuesta_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respu
             cifras = int(texto)
         except:
             logging.error('No se pudo leer `cifras` en `%s`.' % l)
-            logging.error('Se utilizan 3 de forma predeterminada.')
-            cifras = 3
 
-    resp = Respuesta(TPreg.RESP_CORTA)
     # Ver si la respuesta es un entero, o de tipo flotante. El tipo
     # entero es el predeterminado.
     texto = parserPPP.derechaIgual(l, 'respuesta')
@@ -542,4 +547,60 @@ def respuesta_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respu
         resp.add_opcion(TPreg.ALEATORIO)
         random.shuffle(litems)
     resp.add_respuesta(litems.index(indice))
+    return resp
+
+def respuesta_encabezado(l: str, lineas: List[str], 
+                                        dParams: Dict[str, Any]) -> Respuesta:
+    """Objeto Respuesta de encabezado.
+
+    Argumentos
+    ---------
+    l:
+        Primera línea. Para leer las opciones específicas.
+    linea:
+        Resto de las líneas de texto.
+    dParams:
+        Diccionario de variables definidas por el usuario.
+
+    Devuelve
+    --------
+        Objeto de tipo Respuesta de Encabezado, con los parámetros ya 
+        sustituidos.
+    """
+
+    logging.debug('Entrando a "respuesta_encabezado"')
+    logging.debug('Texto : %s', ''.join(lineas))
+
+    # Se inicializa el objeto Respuesta.
+    resp = Respuesta(TPreg.ENCABEZADO)
+
+    # Definiendo el número de cifras significativas en 3.
+    cifras: int = 3
+    # Buscando si el usuario lo definió.
+    texto: str = parserPPP.derechaIgual(l, 'cifras')
+    if len(texto) > 0:
+        try:
+            cifras = int(texto)
+        except:
+            logging.error('No se pudo leer `cifras` en `%s`.' % l)
+
+    # Se ignoran los comentarios.
+    ignorar: bool = True
+    while ignorar:
+        l = lineas.pop(0).strip()
+        ignorar = len(l) == 0 or l[0] == Info.COMMENT
+
+    # Se leen los parámetros.
+    dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
+    if l == Info.VARIABLES:
+        while True:
+            l = lineas.pop(0).strip()
+            if l == Info.PREGUNTA:
+                break
+            elif len(l) == 0 or l[0] == Info.COMMENT:
+                continue
+            else:
+                parserPPP.evaluarParam(l, dLocal, dParams)
+
+    # No hay nada más que hacer por acá.
     return resp
