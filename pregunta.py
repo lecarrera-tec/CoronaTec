@@ -11,7 +11,8 @@ import TPreg
 from respuesta import Respuesta
 from diccionarios import DFunRandom, DFunciones, DGlobal
 
-def get_latex(filename: str, dParams: Dict[str, Any]) -> str:
+def get_latex(filename: str, dParams: Dict[str, Any], 
+                                                revisar: bool = False) -> str:
     """Genera el código LaTeX de la pregunta.
 
     Lo que hace es clasificar el tipo de pregunta, y llamar a la 
@@ -50,9 +51,9 @@ def get_latex(filename: str, dParams: Dict[str, Any]) -> str:
     l = l.strip(Info.STRIP)
     tipo: str = parserPPP.derechaIgual(l, 'tipo')
     if tipo == 'respuesta corta':
-        texto = latex_corta(l, lineas, dParams)
+        texto = latex_corta(l, lineas, dParams, revisar)
     elif tipo == 'seleccion unica':
-        texto = latex_unica(l, lineas, dParams)
+        texto = latex_unica(l, lineas, dParams, revisar)
     elif tipo == 'encabezado':
         texto = latex_encabezado(l, lineas, dParams)
 
@@ -73,7 +74,8 @@ def get_latex(filename: str, dParams: Dict[str, Any]) -> str:
         texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
     return texto
 
-def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
+def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any], 
+                                                        revisar: bool) -> str:
     """LaTeX de pregunta de selección única.
 
     Argumentos
@@ -84,6 +86,8 @@ def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
         Resto de las líneas de texto.
     dParams:
         Diccionario de variables definidas por el usuario.
+    revisar:
+        A la hora de imprimir vistas previas del examen.
 
     Devuelve
     --------
@@ -143,7 +147,7 @@ def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
     # Falta agregar a la lista el último item
     litems.append('%s\n\n' % ''.join(texto).rstrip())
     # Desordenamos los items.
-    if orden == 'aleatorio':
+    if orden == 'aleatorio' and not revisar:
         random.shuffle(litems)
     # Construimos el latex
     lista.append('    \\begin{enumerate}%s\n' % Info.FORMATO_ITEM)
@@ -152,7 +156,8 @@ def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
     lista.append('    \\end{enumerate}\n')
     return ('%s\n' % ''.join(lista).strip())
 
-def latex_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
+def latex_corta(l: str, lineas: List[str], dParams: Dict[str, Any], 
+                                                        revisar: bool) -> str:
     """LaTeX de pregunta de respuesta corta.
 
     Argumentos
@@ -194,6 +199,7 @@ def latex_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
     while ignorar:
         l = lineas.pop(0).strip()
         ignorar = len(l) == 0 or l[0] == Info.COMMENT
+
     # Definiendo diccionario y se evalúan las variables.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if l == Info.VARIABLES:
@@ -218,6 +224,16 @@ def latex_corta(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:
         ltexto.append('    %s' % parserPPP.update(l, dLocal, cifras))
         l = lineas.pop(0)
     lista.append('%s\n\n' % ''.join(ltexto).rstrip())
+
+    if revisar:
+        logging.debug('Respuesta corta -> Revisar: Imprimiendo respuesta')
+        assert(l.strip().startswith(Info.LITEM))
+        ignorar = True
+        while ignorar:
+            l = lineas.pop(0).strip()
+            ignorar = len(l) == 0 or l[0] == Info.COMMENT
+        lista.append('\\bigskip\n\n\\noindent R/ %s\n' % str(eval(l, DGlobal, dLocal)))
+
     return ('%s\n' % ''.join(lista).strip())
 
 def latex_encabezado(l: str, lineas: List[str], dParams: Dict[str, Any]) -> str:

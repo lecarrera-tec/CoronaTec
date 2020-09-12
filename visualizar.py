@@ -35,7 +35,6 @@ lista: List[str] = sys.argv[1].rsplit(sep='/', maxsplit=1)
 filename: str = '%s-vp' % lista[1].rsplit(sep='.', maxsplit=1)[0]
 carpeta: str = lista[0]
 
-dParams: Dict[str, Any] = {}
 
 foutput = open('%s.tex' % filename, 'w')
 texto: str
@@ -50,9 +49,11 @@ else:
     foutput.write(encabezado)
 
 numRep: int = int(sys.argv[2])
+dParams: Dict[str, Any]
 for i in range(numRep):
+    dParams = {}
     foutput.write('\\begin{ejer}\n')
-    texto = pregunta.get_latex(sys.argv[1], dParams)
+    texto = pregunta.get_latex(sys.argv[1], dParams, True)
     foutput.write(texto)
     foutput.write('\n\\end{ejer}\n\\newpage\n\n')
 
