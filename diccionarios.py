@@ -37,9 +37,15 @@ DFunRandom: Dict[str, Any] = {
 }
 
 DFunciones: Dict[str, Any] = {
+        # Constantes:
+        'pi'  : math.pi,
+        'inf' : math.inf,
+        'div' : math.nan, 
+
         # Funciones generales
-        'range': range,
-        'len'  : len,
+        'range'  : range,
+        'len'    : len,
+        'sorted' : sorted,
 
         # Funciones de matematica
         'round'     : round,
@@ -68,13 +74,11 @@ DFunciones: Dict[str, Any] = {
         'gamma'     : math.gamma,
         'gcd'       : math.gcd,
         'hypot'     : math.hypot,
-        'inf'       : math.inf,
         'isqrt'     : math.isqrt,
         'log'       : math.log,
         'log10'     : math.log10,
         'modf'      : math.modf,
         'perm'      : math.perm,
-        'pi'        : math.pi,
         'prod'      : math.prod,
         'radians'   : math.radians,
         'sin'       : math.sin,

@@ -30,6 +30,8 @@ Este proyecto consta de los siguientes programas:
   \item \verb|visualizar| Esta función recibe como argumento la dirección del archivo de una pregunta, el número de ejemplos por generar, para generar un pdf de la pregunta. Esto permite revisar que la pregunta esté bien definida, y ver si genera los resultados esperados.
 
     Si la pregunta requiere de paquetes adicionales, de manera opcional se puede pasar como argumento un \emph{encabezado} de la pregunta que debe iniciar desde \verb|\documentclass...| y llegar hasta \verb|\begin{document}|. Debe incluir un ambiente de tipo \emph{ejer}, porque cada pregunta se encierra entre un \verb|\begin{ejer}| \dots \verb|\end{ejer}|. Puede ver la variable \verb|encabezado| en el archivo \verb|visualizar.py| como referencia.
+
+    Cuando se imprime la vista previa de preguntas de selecci\'on, el orden de los distractores se mantiene fijo, seg\'un el orden original de la pregunta. En el caso de preguntas de respuesta corta, se agrega la respuesta al final de la pregunta.
 \end{itemize}
 
 \subsection{Requisitos}
@@ -240,11 +242,20 @@ En python las sucesiones para la funci\'on \verb|choice| o \verb|sample| se pued
 
 Si lo que se quiere es tomar un elemento aleatorio de una sucesión simple, entonces mejor utilizar las funciones \verb|randrange| o \verb|randint|. 
 
-\subsection{Funciones generales}
-Lo que se tiene es un subconjunto de funciones de python, y algunas programadas espec\'ificamente para la generaci\'on de pruebas.
+\subsection{Constantes y funciones generales}
+Lo que se tiene es un subconjunto de constantes y funciones de python, y algunas programadas espec\'ificamente para la generaci\'on de pruebas.
 
-%% \item \verb|range(stop)| \\[1ex]
-%%   \verb|range(start, stop[, step])| 
+\begin{funcion}
+\verb|pi|; \verb|inf|; \verb|div| \\[1ex]
+  El valor de $\pi$, y constantes utilizadas para evaluar l\'imites en respuesta corta. As\'i $-\infty$ se escribir\'ia \verb|-inf| y $+\infty$ como \verb|inf| o \verb|+inf|. Si el l\'imite sea divergente entonces utilizar \verb|div| (internamente se trabaja con la constante \verb|math.nan|, not a number).
+
+  La constante \verb|e| no se incluye porque podr\'ia ser muy f\'acil utilizarlo como nombre de variable. Para incluirla usar la funci\'on \verb|exp(1)|.
+\end{funcion}
+
+\begin{funcion}
+  \verb|len(xs)|, \verb|sorted(xs)| \\[1ex]
+  Devuelven respectivamente la longitud de un iterable, y el iterable de manera ordenada.
+\end{funcion}
 
 \begin{funcion}
   Funciones de matem\'atica:
@@ -252,7 +263,7 @@ Lo que se tiene es un subconjunto de funciones de python, y algunas programadas 
     \item \verb|+ - * / // %| \\[1ex]
   Suma, resta, multiplicaci\'on, divisi\'on normal (con punto flotante como respuesta), divisi\'on entera y residuo
 
-    \item \verb|degrees(x)|; \verb|radians(x)|; \verb|pi|
+    \item \verb|degrees(x)|; \verb|radians(x)|
 
       Conversi\'on de radianes a grados; conversi\'on de grados a radianes, $\pi$.
 
@@ -363,9 +374,9 @@ En python las sucesiones son 0 indexadas. As\'i, si \verb|xs| es una sucesi\'on,
   \item Si \verb|x| es un n\'umero con decimales:
     \begin{itemize}
       \item \verb|'%f' % x| imprime el n\'umero con 6 decimales de manera predeterminada.
-      \item \verb|'%.nf' % x|, donde \verb|n| es un entero positivo, imprime el n\'umero con \verb|n| decimales de forma predeterminada.
+      \item \verb|'%.nf' % x|, donde \verb|n| es un entero positivo, imprime el n\'umero con \verb|n| decimales.
       \item \verb|'%e' % x| imprime el n\'umero en notaci\'on cient\'ifica con 6 decimales de forma predeterminada.
-      \item \verb|'%.ne' % x|, donde \verb|n| es un entero positivo, imprime el n\'umero en notaci\'on cient\'ifica con \verb|n| decimales de forma predeterminada.
+      \item \verb|'%.ne' % x|, donde \verb|n| es un entero positivo, imprime el n\'umero en notaci\'on cient\'ifica con \verb|n| decimales.
     \end{itemize}
 \end{itemize}
 
