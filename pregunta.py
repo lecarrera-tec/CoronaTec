@@ -74,8 +74,7 @@ def get_latex(filename: str, dParams: Dict[str, Any],
         texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
     return texto
 
-def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any], 
-                                                        revisar: bool) -> str:
+def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any], revisar: bool) -> str:
     """LaTeX de pregunta de selección única.
 
     Argumentos
@@ -94,11 +93,24 @@ def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any],
     Texto LaTeX de la pregunta, con los parámetros ya sustituidos.
     """
 
+    logging.debug('Entrando a "latex_unica"')
+    logging.debug('Texto : %s', ''.join(lineas))
+
     # TODO Faltan leer los parámetros de la pregunta que se encuentran
     # en ``l``. Asumimos que el orden es aleatorio.
     orden = 'aleatorio'
-    logging.debug('Entrando a "latex_unica"')
-    logging.debug('Texto : %s', ''.join(lineas))
+
+    # El índice de la opción.
+    opcion: str = parserPPP.derechaIgual(l, 'opcion')
+    indice: int = 0
+    if opcion == 'todos':
+        None
+    elif len(opcion) > 0:
+        try:
+            indice = int(opcion)
+        except:
+            logging.error('No se pudo leer el indice de la opcion: `%s`' % l)
+
     lista: List[str] = []
     ignorar: bool = True
     while ignorar:
@@ -146,8 +158,11 @@ def latex_unica(l: str, lineas: List[str], dParams: Dict[str, Any],
             texto.append('%s' % parserPPP.update(l, dLocal))
     # Falta agregar a la lista el último item
     litems.append('%s\n\n' % ''.join(texto).rstrip())
+    assert(indice < len(litems))
+    if revisar:
+        litems[indice] = 'R/ %s' % litems[indice]
     # Desordenamos los items.
-    if orden == 'aleatorio' and not revisar:
+    elif orden == 'aleatorio':
         random.shuffle(litems)
     # Construimos el latex
     lista.append('    \\begin{enumerate}%s\n' % Info.FORMATO_ITEM)
@@ -514,7 +529,7 @@ def respuesta_unica(l: str, lineas: List[str], dParams: Dict[str, Any]) -> Respu
 
     # El índice de la opción.
     opcion: str = parserPPP.derechaIgual(l, 'opcion')
-    indice = 0
+    indice: int = 0
     if opcion == 'todos':
         resp.add_opcion(TPreg.TODOS)
         # Aunque podríamos terminar acá, se necesitan leer las

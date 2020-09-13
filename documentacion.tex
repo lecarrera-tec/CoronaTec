@@ -31,7 +31,7 @@ Este proyecto consta de los siguientes programas:
 
     Si la pregunta requiere de paquetes adicionales, de manera opcional se puede pasar como argumento un \emph{encabezado} de la pregunta que debe iniciar desde \verb|\documentclass...| y llegar hasta \verb|\begin{document}|. Debe incluir un ambiente de tipo \emph{ejer}, porque cada pregunta se encierra entre un \verb|\begin{ejer}| \dots \verb|\end{ejer}|. Puede ver la variable \verb|encabezado| en el archivo \verb|visualizar.py| como referencia.
 
-    Cuando se imprime la vista previa de preguntas de selecci\'on, el orden de los distractores se mantiene fijo, seg\'un el orden original de la pregunta. En el caso de preguntas de respuesta corta, se agrega la respuesta al final de la pregunta.
+    Cuando se imprime la vista previa de preguntas de selecci\'on, el orden de los distractores se mantiene fijo seg\'un el orden original de la pregunta y se marca con `R/' la opci\'on correcta. En el caso de preguntas de respuesta corta, se agrega la respuesta al final de la pregunta.
 \end{itemize}
 
 \subsection{Requisitos}
@@ -45,7 +45,6 @@ Este proyecto consta de los siguientes programas:
 \subsection{Modificando el \LaTeX}
 El encabezado predeterminado se puede visualizar en el archivo \verb|latex.py|. Recuerde respaldar cualquier cambio que haga, porque cada versi\'on nueva va a borrar los cambios que usted haya realizado.
 
-\newpage
 \section{Estructura del archivo general}
 \begin{verbatim}
 <Escuelas>
