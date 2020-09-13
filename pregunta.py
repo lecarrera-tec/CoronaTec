@@ -1,9 +1,10 @@
 """Leer archivos de preguntas."""
 
 import logging
+import os
 import random
-from typing import Any, List, Dict
 import sys
+from typing import Any, List, Dict
 
 import parserPPP
 import Info
@@ -67,6 +68,13 @@ def get_latex(filename: str, dParams: Dict[str, Any],
     # el archivo.
     idx: int = filename.rfind('/')
     path: str = filename[:idx]
+
+    # Ponemos el path en terminos absolutos.
+    cwd = os.getcwd()
+    os.chdir(path)
+    path = os.getcwd()
+    os.chdir(cwd)
+
     # Ahora buscamos cada includegraphics, y le agregamos el path.
     idx = 0
     while True:
@@ -123,13 +131,13 @@ def latex_unica(opciones: str, lineas: List[str],
     lista: List[str] = []
     ignorar: bool = True
     while ignorar:
-        linea = lineas[counter].strip(), counter += 1
+        linea = lineas[counter].strip(); counter += 1
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
     # Definiendo diccionario.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if linea == Info.VARIABLES:
         while True:
-            linea = lineas[counter].strip(), counter += 1
+            linea = lineas[counter].strip(); counter += 1
             if linea == Info.PREGUNTA:
                 break
             elif len(linea) == 0 or linea[0] == Info.COMMENT:
@@ -142,12 +150,12 @@ def latex_unica(opciones: str, lineas: List[str],
     # Redefinimos el diccionario, eliminando las preguntas que generan
     # números aleatorios.
     dLocal = {**dParams, **DFunciones}
-    linea = lineas[counter], counter += 1
+    linea = lineas[counter]; counter += 1
     texto: List[str] = []
     while not linea.strip().startswith(Info.LITEM):
         # Agregamos la línea de texto actualizando las @-expresiones.
         texto.append('    %s' % parserPPP.update(linea, dLocal))
-        linea = lineas[counter], counter += 1
+        linea = lineas[counter]; counter += 1
     lista.append('%s\n%s' % (''.join(texto).rstrip(), '    \\nopagebreak\n'))
 
     # Ahora siguen los items.
@@ -158,8 +166,8 @@ def latex_unica(opciones: str, lineas: List[str],
     litems: List[str] = []
     item: str
     ultimo: str
-    while len(lineas) > 0:
-        linea = lineas[counter], counter += 1
+    while counter < len(lineas):
+        linea = lineas[counter]; counter += 1
         # Un nuevo item. Finalizamos el anterior.
         if linea.strip().startswith(Info.LITEM):
             # TODO falta revisar opciones como índice.
@@ -574,14 +582,14 @@ def respuesta_unica(opciones: str, lineas: List[str],
     linea: str
     ignorar: bool = True
     while ignorar:
-        linea = lineas[counter].strip(), counter += 1
+        linea = lineas[counter].strip(); counter += 1
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
 
     # Se leen las variables
     if linea == Info.VARIABLES:
         while True:
-            linea = lineas[counter].strip(), counter += 1
+            linea = lineas[counter].strip(); counter += 1
             if linea == Info.PREGUNTA:
                 break
             elif len(linea) == 0 or linea[0] == Info.COMMENT:
@@ -592,9 +600,9 @@ def respuesta_unica(opciones: str, lineas: List[str],
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.
     assert(linea == Info.PREGUNTA)
-    linea = lineas[counter], counter += 1
+    linea = lineas[counter]; counter += 1
     while not linea.strip().startswith(Info.LITEM):
-        linea = lineas[counter], counter += 1
+        linea = lineas[counter]; counter += 1
 
     # Ahora siguen los items. Se tienen que construir para asegurarse de
     # que no hayan distractores repetidos, pero en realidad lo \'unico que
@@ -607,8 +615,8 @@ def respuesta_unica(opciones: str, lineas: List[str],
     indices: List[int] = [0]
     item: str
     ultimo: str
-    while len(lineas) > 0:
-        linea = lineas[counter], counter += 1
+    while counter < len(lineas):
+        linea = lineas[counter]; counter += 1
         # Un nuevo item. Finalizamos el anterior.
         if linea.strip().startswith(Info.LITEM):
             # Se agrega un \'indice, lo importante!

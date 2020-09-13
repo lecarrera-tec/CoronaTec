@@ -1,7 +1,8 @@
 v0.4.0
-Se compara el texto de los items, y si se encuentra que son iguales
-vuelve a generar la pregunta. En otras palabras, se garantiza (?) que
-no hayan dos opciones iguales.
+- Los archivos ahora se generan directamente en la carpeta destino.
+- Se compara el texto de los items, y si se encuentra que son iguales
+  vuelve a generar la pregunta. En otras palabras, se garantiza (?) que
+  no hayan dos opciones iguales.
 
 v0.3.1
 - Se agrega este archivo donde se documentan cambios, mejoras y/o

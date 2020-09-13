@@ -55,6 +55,9 @@ else:
         if me.endswith('.csv'):
             lestudiantes.append('%s%s' % (path, me))
 
+# Directorio actual
+cwd: str = os.getcwd()
+
 # Se trabaja grupo por grupo.
 carpeta: str    # Carpeta donde se guardan los pdf's.
 filename: str 
@@ -111,8 +114,10 @@ for path in lestudiantes:
         logging.debug('Se tienen %d secciones en total' % len(examen.secciones))
         if len(examen.secciones) > 1 or len(seccion.titulo) > 0:
             tex.append('  \\newpage\n')
-            tex.append('  \\section{%s {\\normalsize (total de la secci\\\'on %d puntos)}}\n\n' 
-                                    % (seccion.titulo, seccion.get_puntaje()))
+            tex.append('  \\section{%s %s %d puntos)}}\n\n' 
+                            % (seccion.titulo, 
+                                '{\\normalsize (total de la secci\\\'on:',
+                                seccion.get_puntaje()))
         else:
             # Solamente se tiene una secci\'on sin titulo.
             tex.append('  \\newpage\n')
@@ -121,11 +126,21 @@ for path in lestudiantes:
         # Ahora se trabaja con el resto de las secciones
         for seccion in examen.secciones[1:]:
             tex.append('  \\newpage\n')
-            tex.append('  \\section{%s {\\normalsize (total de la secci\\\'on %d puntos)}}\n\n' % (seccion.titulo,seccion.get_puntaje()))
+            tex.append('  \\section{%s %s %d puntos)}}\n\n' 
+                        % (seccion.titulo, 
+                            '{\\normalsize (total de la secci\\\'on:',
+                            seccion.get_puntaje()))
             tex.append(seccion.get_latex())
     
         # Cerrando el documento.
         tex.append('\\end{document}\n')
+
+        # Se cambia de directorio.
+        try:
+            os.chdir('%s/' % carpeta)
+        except:
+            logging.critical('No se pudo cambiar a directorio.')
+            sys.exit()
     
         # Se imprime el documento.
         filename = idstr[-6:]
@@ -138,11 +153,14 @@ for path in lestudiantes:
         os.system('pdflatex %s' % filename)
         os.system('pdflatex %s' % filename)
         os.system('pdfcrop -margins 20 %s.pdf temp.pdf' % filename)
+        os.rename('temp.pdf', '%s.pdf' % filename)
         logging.debug('Fin de examen\n')
 
-        # Se mueve el pdf a la carpeta respectiva, y se eliminan el 
-        # resto de los archivos.
-        os.replace('temp.pdf', '%s/%s.pdf' % (carpeta, filename))
+        # Se eliminan los archivo '*.{aux,log,tex,...}'
         for file in os.listdir():
             if file.startswith(filename):
                 os.remove(file)
+
+        # Se devuelve a la carpeta original.
+        os.chdir(cwd)
+
