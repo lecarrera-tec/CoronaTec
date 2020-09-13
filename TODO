@@ -1,8 +1,8 @@
-- Lo que sigue es generar el pdf de las notas del grupo, y el reporte
-  para el estudiante.
-
 - En el nombre de la carpeta de la generación del examen, y tal vez en
   el nombre del archivo pdf del examen generado, incluir la versión del 
   examen. Eso podría ahorrar algunos dolores de cabeza. Incluso poner la 
   versión *en* el pdf, junto con el nombre del estudiante. Se debe
   reajustar el valor del índice.
+
+- Incluir en la documentaci\'on de que los distractores repetidos se
+  tratan de evitar.

@@ -32,36 +32,45 @@ if len(sys.argv) < 3 or len(sys.argv) > 4:
 
 # Carpeta donde se va a guardar el pdf
 lista: List[str] = sys.argv[1].rsplit(sep='/', maxsplit=1)
-filename: str = '%s-vp' % lista[1].rsplit(sep='.', maxsplit=1)[0]
+print(lista)
+origen: str = lista[1]
+print(origen)
+output: str = '%s-vp' % origen.rsplit(sep='.', maxsplit=1)[0]
+print(output)
 carpeta: str = lista[0]
-
-
-foutput = open('%s.tex' % filename, 'w')
-texto: str
+print(carpeta)
 
 # Se comienza por el encabezado.
 if len(sys.argv) == 4:
     finput = open(sys.argv[3], 'r')
-    texto = '\n'.join(finput.readlines())
+    encabezado = '\n'.join(finput.readlines())
     finput.close()
-    foutput.write(texto)
-else:
-    foutput.write(encabezado)
 
+# Se cambia al directorio del archivo.
+try:
+    os.chdir(carpeta)
+except:
+    logging.critical('No se pudo abrir carpeta: `%s`' % carpeta)
+    sys.exit()
+
+# Se agrega el encabezado.
+foutput = open('%s.tex' % output, 'w')
+foutput.write(encabezado)
+
+texto: str
 numRep: int = int(sys.argv[2])
 dParams: Dict[str, Any]
 for i in range(numRep):
     dParams = {}
     foutput.write('\\begin{ejer}\n')
-    texto = pregunta.get_latex(sys.argv[1], dParams, True)
+    texto = pregunta.get_latex(origen, dParams, True)
     foutput.write(texto)
     foutput.write('\n\\end{ejer}\n\\newpage\n\n')
 
 foutput.write('\\end{document}\\n\\n')
 foutput.close()
-os.system('pdflatex %s' % filename)
+os.system('pdflatex %s' % output)
 logging.debug('Fin de visualizar')
-os.replace('%s.pdf' % filename, '%s/%s.pdf' % (carpeta, filename))
 for file in os.listdir():
-    if file.startswith(filename):
+    if file.startswith(output) and not file.endswith('.pdf'):
         os.remove(file)

@@ -153,13 +153,14 @@ for path in lestudiantes:
         os.system('pdflatex %s' % filename)
         os.system('pdflatex %s' % filename)
         os.system('pdfcrop -margins 20 %s.pdf temp.pdf' % filename)
-        os.rename('temp.pdf', '%s.pdf' % filename)
-        logging.debug('Fin de examen\n')
 
         # Se eliminan los archivo '*.{aux,log,tex,...}'
         for file in os.listdir():
             if file.startswith(filename):
                 os.remove(file)
+
+        os.rename('temp.pdf', '%s.pdf' % filename)
+        logging.debug('Fin de examen\n')
 
         # Se devuelve a la carpeta original.
         os.chdir(cwd)

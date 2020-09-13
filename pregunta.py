@@ -67,23 +67,23 @@ def get_latex(filename: str, dParams: Dict[str, Any],
     # Primero comenzamos extrayendo el path hasta el folder donde está
     # el archivo.
     idx: int = filename.rfind('/')
-    path: str = filename[:idx]
+    if idx > 0:
+        path: str = filename[:idx]
+        # Ponemos el path en terminos absolutos.
+        cwd = os.getcwd()
+        os.chdir(path)
+        path = os.getcwd()
+        os.chdir(cwd)
 
-    # Ponemos el path en terminos absolutos.
-    cwd = os.getcwd()
-    os.chdir(path)
-    path = os.getcwd()
-    os.chdir(cwd)
-
-    # Ahora buscamos cada includegraphics, y le agregamos el path.
-    idx = 0
-    while True:
-        idx = texto.find('\\includegraphics', idx)
-        if idx == -1:
-            break
-        idx = texto.find('{', idx)
-        assert(idx != -1)
-        texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
+        # Ahora buscamos cada includegraphics, y le agregamos el path.
+        idx = 0
+        while True:
+            idx = texto.find('\\includegraphics', idx)
+            if idx == -1:
+                break
+            idx = texto.find('{', idx)
+            assert(idx != -1)
+            texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
     return texto
 
 def latex_unica(opciones: str, lineas: List[str], 
