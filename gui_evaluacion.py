@@ -3,12 +3,6 @@ from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter.messagebox import showerror
 import os
 
-#Establecer la ruta para ejecución relativa a la posición del archivo de intefaz, 
-#por lo que los demás archivos deben estar junto a este
-path = os.path.dirname(__file__)
-os.chdir(path)
-print(path)
-
 #funcion para abrir Prueba de Preguntas Parametrizadas
 def open_file_dir(widget, tipo_archivo, is_dir=False):
     #abrir cuadro de dialogo para solicitar archivo
