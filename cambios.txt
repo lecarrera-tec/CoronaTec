@@ -1,0 +1,21 @@
+v0.4.0
+Se compara el texto de los items, y si se encuentra que son iguales
+vuelve a generar la pregunta. En otras palabras, se garantiza (?) que
+no hayan dos opciones iguales.
+
+v0.3.1
+- Se agrega este archivo donde se documentan cambios, mejoras y/o
+  correcciones.
+- Se agrega la constante div; la idea es utilizarla para límites. Falta
+  construir ejemplos para verificar que funciona.
+- Se modifica el comportamiento cuando las preguntas se generan con 
+  `visualizar`, de manera que en las preguntas de selección los
+  distractores queden fijos y se especifica con 'R/' la opción correcta, 
+  y en las preguntas de respuesta corta se imprime el resultado.
+- Se actualiza la documentación con los cambios.
+
+v0.3.0
+Proyecto con banco de preguntas, preguntas de respuesta corta verificado
+para enteros. Falta revisar comportamiento de variables con punto
+flotante, y cómo usar inf, ya que entonces las respuestas de form no
+pueden ser numéricas únicamente, tienen que ser de texto.
