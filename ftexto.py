@@ -22,6 +22,7 @@ def txtFraccion(num: int, den: int, conSigno: bool = False) -> str:
     utilizando el comando dfrac.
     """
 
+    # Se determina el signo de la fracci\'on.
     signo: int = 1
     assert(den != 0)
     if num < 0:
@@ -30,18 +31,24 @@ def txtFraccion(num: int, den: int, conSigno: bool = False) -> str:
     if den < 0:
         signo *= -1
         den = abs(den)
+
+    # Se determina el m\'aximo com\'un denominador, para simplificar.
     factor: int = gcd(num, den)
     num = num // factor
     den = den // factor
+
+    # Si es positivo, se imprime o no el +
     texto: str
     if signo == 1:
         if conSigno:
             texto = '+'
         else:
             texto = ''
+    # es negativo.
     else:
         texto = '-'
 
+    # No es una fracci\'on.
     if den == 1:
         texto = '%s%d' % (texto, num)
     else:
@@ -66,6 +73,8 @@ def txtRaiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
     --------
     """
 
+    # Se determina el signo. Negativo solo si el \'indice de la ra\'iz
+    # es impar.
     signo: int = 1
     assert(indice >= 2)
     assert(indice % 2 == 1 or arg >= 0)
@@ -73,6 +82,8 @@ def txtRaiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
         arg = abs(arg)
         signo = -1
 
+    # Se obtienen los factores, y se determina lo que queda afuera
+    # y lo que queda adentro.
     lfact: List[Tuple[int, int]] = factores(arg)
     afuera: int = 1
     adentro: int = 1
@@ -91,10 +102,11 @@ def txtRaiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
     if afuera > 1:
         texto = '%s%d' % (texto, afuera)
 
-    if indice == 2:
-        texto = '%s\\sqrt{%d}' % (texto, adentro)
-    else:
-        texto = '%s\\sqrt[%d]{%d}' % (texto, indice, adentro)
+    if adentro > 1:
+        if indice == 2:
+            texto = '%s\\sqrt{%d}' % (texto, adentro)
+        else:
+            texto = '%s\\sqrt[%d]{%d}' % (texto, indice, adentro)
 
     return texto
 
@@ -150,3 +162,60 @@ def txtFloat(numero: float, cifras: int) -> str:
     else:
         ftxt = '%%.%df' % (cifras + int(-log10(numero)))
     return ftxt % numero
+
+def txtNumero(numero: int, mil: bool = False) -> str:
+    assert(numero > 0 and numero <= 999999999999)
+    texto: str
+    teens: List[str] = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 
+            'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
+            'catorce', 'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho',
+            'diecinueve', 'veinte', 'veintiuno', 'veintid\\\'os',
+            'veintitr\\\'es', 'veinticuatro', 'veinticinco', 'veintis\\\'eis',
+            'veintisiete', 'veintiocho', 'veintinueve']
+    decenas: List[str] = ['treinta', 'cuarenta', 'cincuenta', 'sesenta',
+            'setenta', 'ochenta', 'noventa', 'cien']
+    centenas: List[str] = ['ciento', 'doscientos', 'trescientos', 
+            'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos',
+            'ochocientos', 'novecientos', 'mil']
+    miles: List[str] = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 
+            'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
+            'catorce', 'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho',
+            'diecinueve', 'veinte', 'veintiun', 'veintid\\\'os',
+            'veintitr\\\'es', 'veinticuatro', 'veinticinco', 'veintis\\\'eis',
+            'veintisiete', 'veintiocho', 'veintinueve']
+    resp = ''
+    if numero >= 2000000:
+        temp = numero // 1000000
+        numero = numero % 1000000
+        resp = '%s millones' % txtNumero(temp, mil)
+    if numero >= 30000:
+        temp = numero // 1000
+        numero = numero % 1000
+        resp = '%s %s mil' % (resp, txtNumero(temp, True))
+    if numero >= 2000:
+        temp = numero // 1000
+        numero = numero % 1000
+        if mil:
+            resp = '%s %s mil' % (resp, miles[temp])
+        else:
+            resp = '%s %s mil' % (resp, teens[temp])
+    if numero >= 1000:
+        numero = numero % 1000
+        resp = 'mil'
+    if numero > 100:
+        temp = numero // 100 - 1
+        numero = numero % 100
+        resp = '%s %s' % (resp, centenas[temp])
+    if numero >= 30:
+        temp = numero // 10 - 3
+        numero = numero % 10
+        if numero > 0:
+            resp = '%s %s y' % (resp, decenas[temp])
+        else:
+            resp = '%s %s' % (resp, decenas[temp])
+    if numero > 0:
+        if mil:
+            resp = '%s %s' % (resp, miles[numero])
+        else:
+            resp = '%s %s' % (resp, teens[numero])
+    return resp.strip()
