@@ -45,6 +45,12 @@ Este proyecto consta de los siguientes programas:
 \subsection{Modificando el \LaTeX}
 El encabezado predeterminado se puede visualizar en el archivo \verb|latex.py|. Recuerde respaldar cualquier cambio que haga, porque cada versi\'on nueva va a borrar los cambios que usted haya realizado.
 
+Se utiliza el espa\~nol como paquete predeterminado de idiomas. Si quiere utilizar punto decimal en lugar de la coma, puede incluir en 
+\begin{verbatim}
+<Encabezado>
+\decimalpoint
+\end{verbatim}
+
 \section{Estructura del archivo general}
 \begin{verbatim}
 <Escuelas>
@@ -89,7 +95,7 @@ __Instrucciones del examen__
   \item En las instrucciones \emph{no} debe aparecer el símbolo de abrir etiquetas (ver \verb|abrir| en \verb|Info.py|) como primer carácter del párrafo, porque es la forma de determinar que allí finalizan.
   \item No debe haber espacios en blanco entre las especificaciones de las preguntas, pero sí se permiten comentarios.
   \item El \verb|origen| de la pregunta puede ser un archivo con extensión \verb|.tex| o una carpeta.
-  \item Si la dirección es una carpeta, entonces el puntaje para cualquiera de las preguntas es el mismo, y se toma de acá. Si el puntaje no aparece, entonces el predeterminado es 1~punto.
+  \item Si la dirección es una carpeta, entonces el puntaje para cualquiera de las preguntas es el mismo. Si el puntaje no aparece, entonces el predeterminado es 1~punto.
   \item La muestra se refiere al n\'umero de preguntas que se toma de la carpeta. Si no aparece, el predeterminado es 1.
   \item Las preguntas finalizan con una línea en blanco.
   \item De manera opcional, se pueden encerrar varias preguntas entre \verb|<bloque>| y \verb|</bloque>|. El efecto es que no va a separar las preguntas con una nueva p\'agina, y va a mantener las variables entre las preguntas.
@@ -245,22 +251,32 @@ Si lo que se quiere es tomar un elemento aleatorio de una sucesión simple, ento
 Lo que se tiene es un subconjunto de constantes y funciones de python, y algunas programadas espec\'ificamente para la generaci\'on de pruebas.
 
 \begin{funcion}
-\verb|pi|; \verb|inf|; \verb|div| \\[1ex]
-  El valor de $\pi$, y constantes utilizadas para evaluar l\'imites en respuesta corta. As\'i $-\infty$ se escribir\'ia \verb|-inf| y $+\infty$ como \verb|inf| o \verb|+inf|. Si el l\'imite sea divergente entonces utilizar \verb|div| (internamente se trabaja con la constante \verb|math.nan|, not a number).
+\verb|div|; \verb|inf|; \verb|pi| \\[1ex]
+  El valor de $\pi$, y constantes utilizadas para evaluar l\'imites en respuesta corta. As\'i $-\infty$ se escribir\'ia \verb|-inf| y $+\infty$ como \verb|inf| o \verb|+inf|. Si el l\'imite sea divergente entonces utilizar \verb|div| (internamente se trabaja con la constante \verb|math.nan|, \emph{not a number}).
 
   La constante \verb|e| no se incluye porque podr\'ia ser muy f\'acil utilizarlo como nombre de variable. Para incluirla usar la funci\'on \verb|exp(1)|.
 \end{funcion}
 
 \begin{funcion}
+  \verb|lambda x: __funcion que depende de x__| \\[1ex]
+  Funciones an\'onimas.
+\end{funcion}
+
+\begin{funcion}
   \verb|len(xs)|, \verb|sorted(xs)| \\[1ex]
-  Devuelven respectivamente la longitud de un iterable, y el iterable de manera ordenada.
+  Devuelven respectivamente la longitud de un iterable, y el iterable de manera ordenada creciente. Si se quiere ordenar \verb|xs| de manera decreciente, entonces se debe escribir \verb|sorted(xs, reverse = True)|. Tambi\'en se puede utilizar una funci\'on para especificar la funci\'on de orden: \verb|sorted(xs, key = __funcion__)|. Por ejemplo:
+  \begin{verbatim}
+  ls = [*range(-9, 10)]
+  ls = sorted(sample(ls, 5), key = abs)
+  \end{verbatim}
+  podr\'ia dar como resultado \verb|[2, 4, -5, -6, 8]| para \verb|ls|.
 \end{funcion}
 
 \begin{funcion}
   Funciones de matem\'atica:
   \begin{enumerate}[a)]
-    \item \verb|+ - * / // %| \\[1ex]
-  Suma, resta, multiplicaci\'on, divisi\'on normal (con punto flotante como respuesta), divisi\'on entera y residuo
+    \item \verb|+ - * / // % **| \\[1ex]
+  Suma, resta, multiplicaci\'on, divisi\'on normal (con punto flotante como respuesta), divisi\'on entera, residuo y potencia.
 
     \item \verb|degrees(x)|; \verb|radians(x)|
 
@@ -362,9 +378,21 @@ Lo que se tiene es un subconjunto de constantes y funciones de python, y algunas
   Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
 \end{funcion}
 
+\begin{funcion}
+  \verb|txtNumero(n)| \\[1ex]
+  Para $n > 0$, devuelve el texto que representa al valor de $n$.
+\end{funcion}
+
 \subsection{Trabajando con sucesiones}
 
 En python las sucesiones son 0 indexadas. As\'i, si \verb|xs| es una sucesi\'on, entonces \verb|xs[0]| es el primer elemento. El tama\~no de una sucesi\'on se da por \verb|len(xs)|. El \'ultimo elemento ser\'ia \verb|xs[-1]|. Un subconjunto: \verb|xs[i:j]| va a ser los elementos que hay desde \verb|xs[i]| hasta \verb|xs[j-1]|.
+
+\subsection{Listas por comprensi\'on}
+\begin{verbatim}
+xs = [i for i in range(10)]
+ys = [random() for i in range(10)]
+ls = sorted([(xs[i], ys[i]) for i in range(10)], key = lambda tt: tt[1])
+\end{verbatim}
 
 \subsection{Formato de texto}
 
@@ -377,6 +405,7 @@ En python las sucesiones son 0 indexadas. As\'i, si \verb|xs| es una sucesi\'on,
       \item \verb|'%e' % x| imprime el n\'umero en notaci\'on cient\'ifica con 6 decimales de forma predeterminada.
       \item \verb|'%.ne' % x|, donde \verb|n| es un entero positivo, imprime el n\'umero en notaci\'on cient\'ifica con \verb|n| decimales.
     \end{itemize}
+  \item Si se necesita concatenar varios textos: \verb|'(%d, %d)' % (m, n)| representa un par ordenado de enteros.
 \end{itemize}
 
 \end{document}

@@ -1,4 +1,8 @@
 v0.4.0
+- Se agrega la función `txtNumero`.
+- Se agregan múltiples variables en las definiciones.
+- Se agregan expresiones \verb|lambda|, set para conjuntos y las 
+  funciones \verb|min| y \verb|max|
 - Los archivos ahora se generan directamente en la carpeta destino.
 - Se compara el texto de los items, y si se encuentra que son iguales
   vuelve a generar la pregunta. En otras palabras, se garantiza (?) que
