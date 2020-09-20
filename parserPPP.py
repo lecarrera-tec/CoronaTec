@@ -2,6 +2,7 @@
 import logging
 from math import log10
 from typing import Any, List, Dict
+from sys import exit
 
 from diccionarios import DGlobal, DFunciones, DFunRandom
 from fmate import digSignif
@@ -47,7 +48,7 @@ def derechaIgual(expresion : str, izq : str) -> str:
     return ''
 
 def evaluarParam(linea: str, dLocal: Dict[str, Any], 
-                                            dparams: Dict[str, Any]) -> None:
+                 dparams: Dict[str, Any]) -> None:
     """Función que evalúa las variables dadas por el usuario.
 
     Observe que la función no devuelve nada. Simplemente actualiza los
@@ -56,7 +57,7 @@ def evaluarParam(linea: str, dLocal: Dict[str, Any],
     ----------
     linea:
         Línea de texto. Se espera que sea de la forma:
-        ``<nombre_de_variable> = <expresion evaluable>``
+        <nombre_variable>[, <nombre_variable]* = <expresion evaluable>
     dLocal:
         Diccionario que incluye todas las funciones y los parámetros ya
         definidos por el usuario. Se actualiza con la variable que se
@@ -72,17 +73,34 @@ def evaluarParam(linea: str, dLocal: Dict[str, Any],
     # iguales en la expresión a evaluar y hay que dejarlos intactos.
     logging.debug('def. de variable: `%s`' % linea)
     lista: List[str] = linea.split('=', 1)
-    nombreVariable: str = lista[0].strip()
+    variables: List[str] = lista[0].strip().split(',')
     # Revisar que el nombre de la variable no corresponda a ninguna
     # función.
-    if (nombreVariable in DFunRandom) or (nombreVariable in DFunciones):
-        logging.error('Nombre de variable es una palabra reservada.')
-        return
+    for var in variables:
+        var = var.strip()
+        if (var in DFunRandom) or (var in DFunciones):
+            logging.critical('Nombre de variable es una palabra reservada.')
+            exit()
     logging.debug('Evaluar: `%s`' % lista[1].strip())
     resultado: Any = eval(lista[1].strip(), DGlobal, dLocal)
     logging.debug('Evaluado: `%s`' % str(resultado))
-    dparams[nombreVariable] = resultado
-    dLocal[nombreVariable] = resultado
+    n: int = len(variables)
+    logging.debug('Numero de variables: %d' % n)
+    if n == 1:
+        variables[0] = variables[0].strip()
+        logging.debug('  %s: %s' % (variables[0], str(resultado)))
+        dparams[variables[0]] = resultado
+        dLocal[variables[0]] = resultado
+    elif n == len(resultado):
+        for i in range(n):
+            variables[i] = variables[i].strip()
+            logging.debug('  %s: %s' % (variables[i], str(resultado[i])))
+            dparams[variables[i]] = resultado[i]
+            dLocal[variables[i]] = resultado[i]
+    else:
+        logging.critical('El numero de iterables no coincide:')
+        logging.critical('%s = %s' % (','.join(variables), str(resultado)))
+        exit()
 
 def update(linea: str, dLocal: Dict[str, Any], cifras: int = 3) -> str:
     """Actualiza cualquier @-expresión que haya que evaluar en el texto.
@@ -139,6 +157,8 @@ def update(linea: str, dLocal: Dict[str, Any], cifras: int = 3) -> str:
             unir.append('%d%s' % (expr, texpr[fin+1:]))
         elif isinstance(expr, float):
             unir.append('%s%s' % (txtFloat(expr, cifras), texpr[fin+1:]))
+        elif isinstance(expr, set):
+            unir.append('\\{%s\\}%s' % (str(expr)[1:-1].replace('\'', ''), texpr[fin+1:]))
         # No tenemos idea de qué tipo es.
         else:
             unir.append('%s%s' % (str(expr), texpr[fin+1:]))
