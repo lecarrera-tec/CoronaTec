@@ -2,6 +2,12 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter.messagebox import showerror
 import os
+from sys import platform
+
+if platform == 'darwin' or platform.startswith('linux'):
+    python = 'python3.8'
+else:
+    python = 'python'
 
 #funcion para abrir Prueba de Preguntas Parametrizadas
 def open_file_dir(widget, tipo_archivo, is_dir=False):
@@ -38,10 +44,11 @@ def call_visualizar():
         showerror(title="ERROR", message= "La cantidad de muestras debe ser un número")
         return
     if len(encabezado_path):
-        command_line = 'python visualizar.py "%s" %d "%s"' % (pregunta_path, cant_muestras, encabezado_path)
+        command_line = '%s visualizar.py "%s" %d "%s"' % (python, 
+                                pregunta_path, cant_muestras, encabezado_path)
     else:
-        command_line = 'python visualizar.py "%s" %d' % (pregunta_path, cant_muestras)
-    #command_line = ' '.join(['python visualizar.py', pregunta_path, str(cant_muestras), encabezado_path])
+        command_line = '%s visualizar.py "%s" %d' % (python, pregunta_path, 
+                                                                cant_muestras)
     print(command_line)
     os.system(command_line)
 
@@ -62,7 +69,8 @@ def call_generar():
         print(ind_rep)
         showerror(title="ERROR", message= "El indice de repetición debe ser un número")
         return
-    command_line = 'python generar.py "' + ppp_path + '" "' + student_list + '" "' + str(ind_rep) + '"'
+    command_line = '%s generar.py "%s" "%s" %d' % (python, ppp_path, 
+                                                        student_list, ind_rep)
     print(command_line)
     os.system(command_line)
 
@@ -89,7 +97,9 @@ def call_evaluar():
         print(resp_path)
         showerror(title="ERROR", message= "El archivo .csv de respuestas no existe")
         return
-    command_line = 'python evaluar.py "' + ppp_path + '" "' + student_list + '" "' + resp_path + '" "' + str(ind_rep) + '"'
+    command_line = '%s evaluar.py "%s" "%s" "%s" %d' % (python, ppp_path,
+                                            student_list, resp_path, ind_rep)
+    #command_line = 'python evaluar.py "' + ppp_path + '" "' + student_list + '" "' + resp_path + '" "' + str(ind_rep) + '"'
     print(command_line)
     os.system(command_line)
 
