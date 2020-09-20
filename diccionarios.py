@@ -43,9 +43,12 @@ DFunciones: Dict[str, Any] = {
         'div' : math.nan, 
 
         # Funciones generales
-        'range'  : range,
         'len'    : len,
+        'min'    : min,
+        'max'    : max,
+        'range'  : range,
         'sorted' : sorted,
+        'set'    : set,
 
         # Funciones de matematica
         'round'     : round,
@@ -96,4 +99,5 @@ DFunciones: Dict[str, Any] = {
         'txtCoef': ftexto.txtCoef,
         'txtExpo': ftexto.txtExpo,
         'txtConSigno': ftexto.txtConSigno,
+        'txtNumero': ftexto.txtNumero,
 }

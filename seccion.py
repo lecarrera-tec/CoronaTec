@@ -210,7 +210,7 @@ class Seccion:
                 texto = '  \\begin{ejer}~\\textbf{[%d %s]}\n' % (
                         puntaje, 'puntos' if puntaje > 1 else 'punto')
                 if bloque:
-                    origen = '\\end{ejer}\n\n'
+                    origen = '\\end{ejer} \\bigskip\n\n'
                 else:
                     origen = '\\end{ejer}\n\\newpage\n\n'
                 lista.append('%s%s%s' % (texto, 

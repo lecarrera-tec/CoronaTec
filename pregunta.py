@@ -61,6 +61,9 @@ def get_latex(filename: str, dParams: Dict[str, Any],
         texto = latex_unica(linea, lineas, dParams, revisar)
     elif tipo == 'encabezado':
         texto = latex_encabezado(linea, lineas, dParams)
+    else:
+        logging.critical('Tipo de pregunta desconocido: `%s`' % linea)
+        sys.exit()
 
     # Queda aún algo muy importante por hacer, y es modificar el path 
     # de las figuras que se incluyan: \includegraphics[opciones]{path}
@@ -475,7 +478,7 @@ def respuesta_corta(opciones: str, lineas: List[str],
         linea = lineas.pop(0)
 
     # Ahora siguen los items.
-    entero: int
+    # entero: int
     flotante: float
     error: float
     # Se redefine el diccionario para eliminar las funciones random.
@@ -607,7 +610,7 @@ def respuesta_unica(opciones: str, lineas: List[str],
     # Ahora siguen los items. Se tienen que construir para asegurarse de
     # que no hayan distractores repetidos, pero en realidad lo \'unico que
     # nos interesan son los \'indices.
-    texto: str = []
+    texto: List[str] = []
     assert(linea.strip().startswith(Info.LITEM))
     # TODO Hay que leer la opción de indice del item cuando 
     # corresponda. Primero se va a crear una lista de los items.
@@ -631,7 +634,7 @@ def respuesta_unica(opciones: str, lineas: List[str],
                     logging.debug('Generar de nuevo:')
                     logging.debug('  %s = %s!!' % (item, ultimo))
                     # Se tiene que generar de nuevo la respuesta.
-                    return respuesta_unica(opciones, lineas, dParams, revisar)
+                    return respuesta_unica(opciones, lineas, dParams)
             litems.append('%s\n\n' % ultimo)
             texto = []
         else:

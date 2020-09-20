@@ -66,6 +66,7 @@ linea : str    # Un estudiante de la lista.
 idstr : str    # String del identificador del estudiante (# de carnet).
 separar : List[str]   # Separar info del estudiante.
 for path in lestudiantes:
+    logging.debug('Nueva lista: %s' % path)
     # Carpeta donde se van a guardar los pdf's de los ex\'amenes.
     lista = path.rsplit(sep='/', maxsplit=1)
     filename = lista[1].rsplit(sep='.', maxsplit=1)[0]
@@ -86,7 +87,7 @@ for path in lestudiantes:
     
     # Ahora se trabaja con cada estudiante de la Lista.
     for linea in Lista:
-        logging.debug('Nuevo examen.')
+        logging.debug('Nuevo examen: %s' % linea)
         # Separamos el n\'umero de identificaci\'on del resto del nombre.
         # ##-id-##, <apellidos/nombres>, xxxxx
         separar = linea.split(',')
