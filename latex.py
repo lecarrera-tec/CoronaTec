@@ -8,6 +8,7 @@ def get_encabezadoExamen(examen) -> str:
         '\\usepackage[scale=0.85,top=1in,papersize={8.5in,30in},head=14.5pt]{geometry}\n',
         '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
+        '\\usepackage[spanish]{babel}\n',
         '\\usepackage{paralist}\n',
         '\\usepackage{graphicx}\n\n',
         # Esto es para el cintillo en la parte superior
