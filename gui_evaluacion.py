@@ -20,7 +20,7 @@ def open_file_dir(widget, tipo_archivo, is_dir=False):
             filetypes=tipo_archivo
         )
     if not filepath:
-        return 
+        return
     widget.configure(state='normal')
     widget.delete(0, tk.END)
     widget.insert(0, filepath)
@@ -44,10 +44,10 @@ def call_visualizar():
         showerror(title="ERROR", message= "La cantidad de muestras debe ser un número")
         return
     if len(encabezado_path):
-        command_line = '%s visualizar.py "%s" %d "%s"' % (python, 
+        command_line = '%s visualizar.py "%s" %d "%s"' % (python,
                                 pregunta_path, cant_muestras, encabezado_path)
     else:
-        command_line = '%s visualizar.py "%s" %d' % (python, pregunta_path, 
+        command_line = '%s visualizar.py "%s" %d' % (python, pregunta_path,
                                                                 cant_muestras)
     print(command_line)
     os.system(command_line)
@@ -69,7 +69,7 @@ def call_generar():
         print(ind_rep)
         showerror(title="ERROR", message= "El indice de repetición debe ser un número")
         return
-    command_line = '%s generar.py "%s" "%s" %d' % (python, ppp_path, 
+    command_line = '%s generar.py "%s" "%s" %d' % (python, ppp_path,
                                                         student_list, ind_rep)
     print(command_line)
     os.system(command_line)
@@ -117,7 +117,7 @@ window.title("Evaluaciones")
 frame_generar = tk.Frame(master=window, borderwidth=1, padx = 10, pady = 10)
 frame_generar.pack()
 
-#row_number permite controlar el numero de fila en la que se insertan elementos en la pantalla, 
+#row_number permite controlar el numero de fila en la que se insertan elementos en la pantalla,
 #facilita agregar elementos en la parte superior
 row_number = 0
 

@@ -1,193 +1,123 @@
-from typing import List
 import logging
 import sys
+from typing import List
 
-from seccion import Seccion
 import Info
-import parserPPP
-import latex
+import leer
+from seccion import Seccion
+
 
 class PPP:
-    """
-    Clase principal para las Pruebas de Preguntas Parametrizadas
+    """ Clase principal para las Pruebas de Preguntas Parametrizadas
 
-    Contiene la estructura principal:
-      - El nombre del curso.
-      - El t\'itulo de la prueba.
-      - Instrucciones generales para la prueba.
-      - La lista de las secciones, que son a su vez una clase.
-        (aqu\'i es donde est\'a la informaci\'on importante)
+    Variables
+    ---------
+    cursos:
+        Nombre de los cursos.
+    dirTrabajo:
+        Dirección a la carpeta de la prueba. Se requiere porque la
+        dirección de las preguntas es relativa a dicha carpeta.
+    encabezado:
+        Encabezado a agregar a LaTeX
+    escuelas:
+        Lista de escuelas del examen.
+    instrucciones:
+        Instrucciones de la prueba.
+    puntaje
+        Puntaje total de la prueba.
+    secciones:
+        Una lista de instancias de la clase seccion
+    semestre:
+        Texto del semestre y año.
+    tiempo:
+        Duración de la prueba.
+    titulo:
+        Título de la prueba.
     """
 
     def __init__(self, filename: str):
-        """
-        Constructor. Recibe como argumento la direccion un archivo 
-        de tipo .ppp
+        """ Constructor.
 
-        Devuelve la estructura principal, y la estructura anidada
-        de cada una de las secciones.
-
-        Se definen las variables:
-            - dir_trabajo   : direcci\'on a la carpeta de la prueba.
-                              Se requiere porque la direcci\'on de las
-                              preguntas es relativa a dicha carpeta.
-            - escuelas      : Lista de escuelas del examen.
-            - semestre      : Texto del semestre y a\~no.
-            - tiempo        : Duraci\'on de la prueba.
-            - cursos        : Nombre de los cursos.
-            - titulo        : T\'itulo de la prueba.a
-            - instrucciones : Instrucciones de la prueba.
-            - encabezado    : Encabezado a agregar a \LaTeX
-            - secciones     : Una lista de instancias de la clase 
-                              seccion
+        Argumentos
+        ----------
+        filename:
+            La direccion un archivo de tipo .ppp
         """
         # Definimos el puntaje total como 0, de manera temporal.
         self.puntaje = 0
 
-        # Definimos el directorio local como el directorio de trabajo, 
-        # pero si la direcci\'on dada no es un archivo en el directorio 
-        # actual, entonces vamos a guardar la direcci\'on al archivo, 
-        # porque la referencia a los archivos de las preguntas es 
-        # relativa al directorio del archivo principal. 
-        # Warning! Estamos pensando en linux!
-        self.dir_trabajo: str = './'
+        # Definimos el directorio local como el directorio de trabajo,
+        # pero si la dirección dada no es un archivo en el directorio
+        # actual, entonces vamos a guardar la dirección al archivo,
+        # porque la referencia a los archivos de las preguntas es
+        # relativa al directorio del archivo principal.
+        self.dirTrabajo: str = './'
         idx = filename.rfind('/')
         if idx > 0:
-            self.dir_trabajo = filename[0:idx+1]
+            self.dirTrabajo = filename[0:idx+1]
 
-        # Vamos a leer el archivo linea x linea. Por lo general se van 
-        # a ignorar lineas en blanco y lineas que comiencen con el 
+        # Vamos a leer el archivo linea x linea. Por lo general se van
+        # a ignorar lineas en blanco y lineas que comiencen con el
         # caracter de comentario.
         try:
             finp = open(filename, 'r')
-        except:
+        except OSError:
             logging.critical('No se pudo abrir archivo principal.')
             sys.exit()
+        lsTexto: List[str] = finp.readlines()
+        finp.close()
 
-        # Lo primero que deber\'iamos encontrar en el archivo es el nombre 
-        # de las escuelas. Buscamos primero la etiqueta.
-        ignorar: bool = True
-        while ignorar:
-            l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
-        assert(l == Info.ESCUELAS)
-        # Agregamos todas las l\'ineas que no comiencen con comentario
-        # hasta llegar a una l\'inea en blanco.
-        self.escuelas: List[str] = []
-        while True:
-            l = finp.readline().strip()
-            if len(l) == 0:
-                break
-            if l.startswith(Info.COMMENT):
-                continue
-            self.escuelas.append(l)
+        linea: str
+        hayEtiqueta: bool
+
+        # Lo primero que deberíamos encontrar en el archivo es el nombre
+        # de las escuelas. Obligatorio.
+        self.escuelas: List[str] = leer.escuelas(lsTexto)
         logging.info('<Escuelas>: %s' % ', '.join(self.escuelas))
 
-        # Sigue el semestre.
-        ignorar = True
-        while ignorar:
-            l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
-        assert(l == Info.SEMESTRE)
-
-        # Guardamos el texto del semestre.
-        self.semestre = finp.readline().strip()
+        # Sigue el texto del semestre. Obligatorio.
+        self.semestre = leer.semestre(lsTexto)
         logging.info('<Semestre>: %s' % self.semestre)
 
-        # Sigue el tiempo.
-        ignorar = True
-        while ignorar:
-            l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
-        assert(l == Info.TIEMPO)
-
-        # Guardamos el texto del tiempo.
-        self.tiempo = finp.readline().strip()
+        # Guardamos el texto del tiempo. Obligatorio.
+        self.tiempo = leer.tiempo(lsTexto)
         logging.info('%s: %s' % (Info.TIEMPO, self.semestre))
 
-        # Ahora sigue el nombre de los cursos. Buscamos primero la 
-        # etiqueta.
-        ignorar = True
-        while ignorar:
-            l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
-        assert(l == Info.CURSOS)
-        # Agregamos todas las l\'ineas que no comiencen con comentario
-        # hasta llegar a una l\'inea en blanco.
-        self.cursos: List[str] = []
-        while True:
-            l = finp.readline().strip()
-            if len(l) == 0:
-                break
-            if l.startswith(Info.COMMENT):
-                continue
-            self.cursos.append(l)
+        # Ahora sigue el nombre de los cursos. Obligatorio.
+        self.cursos = leer.cursos(lsTexto)
         logging.info('<Cursos>: %s' % ', '.join(self.cursos))
 
-        # Luego deber\'ia seguir el t\'itulo de la prueba. Buscamos la 
-        # etiqueta respectiva.
-        ignorar = True
-        while ignorar:
-            l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == Info.COMMENT 
-        assert(l == Info.TITULO)
-
-        # Guardamos el texto del titulo.
-        self.titulo = finp.readline().strip()
+        # Sigue el título de la prueba. Obligatorio.
+        self.titulo, linea = leer.titulo(lsTexto)
         logging.info('<Titulo>: %s' % self.titulo)
 
-        # Buscamos la siguiente etiqueta.
-        ignorar = True
-        while ignorar:
-            l = finp.readline().strip()
-            ignorar = len(l) == 0 or l[0] == Info.COMMENT
-        
-        # Ahora revisamos si existe encabezado para LaTeX. Si no 
-        # hubiera encabezado, observe que entonces la variable 
-        # estar\'ia en blanco.
-        lista: List[str] = []
-        continuar : bool
-        if l == Info.ENCABEZADO:
-            l = finp.readline()
-            while l.find(Info.ABRIR) == -1:
-                lista.append(l)
-                l = finp.readline()
+        # Ahora revisamos si existe encabezado para LaTeX. Si no
+        # hubiera encabezado, se tiene un texto vacio.
+        self.encabezado, linea = leer.encabezado(lsTexto)
+        if len(self.encabezado) > 0:
             logging.info('<Encabezado>')
-            self.encabezado = '%s\n' % ''.join(lista).strip()
             logging.info(self.encabezado)
         else:
-            self.encabezado = ''
+            logging.info('No se encontró encabezado.')
 
-        # Revisamos si son las instrucciones. Pueden abarcar varias 
-        # l\'ineas de texto. Si no hubiera instrucciones, observe que
-        # entonces la variable estar\'ia en blanco.
-        lista = []
-        if l.strip() == Info.INSTRUCCIONES:
-            l = finp.readline()
-            while l.find(Info.ABRIR) == -1:
-                lista.append(l)
-                l = finp.readline()
+        # Revisamos si siguen las instrucciones. Pueden abarcar varias
+        # líneas de texto. Si no hubiera instrucciones, observe que
+        # entonces la variable sería un texto vacío.
+        self.instrucciones, linea = leer.instrucciones(linea, lsTexto)
+        if len(self.instrucciones) > 0:
             logging.info('<Instrucciones>')
-            self.instrucciones = '%s\n' % ''.join(lista).strip()
             logging.info(self.instrucciones)
         else:
-            self.instrucciones = ''
+            logging.info('No se encontraron instrucciones.')
 
-        # No queda de otra. Tienen que seguir las secciones. Una lista 
+        # No queda de otra. Tienen que seguir las secciones. Una lista
         # de instancias de la clase Seccion.
-        l = l.strip()
-        assert(l.startswith(Info.LSECCION))
-        counter = 0
-        self.secciones = [];
-        es_aleatorio: bool = False
-        while l.startswith(Info.LSECCION):
-            l = l.strip(Info.STRIP)
-            counter += 1
-            logging.info('%d : Llamando a seccion ...' % counter)
-            es_aleatorio = parserPPP.derechaIgual(l, 'orden') == 'aleatorio'
-            self.secciones.append(
-                    Seccion(finp, self.dir_trabajo, es_aleatorio))
-            l = finp.readline().strip()
+        linea = linea.strip()
+        assert(linea.startswith(Info.LSECCION))
+        self.secciones: List[Seccion]
+        self.secciones = leer.secciones(linea, lsTexto, self.dirTrabajo)
+
+        # ¡¡¡Terminamos!!!
         logging.info('Fin de PPP\n')
 
     def get_puntaje(self) -> int:
@@ -199,9 +129,10 @@ class PPP:
                 self.puntaje += cada.get_puntaje()
         return self.puntaje
 
+    # TODO No contar las preguntas de tipo encabezado.
     def get_numPreguntas(self) -> List[int]:
-        """ 
-        Devuelve el n\'umero de preguntas por cada una de las secciones. 
+        """
+        Devuelve el número de preguntas por cada una de las secciones.
         """
         lista: List[int] = []
         for cada in self.secciones:

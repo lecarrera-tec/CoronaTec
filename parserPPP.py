@@ -8,20 +8,20 @@ from diccionarios import DGlobal, DFunciones, DFunRandom
 from fmate import digSignif
 from ftexto import txtFloat
 
-def derechaIgual(expresion : str, izq : str) -> str:
+def derechaIgual(expresion: str, izq: str) -> str:
     """Extrae el expresión a la derecha de un igual.
 
     Argumentos
     ----------
-    expresion: 
-        Texto que puede estar formado por varios iguales separados por 
+    expresion:
+        Texto que puede estar formado por varios iguales separados por
         comas. Se busca el igual con el respectivo lado izquierdo.
-    izq: 
+    izq:
         Expresión a buscar al lado izquierda del igual.
 
     Devuelve
     --------
-    El texto que esté al lado derecho del igual de la expresión 
+    El texto que esté al lado derecho del igual de la expresión
     referida por ``izq``. Si la expresión no se encuentra, devuelve
     un string vacío.
     """
@@ -40,14 +40,14 @@ def derechaIgual(expresion : str, izq : str) -> str:
         # Si el lado izquierdo no coincide, continuamos
         if temp != izq:
             continue
-        # El lado izquierdo coincide. Devolvemos lo que hay al lado 
+        # El lado izquierdo coincide. Devolvemos lo que hay al lado
         # derecho del igual.
         temp = elem[idx+1:].strip()
         return temp
     # No se encontró nada.
     return ''
 
-def evaluarParam(linea: str, dLocal: Dict[str, Any], 
+def evaluarParam(linea: str, dLocal: Dict[str, Any],
                  dparams: Dict[str, Any]) -> None:
     """Función que evalúa las variables dadas por el usuario.
 
@@ -64,12 +64,12 @@ def evaluarParam(linea: str, dLocal: Dict[str, Any],
         lea en esta línea.
     dparams:
         Diccionario de las variables del usuario. Se actualiza también
-        con la variable dada por el usuario en esta línea. La 
-        redundancia se debe a que el diccionario local se va a 
+        con la variable dada por el usuario en esta línea. La
+        redundancia se debe a que el diccionario local se va a
         restringir para el caso del texto de la pregunta.
     """
 
-    # Se separa solamente el primer igual que se encuentre. Podría haber 
+    # Se separa solamente el primer igual que se encuentre. Podría haber
     # iguales en la expresión a evaluar y hay que dejarlos intactos.
     logging.debug('def. de variable: `%s`' % linea)
     lista: List[str] = linea.split('=', 1)

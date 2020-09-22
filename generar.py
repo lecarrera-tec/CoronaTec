@@ -45,7 +45,7 @@ else:
         listdir = os.listdir(path)
     except:
         logging.critical('%s "%s" %s' % (
-            'No se pudo abrir carpeta', 
+            'No se pudo abrir carpeta',
             sys.argv[2],
             'con las listas de estudiantes.'))
         sys.exit()
@@ -60,11 +60,11 @@ cwd: str = os.getcwd()
 
 # Se trabaja grupo por grupo.
 carpeta: str    # Carpeta donde se guardan los pdf's.
-filename: str 
+filename: str
 lista: List[str]
-linea : str    # Un estudiante de la lista.
-idstr : str    # String del identificador del estudiante (# de carnet).
-separar : List[str]   # Separar info del estudiante.
+linea: str    # Un estudiante de la lista.
+idstr: str    # String del identificador del estudiante (# de carnet).
+separar: List[str]   # Separar info del estudiante.
 for path in lestudiantes:
     logging.debug('Nueva lista: %s' % path)
     # Carpeta donde se van a guardar los pdf's de los ex\'amenes.
@@ -73,7 +73,7 @@ for path in lestudiantes:
     carpeta = '%s/%s' % (lista[0], filename.upper())
     if not os.path.exists(carpeta):
         os.mkdir(carpeta)
-    
+
     # Se lee el archivo de los estudiantes.
     try:
         finput = open(path, 'r')
@@ -84,7 +84,7 @@ for path in lestudiantes:
     # Se separa la lista por estudiante.
     Lista: List[str] = finput.readlines()
     finput.close()
-    
+
     # Ahora se trabaja con cada estudiante de la Lista.
     for linea in Lista:
         logging.debug('Nuevo examen: %s' % linea)
@@ -92,47 +92,47 @@ for path in lestudiantes:
         # ##-id-##, <apellidos/nombres>, xxxxx
         separar = linea.split(',')
         idstr = separar[0].strip()
-        nombre = ' '.join([palabra.capitalize() 
+        nombre = ' '.join([palabra.capitalize()
                              for palabra in separar[1].strip().split()])
-    
+
         # Se inicializa la semilla usando el identificador multiplicado por
         # una constante, seg\'un el \'indice de repetici\'on dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
         logging.debug('numero de carnet: %s' % idstr)
         random.seed(seed)
-    
+
         # Se comienza a generar el archivo.
         tex: List[str] = latex.get_inicioExamen(nombre, examen)
         tex.append('\\noindent\\rule{\\textwidth}{1pt}\\\\[1ex]\n')
         tex.append('\\noindent \\textbf{Instrucciones: }')
         tex.append('%s\\\\\\rule{\\textwidth}{1pt}\n\n' % examen.instrucciones)
-    
+
         # Si es s\'olo una secci\'on y no tiene t\'itulo, entonces no agregamos
         # la etiqueta de secci\'on en LaTeX. En caso contrario, se agrega
-        # la etiqueta para cada una de las secciones, aunque no tengan 
+        # la etiqueta para cada una de las secciones, aunque no tengan
         # t\'itulo.
         seccion = examen.secciones[0]
         logging.debug('Se tienen %d secciones en total' % len(examen.secciones))
         if len(examen.secciones) > 1 or len(seccion.titulo) > 0:
             tex.append('  \\newpage\n')
-            tex.append('  \\section{%s %s %d puntos)}}\n\n' 
-                            % (seccion.titulo, 
+            tex.append('  \\section{%s %s %d puntos)}}\n\n'
+                            % (seccion.titulo,
                                 '{\\normalsize (total de la secci\\\'on:',
                                 seccion.get_puntaje()))
         else:
             # Solamente se tiene una secci\'on sin titulo.
             tex.append('  \\newpage\n')
         tex.append(seccion.get_latex())
-    
+
         # Ahora se trabaja con el resto de las secciones
         for seccion in examen.secciones[1:]:
             tex.append('  \\newpage\n')
-            tex.append('  \\section{%s %s %d puntos)}}\n\n' 
-                        % (seccion.titulo, 
+            tex.append('  \\section{%s %s %d puntos)}}\n\n'
+                        % (seccion.titulo,
                             '{\\normalsize (total de la secci\\\'on:',
                             seccion.get_puntaje()))
             tex.append(seccion.get_latex())
-    
+
         # Cerrando el documento.
         tex.append('\\end{document}\n')
 
@@ -142,14 +142,14 @@ for path in lestudiantes:
         except:
             logging.critical('No se pudo cambiar a directorio.')
             sys.exit()
-    
+
         # Se imprime el documento.
         filename = idstr[-6:]
         fout = open('%s.tex' % filename, 'w')
         fout.write(encabezado)
         fout.writelines(tex)
         fout.close();
-    
+
         # Se genera el pdf.
         os.system('pdflatex %s' % filename)
         os.system('pdflatex %s' % filename)

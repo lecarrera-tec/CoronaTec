@@ -23,19 +23,19 @@ def get_encabezadoExamen(examen) -> str:
         '\\theoremstyle{definition}\n',
         '\\newtheorem{ejer}{}\n\n',
     ]
-    
-    # Se agrega el encabezado dado por el usuario, el nombre del curso 
-    # al t\'itulo de la prueba, y el t\'itulo de la prueba como autor. Aqu\'i 
-    # acaba el encabezado, porque cada examen es a partir de ahora 
+
+    # Se agrega el encabezado dado por el usuario, el nombre del curso
+    # al t\'itulo de la prueba, y el t\'itulo de la prueba como autor. Aqu\'i
+    # acaba el encabezado, porque cada examen es a partir de ahora
     # distinto.
     texto.append(examen.encabezado)
     return ''.join(texto)
 
 
-def get_inicioExamen(nombre : str, examen) -> List[str]:
-    """L\'ineas previas antes de analizar cada una de las secciones. 
+def get_inicioExamen(nombre: str, examen) -> List[str]:
+    """L\'ineas previas antes de analizar cada una de las secciones.
 
-    Recibe como argumento el nombre del estudiante para incluirlo en el 
+    Recibe como argumento el nombre del estudiante para incluirlo en el
     t\'itulo.
     """
     texto = []
@@ -46,7 +46,7 @@ def get_inicioExamen(nombre : str, examen) -> List[str]:
     texto.append('\\textsc{%s} \hfill \\textsc{Tiempo: %s}\\\\\n' % (examen.cursos[0], examen.tiempo))
     for temp in examen.cursos[1:]:
         texto.append('\\textsc{%s}}\\\\[1ex]\n' % temp)
-    texto.append('\\textsc{%s} \hfill \\textsc{Puntaje Total :} %d pts\\\\\n' % (examen.escuelas[0], examen.get_puntaje()))
+    texto.append('\\textsc{%s} \hfill \\textsc{Puntaje Total:} %d pts\\\\\n' % (examen.escuelas[0], examen.get_puntaje()))
     for temp in examen.escuelas[1:]:
         texto.append('\\textsc{%s}\\bigskip\n\n' % temp)
 
@@ -67,7 +67,7 @@ def get_encabezadoInforme(numPreguntas: List[int]) -> str:
         '\\begin{center}\n'
         '  \\begin{tabular}{cccc'
     ]
-    # El encabezado de la tabla. 
+    # El encabezado de la tabla.
     # Se va a ordenar de manera distinta:
     #   - # de carnet
     #   - nombre

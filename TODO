@@ -4,5 +4,4 @@
   versión *en* el pdf, junto con el nombre del estudiante. Se debe
   reajustar el valor del índice.
 
-- Incluir en la documentaci\'on de que los distractores repetidos se
-  tratan de evitar.
+- Agregar la función txtFloat a la documentación.

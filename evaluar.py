@@ -17,13 +17,13 @@ import tabla
 import xlsxwriter
 
 """
-Función que realiza la evaluación de la prueba. 
+Función que realiza la evaluación de la prueba.
 
-Se espera como argumentos el archivo ppp, la carpeta con las listas de 
-los estudiantes (opcionalmente puede ser solamente un archivo de solo un 
-grupo), y el archivo `.csv` de las respuestas. 
+Se espera como argumentos el archivo ppp, la carpeta con las listas de
+los estudiantes (opcionalmente puede ser solamente un archivo de solo un
+grupo), y el archivo `.csv` de las respuestas.
 
-De manera opcional se puede dar el índice de repetición del examen. Esto 
+De manera opcional se puede dar el índice de repetición del examen. Esto
 es para que genere un examen diferente con el mismo número de carnet.
 """
 
@@ -33,28 +33,28 @@ logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
 #
 # A. Se determina si el número de argumentos dados es el requerido.
 #
-# B. Se lee el índice de repetición del examen, si es que se 
+# B. Se lee el índice de repetición del examen, si es que se
 #    incluyó. Si no, 0 es el valor predeterminado.
 #
 # C. Se lee la estructura general de la prueba.
 #
-# D. Se genera un diccionario con las respuestas. La clave es el 
-#    número de carnet, y el valor respectivo corresponde a las 
+# D. Se genera un diccionario con las respuestas. La clave es el
+#    número de carnet, y el valor respectivo corresponde a las
 #    respuestas como una lista de strings.
 #
 # E. El usuario pasó un solo archivo `.csv` o una carpeta donde debe
-#    haber uno o más archivos `.csv`. Se genera una lista del path a 
+#    haber uno o más archivos `.csv`. Se genera una lista del path a
 #    cada uno de los archivos.
 #
 # F. Se trabaja ahora grupo por grupo. Aquí se inicia un archivo .pdf
 #    donde se van a guardar las notas de los estudiantes para dar a cada
 #    profesor.
 #
-#    F. i) Se abre el archivo del grupo, y se trabaja con cada 
+#    F. i) Se abre el archivo del grupo, y se trabaja con cada
 #          estudiante.
 #
-#          1. Se obtiene el número de carnet. Si el número de carnet 
-#             *no* se encuentra en el diccionario, se especifica en el 
+#          1. Se obtiene el número de carnet. Si el número de carnet
+#             *no* se encuentra en el diccionario, se especifica en el
 #             archivo de notas, y se sigue con el siguiente estudiante.
 #          2. Se genera la lista con las Respuesta's, y se califica.
 
@@ -106,20 +106,20 @@ cols: List[str]
 # Diccionario!!!
 todxs: Dict[str, List[str]] = {}
 for fila in lineas:
-    # Se eliminan espacios en blanco y las comillas, en caso que 
+    # Se eliminan espacios en blanco y las comillas, en caso que
     # hubieran.
     texto = fila.rstrip().replace('"', '')
     if len(texto) == 0:
         continue
     # Dada una fila, separamos los elementos de cada columna.
     cols = texto.split(Info.CSV_SEP)
-    # Agregamos la llave y le asignamos las respuestas. Tiene la 
+    # Agregamos la llave y le asignamos las respuestas. Tiene la
     # característica que si aparece el mismo carnet una segunda vez,
     # la respuesta es la versión más reciente. No pareciera que
     # importe.
     # Ignoramos las primeras columnas, damos el índice de la columna
     # de la llave, y la columna inicial de las respuestas (y asumimos
-    # que las respuestas son hasta el final, al menos que la última 
+    # que las respuestas son hasta el final, al menos que la última
     # columna sea la que corresponda al # de carnet).
     if Info.CSV_IKEY == -1:
         todxs[cols[Info.CSV_IKEY]] = cols[Info.CSV_ICOL:-1]
@@ -140,7 +140,7 @@ else:
         listdir = os.listdir(path)
     except:
         logging.critical('%s "%s" %s' % (
-            'No se pudo abrir carpeta', 
+            'No se pudo abrir carpeta',
             sys.argv[2],
             'con las listas de estudiantes.'))
         sys.exit()
@@ -154,18 +154,17 @@ else:
 # E. Se trabaja grupo por grupo.
 #-----------------------------------------------------------------------
 carpeta: str    # Carpeta donde se guardan los reportes y la nota.
-filename: str 
+filename: str
 lista: List[str]
 linea: str    # Un estudiante de la lista.
 idstr: str    # String del identificador del estudiante (# de carnet).
 separar: List[str]   # Separar info del estudiante.
 numPreguntas: List[int] = examen.get_numPreguntas()
 todasResp: List[Tuple[str, List[Tuple[str, Respuesta]]]]
-todosPuntos: List[Tuple[str, List[Tuple[float, int]]]] 
+todosPuntos: List[Tuple[str, List[Tuple[float, int]]]]
 for path in lestudiantes:
     todasResp = []
     todosPuntos = []
-    encabezado: str = latex.get_encabezadoInforme(numPreguntas)
     logging.debug('PATH = %s\n' % path)
     # Carpeta donde se van a guardar las notas y el reporte
     # (es la misma carpeta donde se generaron los exámenes en pdf)
@@ -191,7 +190,7 @@ for path in lestudiantes:
     # Se separa la lista por estudiante.
     Lista: List[str] = finput.readlines()
     finput.close()
-    
+
     # Ahora se trabaja con cada estudiante de la Lista.
     irow: int = 0
     for linea in Lista:
@@ -202,7 +201,7 @@ for path in lestudiantes:
         # ##-id-##, <apellidos/nombres>, xxxxx
         separar = linea.split(',')
         idstr = separar[0].strip()
-        nombre = ' '.join([palabra.capitalize() 
+        nombre = ' '.join([palabra.capitalize()
                              for palabra in separar[1].strip().split()])
         #@
         notasSheet.write(irow, 0, idstr)
@@ -215,18 +214,18 @@ for path in lestudiantes:
         if len(misResp) == 0:
             tabla.notasNull(notasSheet, sum(numPreguntas), irow)
             #@ Se suman los puntos ;)
-            notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1, 
+            notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1,
                               chr(ord('E') + sum(numPreguntas) - 1), irow + 1))
             #@ y se calcula la nota
             notasSheet.write(irow, 2, '= 100 * D%d / %d' % (irow + 1, totalPts), bold)
             continue
-    
-        # Se inicializa la semilla usando el identificador multiplicado 
+
+        # Se inicializa la semilla usando el identificador multiplicado
         # por una constante, según el índice de repetición dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
         logging.debug('numero de carnet: %s' % idstr)
         random.seed(seed)
-    
+
         # Se comienzan a agregar las instancias de los objetos de tipo
         # Respuesta.
         for seccion in examen.secciones:
@@ -248,7 +247,7 @@ for path in lestudiantes:
             notasSheet.write(irow, icol, pts[0])
         todosPuntos.append((idstr[-6:], puntos))
         #@ Se suman los puntos
-        notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1, 
+        notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1,
                             chr(ord('E') + sum(numPreguntas) - 1), irow + 1))
         #@ y se calcula la nota
         notasSheet.write(irow, 2, '= 100 * D%d / %d' % (irow + 1, totalPts), bold)
@@ -276,13 +275,13 @@ for path in lestudiantes:
             infoSheet.write(irow+3, icol, puntos[j][1])
             icol += 1
         #@ Se suman los puntos
-        infoSheet.write(irow+1, icol, '=SUM(B%d:%c%d)' % (irow + 2, 
+        infoSheet.write(irow+1, icol, '=SUM(B%d:%c%d)' % (irow + 2,
                             chr(ord('A') + icol - 1), irow + 2))
         #@ y se calcula la nota
-        infoSheet.write(irow+1, icol+1, '= 100 * %c%d / %c%d' % 
-                          (chr(ord('A') + icol), irow+2, 
+        infoSheet.write(irow+1, icol+1, '= 100 * %c%d / %c%d' %
+                          (chr(ord('A') + icol), irow+2,
                               chr(ord('A') + icol), irow+4), bold)
-        infoSheet.write(irow+3, icol, '=SUM(B%d:%c%d)' % (irow+4, 
+        infoSheet.write(irow+3, icol, '=SUM(B%d:%c%d)' % (irow+4,
                             chr(ord('A') + icol - 1), irow + 4))
         infoSheet.write(irow+3, icol+1, 100)
 

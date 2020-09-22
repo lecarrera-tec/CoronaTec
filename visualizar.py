@@ -7,7 +7,8 @@ import logging
 
 import pregunta
 
-logging.basicConfig(filename='_visualizar.log', level=logging.DEBUG, filemode='w')
+logging.basicConfig(
+        filename='_visualizar.log', level=logging.DEBUG, filemode='w')
 
 encabezado: str = """
 \\documentclass[12pt]{article}\n
@@ -24,10 +25,10 @@ encabezado: str = """
 
 # Si no se tienen la cantidad de argumentos correcta, se sale.
 if len(sys.argv) < 3 or len(sys.argv) > 4:
-    print(
-    """Se espera como argumentos el archivo .tex de la pregunta y el numero de 
-    muestras. De manera opcional, un archivo `.tex` para el encabezado, que va
-    desde \\documentclass ... hasta \\begin{document}""")
+    print('Se espera como argumentos el archivo .tex de la pregunta y el\n',
+          'numero de muestras. De manera opcional, un archivo `.tex` para\n',
+          'el encabezado, que va desde \\documentclass ... hasta \n',
+          '\\begin{document}\n\n')
     sys.exit()
 
 # Carpeta donde se va a guardar el pdf
@@ -49,7 +50,7 @@ if len(sys.argv) == 4:
 # Se cambia al directorio del archivo.
 try:
     os.chdir(carpeta)
-except:
+except OSError:
     logging.critical('No se pudo abrir carpeta: `%s`' % carpeta)
     sys.exit()
 

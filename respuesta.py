@@ -7,6 +7,7 @@ import TPreg
 from fmate import mantisa
 from ftexto import txtFloat
 
+
 class Respuesta:
     """ Información necesaria para evaluar las respuestas.
 
@@ -15,7 +16,7 @@ class Respuesta:
     tipoPreg:
         Ver TPreg.py
     respuestas:
-        Lista de posibles respuestas, con el porcentaje de puntuaci\'on 
+        Lista de posibles respuestas, con el porcentaje de puntuaci\'on
         respectivo.
         - Selecci\'on \'unica: un sólo elemento con el \'indice 0-indexado
           de la respuesta correcta.
@@ -28,7 +29,7 @@ class Respuesta:
     """
 
     def __init__(self, tipoPreg: int) -> None:
-        """ Constructor. 
+        """ Constructor.
 
         Argumentos
         ----------
@@ -37,7 +38,7 @@ class Respuesta:
         """
 
         assert(tipoPreg == TPreg.UNICA or tipoPreg == TPreg.RESP_CORTA
-                or tipoPreg == TPreg.ENCABEZADO)
+               or tipoPreg == TPreg.ENCABEZADO)
         self.tipoPreg: int = tipoPreg
         # Las respuestas son una lista abierta de cualquier tipo.
         self.respuestas: List[Any] = []
@@ -46,7 +47,7 @@ class Respuesta:
         self.puntaje: int = 1
 
     def add_opcion(self, opcion: int) -> None:
-        """ Agrega una opcion a la pregunta. 
+        """ Agrega una opcion a la pregunta.
 
         Argumentos
         ----------
@@ -57,8 +58,8 @@ class Respuesta:
         # Verificamos que la opción agregada sea apropiada según el
         # tipo de pregunta.
         if self.tipoPreg & TPreg.UNICA:
-            assert(opcion & (TPreg.ALEATORIO + TPreg.CRECIENTE 
-                    + TPreg.INDICES + TPreg.TODOS))
+            assert(opcion & (TPreg.ALEATORIO + TPreg.CRECIENTE
+                             + TPreg.INDICES + TPreg.TODOS))
         elif self.tipoPreg & TPreg.RESP_CORTA:
             assert(opcion & (TPreg.ENTERO + TPreg.FLOTANTE))
         else:
@@ -69,8 +70,6 @@ class Respuesta:
         self.tipoPreg += opcion
 
     def add_respuesta(self, resp: Any) -> None:
-        # TODO Definir un formato para Tuple[Any,float,float] y 
-        # verificar que TResp coincida con dicho formato.
         logging.debug('Se agrega respuesta: %s' % str(resp))
         self.respuestas.append(resp)
 
@@ -86,7 +85,7 @@ class Respuesta:
             Respuesta del estudiante.
         Devuelve
         --------
-        Una tupla con el puntaje obtenido y el puntaje total de la 
+        Una tupla con el puntaje obtenido y el puntaje total de la
         pregunta.
         """
         logging.debug('Calificar: %s' % texto)
@@ -97,35 +96,16 @@ class Respuesta:
             logging.debug('  Tipo -> TODOS')
             puntos = 1.0 * self.puntaje
         elif self.tipoPreg & TPreg.UNICA:
-            logging.debug('  Tipo -> UNICA')
-            if len(self.respuestas) > 1:
-                logging.error('  Más de una respuesta correcta en selección única.')
-            for opcion in self.respuestas:
-                # Lo que hacemos es que, con que acierte una, le damos
-                # los puntos de la pregunta.
-                logging.debug('  Opcion: %d -- Respuesta: %d (' % 
-                        (opcion, -1 if len(texto) == 0 else ord(texto) - ord('A')))
-                if len(texto) > 0 and ((ord(texto) - ord('A')) == opcion):
-                    puntos = 1.0 * self.puntaje
-                    break
-        elif self.tipoPreg & TPreg.RESP_CORTA and self.tipoPreg & TPreg.ENTERO:
-            expr = eval(texto, DGlobal, DFunciones)
-            puntos = 0.0
-            for resp in self.respuestas:
-                if expr == resp:
-                    puntos = 1.0 * self.puntaje
-                    break
-        elif self.tipoPreg & TPreg.RESP_CORTA and self.tipoPreg & TPreg.FLOTANTE:
-            expr = eval(texto, DGlobal, DFunciones)
-            puntos = 0.0
-            for resp in self.respuestas:
-                assert(resp[1] >= 0)
-                base10 = mantisa(resp[0])
-                menor = (base10[0] - resp[1]) * pow(10, base10[1])
-                mayor = (base10[0] + resp[1]) * pow(10, base10[1])
-                if menor <= expr and expr <= mayor:
-                    puntos = resp[2] * self.puntaje
-                    break
+            puntos = __calificar_unica__(self.respuestas, texto,
+                                         self.puntaje)
+        elif self.tipoPreg & TPreg.ENTERO:
+            assert(self.tipoPreg & TPreg.RESP_CORTA)
+            puntos = __calificar_entero__(self.respuestas, texto,
+                                          self.puntaje)
+        elif self.tipoPreg & TPreg.FLOTANTE:
+            assert(self.tipoPreg & TPreg.RESP_CORTA)
+            puntos = __calificar_flotante__(self.respuestas, texto,
+                                            self.puntaje)
         return (puntos, self.puntaje)
 
     def textoResp(self) -> str:
@@ -144,3 +124,43 @@ class Respuesta:
                 return txtFloat(self.respuestas[0][0], cifras)
         logging.error('No se pudo determinar el tipo de pregunta')
         return ''
+
+
+def __calificar_unica__(respuestas, texto: str, puntaje: int) -> float:
+    logging.debug('  Tipo -> UNICA')
+    puntos: float = 0
+    for opcion in respuestas:
+        # Lo que hacemos es que, con que acierte una, le damos
+        # los puntos de la pregunta.
+        logging.debug(
+                'Opcion: %d -- Respuesta: %d' % (
+                    opcion,
+                    -1 if len(texto) == 0 else ord(texto) - ord('A')))
+        if len(texto) > 0 and ((ord(texto) - ord('A')) == opcion):
+            puntos = 1.0 * puntaje
+            break
+    return puntos
+
+
+def __calificar_entero__(respuestas, texto: str, puntaje: int) -> float:
+    expr = eval(texto, DGlobal, DFunciones)
+    puntos: float = 0.0
+    for resp in respuestas:
+        if expr == resp:
+            puntos = 1.0 * puntaje
+            break
+    return puntos
+
+
+def __calificar_flotante__(respuestas, texto: str, puntaje: int) -> float:
+    expr = eval(texto, DGlobal, DFunciones)
+    puntos: float = 0.0
+    for resp in respuestas:
+        assert(resp[1] >= 0)
+        base10 = mantisa(resp[0])
+        menor = (base10[0] - resp[1]) * pow(10, base10[1])
+        mayor = (base10[0] + resp[1]) * pow(10, base10[1])
+        if menor <= expr and expr <= mayor:
+            puntos = resp[2] * puntaje
+            break
+    return puntos

@@ -4,7 +4,7 @@ from typing import List, Tuple
 from fmate import factores
 
 def txtFraccion(num: int, den: int, conSigno: bool = False) -> str:
-    """Texto en LaTeX de una fracci\'on. 
+    """Texto en LaTeX de una fracci\'on.
 
     Argumentos
     ----------
@@ -18,7 +18,7 @@ def txtFraccion(num: int, den: int, conSigno: bool = False) -> str:
 
     Devuelve
     --------
-    Simplifica y devuelve el texto en LaTeX de una fracci\'on, 
+    Simplifica y devuelve el texto en LaTeX de una fracci\'on,
     utilizando el comando dfrac.
     """
 
@@ -98,7 +98,7 @@ def txtRaiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
         texto = '+'
     else:
         texto = ''
-    
+
     if afuera > 1:
         texto = '%s%d' % (texto, afuera)
 
@@ -113,8 +113,8 @@ def txtRaiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
 def txtCoef(numero: int, conSigno: bool = False) -> str:
     """ Imprime el coeficiente para una variable.
 
-    Si el n\'umero es 1 no imprime nada o s\'olo un +. Si el n\'umero es 
-    -1 imprime solo un menos. En caso contrario imprime el n\'umero (con 
+    Si el n\'umero es 1 no imprime nada o s\'olo un +. Si el n\'umero es
+    -1 imprime solo un menos. En caso contrario imprime el n\'umero (con
     signo, si as\'i se especifica.
     """
 
@@ -134,7 +134,7 @@ def txtCoef(numero: int, conSigno: bool = False) -> str:
 def txtExpo(expo: int) -> str:
     """ Escribe la expresi\'on como exponente si se requiere (!= 1)
 
-    Si exp == 1 no devuelve nada. En cualquier otro caso devuelve 
+    Si exp == 1 no devuelve nada. En cualquier otro caso devuelve
     "^{exp}".
 
     Argumentos
@@ -166,7 +166,7 @@ def txtFloat(numero: float, cifras: int) -> str:
 def txtNumero(numero: int, mil: bool = False) -> str:
     assert(numero > 0 and numero <= 999999999999)
     texto: str
-    teens: List[str] = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 
+    teens: List[str] = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco',
             'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
             'catorce', 'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho',
             'diecinueve', 'veinte', 'veintiuno', 'veintid\\\'os',
@@ -174,10 +174,10 @@ def txtNumero(numero: int, mil: bool = False) -> str:
             'veintisiete', 'veintiocho', 'veintinueve']
     decenas: List[str] = ['treinta', 'cuarenta', 'cincuenta', 'sesenta',
             'setenta', 'ochenta', 'noventa', 'cien']
-    centenas: List[str] = ['ciento', 'doscientos', 'trescientos', 
+    centenas: List[str] = ['ciento', 'doscientos', 'trescientos',
             'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos',
             'ochocientos', 'novecientos', 'mil']
-    miles: List[str] = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 
+    miles: List[str] = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco',
             'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
             'catorce', 'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho',
             'diecinueve', 'veinte', 'veintiun', 'veintid\\\'os',
