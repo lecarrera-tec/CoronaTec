@@ -58,10 +58,10 @@ class Seccion:
         self.puntaje: int = 0
         self.aleatorias: bool = aleatorio
 
-        linea: str
+        linea: str = leer.blancos(lsTexto)
         # Se busca un título
         self.titulo: str
-        self.titulo, linea = leer.titulo(lsTexto)
+        self.titulo, linea = leer.titulo(linea, lsTexto)
         if len(self.titulo) > 0:
             logging.info('<Titulo>: %s' % self.titulo)
         else:
@@ -73,7 +73,7 @@ class Seccion:
         if len(self.instrucciones) > 0:
             logging.info('<Instrucciones>: %s' % self.instrucciones)
         else:
-            logging.info('No hay titulo en la sección.')
+            logging.info('No hay instrucciones en la sección.')
 
         # Deberían de seguir las direcciones a los archivos de las
         # preguntas.

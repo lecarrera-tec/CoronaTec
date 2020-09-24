@@ -4,9 +4,8 @@ from math import ceil, log10
 
 from diccionarios import DGlobal, DFunciones
 import TPreg
-from fmate import mantisa
-from ftexto import txtFloat
-
+from fmate import descomponer
+import ftexto as txt
 
 class Respuesta:
     """ Información necesaria para evaluar las respuestas.
@@ -16,10 +15,10 @@ class Respuesta:
     tipoPreg:
         Ver TPreg.py
     respuestas:
-        Lista de posibles respuestas, con el porcentaje de puntuaci\'on
+        Lista de posibles respuestas, con el porcentaje de puntuación
         respectivo.
-        - Selecci\'on \'unica: un sólo elemento con el \'indice 0-indexado
-          de la respuesta correcta.
+        - Selección única: varios elementos con el índice 0-indexado de 
+          las respuestas correctas.
         - Respuesta corta entera: un sólo elemento con la respuesta
           correcta.
         - Respuesta corta flotante: Una lista de tuplas de la forma
@@ -45,6 +44,18 @@ class Respuesta:
         # Puntaje predeterminado. Creo que es innecesario, pero por si
         # las moscas.
         self.puntaje: int = 1
+
+    def get_respuesta(self):
+        if self.tipoPreg & TPreg.TODOS:
+            return '*'
+        if self.tipoPreg & TPreg.UNICA:
+            opcion = self.respuestas[0]
+            return chr(ord('A') + opcion)
+        elif self.tipoPreg & TPreg.RESP_CORTA:
+            if self.tipoPreg & TPreg.ENTERO:
+                return self.respuestas[0]
+            elif self.tipoPreg & TPreg.FLOTANTE:
+                return self.respuestas[0][0]
 
     def add_opcion(self, opcion: int) -> None:
         """ Agrega una opcion a la pregunta.
@@ -111,9 +122,9 @@ class Respuesta:
     def textoResp(self) -> str:
         """ Devuelve el texto de la respuesta correcta. """
 
+        if self.tipoPreg & TPreg.TODOS:
+            return '*'
         if self.tipoPreg & TPreg.UNICA:
-            if self.tipoPreg & TPreg.TODOS:
-                return '*'
             opcion = self.respuestas[0]
             return chr(ord('A') + opcion)
         elif self.tipoPreg & TPreg.RESP_CORTA:
@@ -121,7 +132,7 @@ class Respuesta:
                 return str(self.respuestas[0])
             elif self.tipoPreg & TPreg.FLOTANTE:
                 cifras: int = int(ceil(-log10(self.respuestas[0][1])))
-                return txtFloat(self.respuestas[0][0], cifras)
+                return txt.decimal(self.respuestas[0][0], cifras)
         logging.error('No se pudo determinar el tipo de pregunta')
         return ''
 
@@ -153,14 +164,17 @@ def __calificar_entero__(respuestas, texto: str, puntaje: int) -> float:
 
 
 def __calificar_flotante__(respuestas, texto: str, puntaje: int) -> float:
+    logging.debug('Calificar flotante [%d pt]: `%s`' % (puntaje, texto))
     expr = eval(texto, DGlobal, DFunciones)
     puntos: float = 0.0
-    for resp in respuestas:
-        assert(resp[1] >= 0)
-        base10 = mantisa(resp[0])
-        menor = (base10[0] - resp[1]) * pow(10, base10[1])
-        mayor = (base10[0] + resp[1]) * pow(10, base10[1])
+    for resp, error, factor in respuestas:
+        assert(error >= 0)
+        mantisa, expo = descomponer(resp)
+        menor = (mantisa - error) * 10**expo
+        mayor = (mantisa + error) * 10**expo
+        logging.debug('@@@ (error = %.5f) %.5f en [%.5f, %.5f]?'\
+                      % (error, expr, menor, mayor))
         if menor <= expr and expr <= mayor:
-            puntos = resp[2] * puntaje
+            puntos = factor * puntaje
             break
     return puntos

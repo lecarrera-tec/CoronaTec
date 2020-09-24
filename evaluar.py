@@ -271,7 +271,7 @@ for path in lestudiantes:
             temp = resps[1][j]
             infoSheet.write(irow,   icol, temp[0])
             infoSheet.write(irow+1, icol, puntos[j][0])
-            infoSheet.write(irow+2, icol, temp[1].textoResp())
+            infoSheet.write(irow+2, icol, temp[1].get_respuesta())
             infoSheet.write(irow+3, icol, puntos[j][1])
             icol += 1
         #@ Se suman los puntos

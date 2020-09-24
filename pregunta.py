@@ -6,7 +6,6 @@ import random
 import sys
 from typing import Any, List, Dict
 
-import leer
 import parserPPP
 import Info
 import TPreg
@@ -87,7 +86,7 @@ def get_latex(filename: str, dParams: Dict[str, Any],
         return ''
 
     # Se obtienen todas las lineas del archivo y se cierra.
-    lineas: List[str] = f.readlines()
+    lsTexto: List[str] = f.readlines()
     f.close()
     texto: str
     linea: str
@@ -95,7 +94,7 @@ def get_latex(filename: str, dParams: Dict[str, Any],
     # Se ignoran los comentarios.
     ignorar: bool = True
     while ignorar:
-        linea = lineas.pop(0).strip()
+        linea = lsTexto.pop(0).strip()
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
@@ -103,11 +102,11 @@ def get_latex(filename: str, dParams: Dict[str, Any],
     linea = linea.strip(Info.STRIP)
     tipo: str = parserPPP.derechaIgual(linea, 'tipo')
     if tipo == 'respuesta corta':
-        texto = latex_corta(linea, lineas, dParams, revisar)
+        texto = latex_corta(linea, lsTexto, dParams, revisar)
     elif tipo == 'seleccion unica':
-        texto = latex_unica(linea, lineas, dParams, revisar)
+        texto = latex_unica(linea, lsTexto, dParams, revisar)
     elif tipo == 'encabezado':
-        texto = latex_encabezado(linea, lineas, dParams)
+        texto = latex_encabezado(linea, lsTexto, dParams)
     else:
         logging.critical('Tipo de pregunta desconocido: `%s`' % linea)
         sys.exit()
@@ -136,7 +135,8 @@ def get_latex(filename: str, dParams: Dict[str, Any],
             texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
     return texto
 
-def get_respuesta(self, dParams: Dict[str, Any]) -> Respuesta:
+
+def get_respuesta(filename: str, dParams: Dict[str, Any]) -> Respuesta:
     """ Constructor de la respuesta.
 
     Lo que hace es clasificar el tipo de pregunta, y llamar a la 
@@ -157,19 +157,18 @@ def get_respuesta(self, dParams: Dict[str, Any]) -> Respuesta:
 
     # Se abre el archivo, se leen y guardan las líneas y se cierra
     # el archivo.
-    filename = self.origen
     try:
         f = open(filename)
-    except:
+    except FileNotFoundError:
         logging.error('No se pudo abrir archivo "%s"' % filename)
         sys.exit()
-    lineas: List[str] = f.readlines()
+    lsTexto: List[str] = f.readlines()
     f.close()
 
     # Ignorando comentarios y líneas en blanco.
     ignorar: bool = True
     while ignorar:
-        linea: str = lineas.pop(0).strip()
+        linea: str = lsTexto.pop(0).strip()
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
@@ -177,17 +176,17 @@ def get_respuesta(self, dParams: Dict[str, Any]) -> Respuesta:
     linea = linea.strip(Info.STRIP)
     tipo: str = parserPPP.derechaIgual(linea, 'tipo')
     if tipo == 'respuesta corta':
-        return respuesta_corta(linea, lineas, dParams)
+        return respuesta_corta(linea, lsTexto, dParams)
     elif tipo == 'seleccion unica':
-        return respuesta_unica(linea, lineas, dParams)
+        return respuesta_unica(linea, lsTexto, dParams)
     elif tipo == 'encabezado':
-        return respuesta_encabezado(linea, lineas, dParams)
+        return respuesta_encabezado(linea, lsTexto, dParams)
 
     logging.error('Tipo de pregunta desconocido: %s' % linea)
     return Respuesta(TPreg.NINGUNA)
 
 
-def latex_unica(opciones: str, lineas: List[str],
+def latex_unica(opciones: str, lsTexto: List[str],
                 dParams: Dict[str, Any], revisar: bool) -> str:
     """LaTeX de pregunta de selección única.
 
@@ -209,7 +208,7 @@ def latex_unica(opciones: str, lineas: List[str],
     """
 
     logging.debug('Entrando a "latex_unica"')
-    logging.debug('Texto: %s', ''.join(lineas))
+    logging.debug('Texto: %s', ''.join(lsTexto))
 
     # TODO Faltan leer los parámetros de la pregunta que se encuentran
     # en `opciones`. Asumimos que el orden es aleatorio.
@@ -232,14 +231,14 @@ def latex_unica(opciones: str, lineas: List[str],
     lista: List[str] = []
     ignorar: bool = True
     while ignorar:
-        linea = lineas[counter].strip()
+        linea = lsTexto[counter].strip()
         counter += 1
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
     # Definiendo diccionario.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if linea == Info.VARIABLES:
         while True:
-            linea = lineas[counter].strip()
+            linea = lsTexto[counter].strip()
             counter += 1
             if linea == Info.PREGUNTA:
                 break
@@ -253,13 +252,13 @@ def latex_unica(opciones: str, lineas: List[str],
     # Redefinimos el diccionario, eliminando las preguntas que generan
     # números aleatorios.
     dLocal = {**dParams, **DFunciones}
-    linea = lineas[counter]
+    linea = lsTexto[counter]
     counter += 1
     texto: List[str] = []
     while not linea.strip().startswith(Info.LITEM):
         # Agregamos la línea de texto actualizando las @-expresiones.
         texto.append('    %s' % parserPPP.update(linea, dLocal))
-        linea = lineas[counter]
+        linea = lsTexto[counter]
         counter += 1
     lista.append('%s\n%s' % (''.join(texto).rstrip(), '    \\nopagebreak\n'))
 
@@ -271,8 +270,8 @@ def latex_unica(opciones: str, lineas: List[str],
     litems: List[str] = []
     item: str
     ultimo: str
-    while counter < len(lineas):
-        linea = lineas[counter]
+    while counter < len(lsTexto):
+        linea = lsTexto[counter]
         counter += 1
         # Un nuevo item. Finalizamos el anterior.
         if linea.strip().startswith(Info.LITEM):
@@ -286,7 +285,7 @@ def latex_unica(opciones: str, lineas: List[str],
                     logging.debug('Generar de nuevo:')
                     logging.debug('  %s = %s!!' % (item, ultimo))
                     # Se tiene que generar de nuevo la pregunta.
-                    return latex_unica(opciones, lineas, dParams, revisar)
+                    return latex_unica(opciones, lsTexto, dParams, revisar)
             litems.append('%s\n\n' % ultimo)
             texto = []
         else:
@@ -309,7 +308,7 @@ def latex_unica(opciones: str, lineas: List[str],
     return ('%s\n' % ''.join(lista).strip())
 
 
-def latex_corta(opciones: str, lineas: List[str], dParams: Dict[str, Any],
+def latex_corta(opciones: str, lsTexto: List[str], dParams: Dict[str, Any],
                 revisar: bool) -> str:
     """LaTeX de pregunta de respuesta corta.
 
@@ -330,7 +329,7 @@ def latex_corta(opciones: str, lineas: List[str], dParams: Dict[str, Any],
     """
 
     logging.debug('Entrando a "latex_corta"')
-    logging.debug('Texto: %s', ''.join(lineas))
+    logging.debug('Texto: %s', ''.join(lsTexto))
 
     # Definiendo el número de cifras significativas en 3.
     cifras: int = 3
@@ -351,14 +350,14 @@ def latex_corta(opciones: str, lineas: List[str], dParams: Dict[str, Any],
     # Se ignoran los comentarios.
     ignorar: bool = True
     while ignorar:
-        linea = lineas.pop(0).strip()
+        linea = lsTexto.pop(0).strip()
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
 
     # Definiendo diccionario y se evalúan las variables.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if linea == Info.VARIABLES:
         while True:
-            linea = lineas.pop(0).strip()
+            linea = lsTexto.pop(0).strip()
             if linea == Info.PREGUNTA:
                 break
             elif len(linea) == 0 or linea[0] == Info.COMMENT:
@@ -371,12 +370,12 @@ def latex_corta(opciones: str, lineas: List[str], dParams: Dict[str, Any],
     # Redefinimos el diccionario, eliminando las preguntas que generan
     # números aleatorios.
     dLocal = {**dParams, **DFunciones}
-    linea = lineas.pop(0)
+    linea = lsTexto.pop(0)
     ltexto: List[str] = []
     while not linea.strip().startswith(Info.LITEM):
         # Se agrega la línea de texto actualizando las @-expresiones.
         ltexto.append('    %s' % parserPPP.update(linea, dLocal, cifras))
-        linea = lineas.pop(0)
+        linea = lsTexto.pop(0)
     lista.append('%s\n\n' % ''.join(ltexto).rstrip())
 
     if revisar:
@@ -384,7 +383,7 @@ def latex_corta(opciones: str, lineas: List[str], dParams: Dict[str, Any],
         assert(linea.strip().startswith(Info.LITEM))
         ignorar = True
         while ignorar:
-            linea = lineas.pop(0).strip()
+            linea = lsTexto.pop(0).strip()
             ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
         lista.append('\\bigskip\n\n\\noindent R/ %s\n'
                      % str(eval(linea, DGlobal, dLocal)))
@@ -392,7 +391,7 @@ def latex_corta(opciones: str, lineas: List[str], dParams: Dict[str, Any],
     return ('%s\n' % ''.join(lista).strip())
 
 
-def latex_encabezado(opciones: str, lineas: List[str],
+def latex_encabezado(opciones: str, lsTexto: List[str],
                      dParams: Dict[str, Any]) -> str:
     """LaTeX de encabezado
 
@@ -413,7 +412,7 @@ def latex_encabezado(opciones: str, lineas: List[str],
     """
 
     logging.debug('Entrando a "latex_encabezado"')
-    logging.debug('Texto: %s', ''.join(lineas))
+    logging.debug('Texto: %s', ''.join(lsTexto))
 
     # Definiendo el número de cifras significativas en 3.
     cifras: int = 3
@@ -431,13 +430,13 @@ def latex_encabezado(opciones: str, lineas: List[str],
     # Se ignoran los comentarios.
     ignorar: bool = True
     while ignorar:
-        linea = lineas.pop(0).strip()
+        linea = lsTexto.pop(0).strip()
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
     # Definiendo diccionario y se evalúan las variables.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if linea == Info.VARIABLES:
         while True:
-            linea = lineas.pop(0).strip()
+            linea = lsTexto.pop(0).strip()
             if linea == Info.PREGUNTA:
                 break
             elif len(linea) == 0 or linea[0] == Info.COMMENT:
@@ -451,13 +450,13 @@ def latex_encabezado(opciones: str, lineas: List[str],
     # números aleatorios.
     dLocal = {**dParams, **DFunciones}
     ltexto: List[str] = []
-    while len(lineas) > 0:
-        linea = lineas.pop(0)
+    while len(lsTexto) > 0:
+        linea = lsTexto.pop(0)
         # Se agrega la línea de texto actualizando las @-expresiones.
         ltexto.append('    %s' % parserPPP.update(linea, dLocal, cifras))
     return ('%s\n' % ''.join(ltexto).strip())
 
-def respuesta_corta(opciones: str, lineas: List[str],
+def respuesta_corta(opciones: str, lsTexto: List[str],
                     dParams: Dict[str, Any]) -> Respuesta:
     """Objeto Respuesta de pregunta de respuesta corta.
 
@@ -477,20 +476,10 @@ def respuesta_corta(opciones: str, lineas: List[str],
     """
 
     logging.debug('Entrando a "respuesta_corta"')
-    logging.debug('Texto: %s', ''.join(lineas))
+    logging.debug('Texto: %s', ''.join(lsTexto))
 
     # Se inicializa el objeto Respuesta.
     resp = Respuesta(TPreg.RESP_CORTA)
-
-    # Definiendo el número de cifras significativas en 3.
-    cifras: int = 3
-    # Buscando si el usuario lo definió.
-    texto: str = parserPPP.derechaIgual(opciones, 'cifras')
-    if len(texto) > 0:
-        try:
-            cifras = int(texto)
-        except:
-            logging.error('No se pudo leer `cifras` en `%s`.' % opciones)
 
     # Ver si la respuesta es un entero, o de tipo flotante. El tipo
     # entero es el predeterminado.
@@ -511,14 +500,14 @@ def respuesta_corta(opciones: str, lineas: List[str],
     # Se ignoran los comentarios.
     ignorar: bool = True
     while ignorar:
-        linea = lineas.pop(0).strip()
+        linea = lsTexto.pop(0).strip()
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
 
     # Se leen los parámetros.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if linea == Info.VARIABLES:
         while True:
-            linea = lineas.pop(0).strip()
+            linea = lsTexto.pop(0).strip()
             if linea == Info.PREGUNTA:
                 break
             elif len(linea) == 0 or linea[0] == Info.COMMENT:
@@ -529,12 +518,11 @@ def respuesta_corta(opciones: str, lineas: List[str],
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.
     assert(linea == Info.PREGUNTA)
-    linea = lineas.pop(0)
+    linea = lsTexto.pop(0)
     while not linea.strip().startswith(Info.LITEM):
-        linea = lineas.pop(0)
+        linea = lsTexto.pop(0)
 
     # Ahora siguen los items.
-    # entero: int
     flotante: float
     error: float
     # Se redefine el diccionario para eliminar las funciones random.
@@ -549,12 +537,8 @@ def respuesta_corta(opciones: str, lineas: List[str],
             if esEntero:
                 # No hay que leer opciones. Se obtiene la siguiente
                 # línea y se lee la expresión.
-                linea = lineas.pop(0).strip()
-                try:
-                    entero = eval(linea, DGlobal, dLocal)
-                except:
-                    logging.error('No se pudo evaluar expresion: `%s`' % linea)
-                    entero = 0
+                linea = lsTexto.pop(0).strip()
+                entero = eval(linea, DGlobal, dLocal)
                 resp.add_respuesta(entero)
             else:
                 # Es de tipo flotante. Hay que leer error aceptable y
@@ -562,7 +546,7 @@ def respuesta_corta(opciones: str, lineas: List[str],
                 texto = parserPPP.derechaIgual(linea, 'error')
                 try:
                     error = float(texto)
-                except:
+                except ValueError:
                     logging.error('No se pudo leer error: `%s`' % linea)
                     error = 0.01
                 texto = parserPPP.derechaIgual(linea, 'factor')
@@ -571,26 +555,21 @@ def respuesta_corta(opciones: str, lineas: List[str],
                 else:
                     try:
                         factor = float(texto)
-                    except:
+                    except ValueError:
                         logging.error('No se pudo leer factor: `%s`' % linea)
                         factor = 1.0
                 # Ya se puede leer la siguiente línea y evaluar la
                 # expresión.
-                linea = lineas.pop(0).strip()
-                try:
-                    flotante = eval(linea, DGlobal, dLocal)
-                except:
-                    logging.error(
-                            'No se pudo evaluar expresion: `%s`' % linea)
-                    flotante = 0.0
+                linea = lsTexto.pop(0).strip()
+                flotante = eval(linea, DGlobal, dLocal)
                 resp.add_respuesta((flotante, error, factor))
-        if len(lineas) == 0:
+        if len(lsTexto) == 0:
             break
-        linea = lineas.pop(0)
+        linea = lsTexto.pop(0)
     return resp
 
 
-def respuesta_unica(opciones: str, lineas: List[str],
+def respuesta_unica(opciones: str, lsTexto: List[str],
                     dParams: Dict[str, Any]) -> Respuesta:
     """Objeto Respuesta de pregunta de selección única.
 
@@ -610,7 +589,7 @@ def respuesta_unica(opciones: str, lineas: List[str],
     """
 
     logging.debug('Entrando a "respuesta_unica"')
-    logging.debug('Texto: %s', ''.join(lineas))
+    logging.debug('Texto: %s', ''.join(lsTexto))
 
     # Creando el objeto de la respuesta.
     resp = Respuesta(TPreg.UNICA)
@@ -643,7 +622,7 @@ def respuesta_unica(opciones: str, lineas: List[str],
     linea: str
     ignorar: bool = True
     while ignorar:
-        linea = lineas[counter].strip()
+        linea = lsTexto[counter].strip()
         counter += 1
         ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
@@ -651,7 +630,7 @@ def respuesta_unica(opciones: str, lineas: List[str],
     # Se leen las variables
     if linea == Info.VARIABLES:
         while True:
-            linea = lineas[counter].strip()
+            linea = lsTexto[counter].strip()
             counter += 1
             if linea == Info.PREGUNTA:
                 break
@@ -663,10 +642,10 @@ def respuesta_unica(opciones: str, lineas: List[str],
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.
     assert(linea == Info.PREGUNTA)
-    linea = lineas[counter]
+    linea = lsTexto[counter]
     counter += 1
     while not linea.strip().startswith(Info.LITEM):
-        linea = lineas[counter]
+        linea = lsTexto[counter]
         counter += 1
 
     # Ahora siguen los items. Se tienen que construir para asegurarse de
@@ -680,8 +659,8 @@ def respuesta_unica(opciones: str, lineas: List[str],
     indices: List[int] = [0]
     item: str
     ultimo: str
-    while counter < len(lineas):
-        linea = lineas[counter]
+    while counter < len(lsTexto):
+        linea = lsTexto[counter]
         counter += 1
         # Un nuevo item. Finalizamos el anterior.
         if linea.strip().startswith(Info.LITEM):
@@ -697,7 +676,7 @@ def respuesta_unica(opciones: str, lineas: List[str],
                     logging.debug('Generar de nuevo:')
                     logging.debug('  %s = %s!!' % (item, ultimo))
                     # Se tiene que generar de nuevo la respuesta.
-                    return respuesta_unica(opciones, lineas, dParams)
+                    return respuesta_unica(opciones, lsTexto, dParams)
             litems.append('%s\n\n' % ultimo)
             texto = []
         else:
@@ -711,7 +690,7 @@ def respuesta_unica(opciones: str, lineas: List[str],
     return resp
 
 
-def respuesta_encabezado(opciones: str, lineas: List[str],
+def respuesta_encabezado(opciones: str, lsTexto: List[str],
                          dParams: Dict[str, Any]) -> Respuesta:
     """Objeto Respuesta de encabezado.
 
@@ -731,20 +710,23 @@ def respuesta_encabezado(opciones: str, lineas: List[str],
     """
 
     logging.debug('Entrando a "respuesta_encabezado"')
-    logging.debug('Texto: %s', ''.join(lineas))
+    logging.debug('Texto: %s', ''.join(lsTexto))
 
     # Se inicializa el objeto Respuesta.
     resp = Respuesta(TPreg.ENCABEZADO)
 
-    linea: str
     # Se ignoran los comentarios.
-    linea = leer.blancos(lineas)
+    linea: str
+    ignorar = True
+    while ignorar:
+        linea = lsTexto.pop(0).strip()
+        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
 
     # Se leen los parámetros.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
     if linea == Info.VARIABLES:
         while True:
-            linea = lineas.pop(0).strip()
+            linea = lsTexto.pop(0).strip()
             if linea == Info.PREGUNTA:
                 break
             elif len(linea) == 0 or linea[0] == Info.COMMENT:

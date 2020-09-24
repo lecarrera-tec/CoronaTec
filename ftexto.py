@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 from fmate import factores
 
-def txtFraccion(num: int, den: int, conSigno: bool = False) -> str:
+def fraccion(num: int, den: int, conSigno: bool = False) -> str:
     """Texto en LaTeX de una fracci\'on.
 
     Argumentos
@@ -38,25 +38,25 @@ def txtFraccion(num: int, den: int, conSigno: bool = False) -> str:
     den = den // factor
 
     # Si es positivo, se imprime o no el +
-    texto: str
+    txt: str
     if signo == 1:
         if conSigno:
-            texto = '+'
+            txt = '+'
         else:
-            texto = ''
+            txt = ''
     # es negativo.
     else:
-        texto = '-'
+        txt = '-'
 
     # No es una fracci\'on.
     if den == 1:
-        texto = '%s%d' % (texto, num)
+        txt = '%s%d' % (txt, num)
     else:
-        texto = '%s\\dfrac{%d}{%d}' % (texto, num, den)
+        txt = '%s\\dfrac{%d}{%d}' % (txt, num, den)
 
-    return texto
+    return txt
 
-def txtRaiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
+def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
     """ Texto de latex para una raiz.
 
     Argumentos
@@ -93,24 +93,24 @@ def txtRaiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
         adentro *= pow(primo, exp_adentro)
 
     if signo == -1:
-        texto = '-'
+        txt = '-'
     elif conSigno:
-        texto = '+'
+        txt = '+'
     else:
-        texto = ''
+        txt = ''
 
     if afuera > 1:
-        texto = '%s%d' % (texto, afuera)
+        txt = '%s%d' % (txt, afuera)
 
     if adentro > 1:
         if indice == 2:
-            texto = '%s\\sqrt{%d}' % (texto, adentro)
+            txt = '%s\\sqrt{%d}' % (txt, adentro)
         else:
-            texto = '%s\\sqrt[%d]{%d}' % (texto, indice, adentro)
+            txt = '%s\\sqrt[%d]{%d}' % (txt, indice, adentro)
 
-    return texto
+    return txt
 
-def txtCoef(numero: int, conSigno: bool = False) -> str:
+def coef(numero: int, conSigno: bool = False) -> str:
     """ Imprime el coeficiente para una variable.
 
     Si el n\'umero es 1 no imprime nada o s\'olo un +. Si el n\'umero es
@@ -131,7 +131,7 @@ def txtCoef(numero: int, conSigno: bool = False) -> str:
     else:
         return '%s%d' % (txtSigno, numero)
 
-def txtExpo(expo: int) -> str:
+def expo(expo: int) -> str:
     """ Escribe la expresi\'on como exponente si se requiere (!= 1)
 
     Si exp == 1 no devuelve nada. En cualquier otro caso devuelve
@@ -151,10 +151,10 @@ def txtExpo(expo: int) -> str:
     else:
         return '^{%d}' % expo
 
-def txtConSigno(numero: int) -> str:
+def conSigno(numero: int) -> str:
     return '%+d' % numero
 
-def txtFloat(numero: float, cifras: int) -> str:
+def decimal(numero: float, cifras: int) -> str:
     if numero < pow(10, -2*cifras-1) or numero >= pow(10, cifras - 1):
         ftxt = '%%.%de' % (cifras - 1)
     elif numero >= 1:
@@ -163,9 +163,9 @@ def txtFloat(numero: float, cifras: int) -> str:
         ftxt = '%%.%df' % (cifras + int(-log10(numero)))
     return ftxt % numero
 
-def txtNumero(numero: int, mil: bool = False) -> str:
+def texto(numero: int, mil: bool = False) -> str:
     assert(numero > 0 and numero <= 999999999999)
-    texto: str
+    txt: str
     teens: List[str] = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco',
             'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
             'catorce', 'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho',
@@ -187,11 +187,11 @@ def txtNumero(numero: int, mil: bool = False) -> str:
     if numero >= 2000000:
         temp = numero // 1000000
         numero = numero % 1000000
-        resp = '%s millones' % txtNumero(temp, mil)
+        resp = '%s millones' % texto(temp, mil)
     if numero >= 30000:
         temp = numero // 1000
         numero = numero % 1000
-        resp = '%s %s mil' % (resp, txtNumero(temp, True))
+        resp = '%s %s mil' % (resp, texto(temp, True))
     if numero >= 2000:
         temp = numero // 1000
         numero = numero % 1000

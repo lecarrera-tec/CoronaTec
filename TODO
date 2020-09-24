@@ -4,4 +4,6 @@
   versión *en* el pdf, junto con el nombre del estudiante. Se debe
   reajustar el valor del índice.
 
-- Agregar la función txtFloat a la documentación.
+- Agregar a la documentación:
+  * txtFloat 
+  * digSignif

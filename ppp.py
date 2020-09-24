@@ -67,33 +67,37 @@ class PPP:
         lsTexto: List[str] = finp.readlines()
         finp.close()
 
-        linea: str
+        linea: str = leer.blancos(lsTexto)
         hayEtiqueta: bool
 
         # Lo primero que deberíamos encontrar en el archivo es el nombre
         # de las escuelas. Obligatorio.
-        self.escuelas: List[str] = leer.escuelas(lsTexto)
+        self.escuelas: List[str]
+        self.escuelas, linea = leer.escuelas(linea, lsTexto)
         logging.info('<Escuelas>: %s' % ', '.join(self.escuelas))
 
         # Sigue el texto del semestre. Obligatorio.
-        self.semestre = leer.semestre(lsTexto)
+        self.semestre: str
+        self.semestre, linea = leer.semestre(linea, lsTexto)
         logging.info('<Semestre>: %s' % self.semestre)
 
         # Guardamos el texto del tiempo. Obligatorio.
-        self.tiempo = leer.tiempo(lsTexto)
+        self.tiempo: str
+        self.tiempo, linea = leer.tiempo(linea, lsTexto)
         logging.info('%s: %s' % (Info.TIEMPO, self.semestre))
 
         # Ahora sigue el nombre de los cursos. Obligatorio.
-        self.cursos = leer.cursos(lsTexto)
+        self.cursos: List[str]
+        self.cursos, linea = leer.cursos(linea, lsTexto)
         logging.info('<Cursos>: %s' % ', '.join(self.cursos))
 
         # Sigue el título de la prueba. Obligatorio.
-        self.titulo, linea = leer.titulo(lsTexto)
+        self.titulo, linea = leer.titulo(linea, lsTexto)
         logging.info('<Titulo>: %s' % self.titulo)
 
         # Ahora revisamos si existe encabezado para LaTeX. Si no
-        # hubiera encabezado, se tiene un texto vacio.
-        self.encabezado, linea = leer.encabezado(lsTexto)
+        # hubiera encabezado, se tiene un texto vac\'io.
+        self.encabezado, linea = leer.encabezado(linea, lsTexto)
         if len(self.encabezado) > 0:
             logging.info('<Encabezado>')
             logging.info(self.encabezado)
@@ -112,7 +116,6 @@ class PPP:
 
         # No queda de otra. Tienen que seguir las secciones. Una lista
         # de instancias de la clase Seccion.
-        linea = linea.strip()
         assert(linea.startswith(Info.LSECCION))
         self.secciones: List[Seccion]
         self.secciones = leer.secciones(linea, lsTexto, self.dirTrabajo)

@@ -31,7 +31,7 @@ def blancos(lsTexto: List[str]) -> str:
     return linea
 
 
-def escuelas(lsTexto: List[str]) -> List[str]:
+def escuelas(linea: str, lsTexto: List[str]) -> Tuple[List[str], str]:
     """ Se leen las escuelas participantes.
 
     Argumentos
@@ -44,20 +44,17 @@ def escuelas(lsTexto: List[str]) -> List[str]:
     --------
     Una lista con cada una de las escuelas.
     """
-    linea: str = blancos(lsTexto)
     assert(linea == Info.ESCUELAS)
     escuelas: List[str] = []
     while True:
-        linea = lsTexto.pop(0).strip()
-        if len(linea) == 0:
+        linea = blancos(lsTexto)
+        if linea[0] == '<':
             break
-        if linea.startswith(Info.COMMENT):
-            continue
         escuelas.append(linea)
-    return escuelas
+    return escuelas, linea
 
 
-def semestre(lsTexto: List[str]) -> str:
+def semestre(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
     """ Se lee el semestre y el año.
 
     Argumentos
@@ -70,13 +67,12 @@ def semestre(lsTexto: List[str]) -> str:
     --------
     Texto del semestre y año.
     """
-    linea: str = blancos(lsTexto)
     assert(linea == Info.SEMESTRE)
-    linea = lsTexto.pop(0).strip()
-    return linea
+    linea = blancos(lsTexto)
+    return linea, blancos(lsTexto)
 
 
-def tiempo(lsTexto: List[str]) -> str:
+def tiempo(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
     """ Se lee el tiempo asignado al examen.
 
     Argumentos
@@ -89,13 +85,12 @@ def tiempo(lsTexto: List[str]) -> str:
     --------
     El tiempo ingresado por el usuario.
     """
-    linea: str = blancos(lsTexto)
     assert(linea == Info.TIEMPO)
-    linea = lsTexto.pop(0).strip()
-    return linea
+    linea = blancos(lsTexto)
+    return linea, blancos(lsTexto)
 
 
-def cursos(lsTexto: List[str]) -> List[str]:
+def cursos(linea: str, lsTexto: List[str]) -> Tuple[List[str], str]:
     """ Se lee los cursos para los cuales aplica el examen.
 
     Argumentos
@@ -108,22 +103,18 @@ def cursos(lsTexto: List[str]) -> List[str]:
     --------
     Una lista con cada uno de los cursos.
     """
-    linea: str = blancos(lsTexto)
     assert(linea == Info.CURSOS)
     # Agregamos todas las líneas que no comiencen con comentario
     # hasta llegar a una línea en blanco.
     lista: List[str] = []
-    while True:
-        linea = lsTexto.pop(0).strip()
-        if len(linea) == 0:
-            break
-        if linea.startswith(Info.COMMENT):
-            continue
+    linea = blancos(lsTexto)
+    while not linea[0] == '<':
         lista.append(linea)
-    return lista
+        linea = blancos(lsTexto)
+    return lista, linea
 
 
-def titulo(lsTexto: List[str]) -> Tuple[str, str]:
+def titulo(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
     """ Se lee el título del examen o de la sección. Puede ser opcional.
 
     Si no tiene título, entonces se devuelve el título en blanco y la
@@ -139,15 +130,15 @@ def titulo(lsTexto: List[str]) -> Tuple[str, str]:
     --------
     Una tupla con el título (si había) y la siguiente línea de texto.
     """
-    linea: str = blancos(lsTexto)
     if linea == Info.TITULO:
-        resp = lsTexto.pop(0).strip()
+        resp = blancos(lsTexto)
+        linea = blancos(lsTexto)
     else:
         resp = ''
     return (resp, linea)
 
 
-def encabezado(lsTexto: List[str]) -> Tuple[str, str]:
+def encabezado(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
     """ Se lee el encabezado de LaTeX para el examen. Es opcional.
 
     Argumentos
@@ -160,7 +151,6 @@ def encabezado(lsTexto: List[str]) -> Tuple[str, str]:
     --------
     El encabezado y la siguiente línea de texto.
     """
-    linea: str = blancos(lsTexto)
     lista: List[str] = []
     if linea == Info.ENCABEZADO:
         linea = lsTexto.pop(0)
@@ -170,7 +160,7 @@ def encabezado(lsTexto: List[str]) -> Tuple[str, str]:
         resp = '%s\n' % ''.join(lista).strip()
     else:
         resp = ''
-    return (resp, linea)
+    return (resp, linea.strip())
 
 
 def instrucciones(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
@@ -186,7 +176,7 @@ def instrucciones(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
         resp = '%s\n' % ''.join(lista).strip()
     else:
         resp = ''
-    return (resp, linea)
+    return (resp, linea.strip())
 
 
 def secciones(linea: str, lsTexto: List[str],
@@ -204,6 +194,8 @@ def secciones(linea: str, lsTexto: List[str],
         es_aleatorio = linea == 'aleatorio'
         # Creando la nueva seccion.
         respuesta.append(Seccion(lsTexto, dirTrabajo, es_aleatorio))
+        if len(lsTexto) == 0:
+            break
         linea = lsTexto.pop(0).strip()
     return respuesta
 
@@ -220,7 +212,7 @@ def preguntas(lsTexto: List[str], dirTrabajo: str,
     origen: str
     # El usuario puede definir bloques, para no hacer página nueva.
     bloque: bool = False
-    while True:
+    while len(lsTexto) > 0:
         linea = lsTexto.pop(0).strip()
         # Línea en blanco, terminamos.
         if len(linea) == 0:

@@ -282,23 +282,23 @@ Lo que se tiene es un subconjunto de constantes y funciones de python, y algunas
 
       Conversi\'on de radianes a grados; conversi\'on de grados a radianes, $\pi$.
 
-\item \verb|acos(x)|;
-      \verb|acosh(x)|;
-      \verb|asin(x)|;
-      \verb|asinh(x)|;
-      \verb|atan(x)|;
-      \verb|atan2(y, x)|;
-      \verb|atanh(x)|;
-      \verb|cos(x)|;
-      \verb|cosh(x)|;
-      \verb|sin(x)|;
-      \verb|sinh(x)|;
-      \verb|tan(x)|;
-      \verb|tanh(x)|
+\item \verb|math.acos(x)|;
+      \verb|math.acosh(x)|;
+      \verb|math.asin(x)|;
+      \verb|math.asinh(x)|;
+      \verb|math.atan(x)|;
+      \verb|math.atan2(y, x)|;
+      \verb|math.atanh(x)|;
+      \verb|math.cos(x)|;
+      \verb|math.cosh(x)|;
+      \verb|math.sin(x)|;
+      \verb|math.sinh(x)|;
+      \verb|math.tan(x)|;
+      \verb|math.tanh(x)|
 
       Funciones trigonom\'etricas y sus inversas (en radianes).
 
-\item \verb|isqrt(x)|; \verb|sqrt(x)|; \verb|exp(x)|; \verb|log(x)|; \verb|log10(x)|
+\item \verb|math.isqrt(x)|; \verb|math.sqrt(x)|; \verb|math.exp(x)|; \verb|math.log(x)|; \verb|math.log10(x)|
 
   Parte entera de la ra\'iz de \verb|x|; funciones en punto flotante para la ra\'iz, exponencial, logaritmo natural y logaritmo en base 10.
 
@@ -313,21 +313,21 @@ Lo que se tiene es un subconjunto de constantes y funciones de python, y algunas
 \item \verb|round(__numero__[, __dig__])| \\[1ex]
   Redondea un n\'umero, y se puede especificar el n\'umero de d\'igitos a utilizar. 0 es el valor predeterminado.
 
-    \item \verb|ceil(x)|;
-      \verb|floor(x)|;
-      \verb|trunc(x)|
+    \item \verb|math.ceil(x)|;
+      \verb|math.floor(x)|;
+      \verb|math.trunc(x)|
 
       Funciones de manejo de decimales.
 
-    \item \verb|factorial(a)|; \verb|comb(n, r)|; \verb|perm(n, r)|
+    \item \verb|math.factorial(a)|; \verb|math.comb(n, r)|; \verb|math.perm(n, r)|
 
       Factorial, combinaciones y permutaciones.
 
-    \item \verb|hypot(x, y)|; \verb|dist(xs, ys)|
+    \item \verb|math.hypot(x, y)|; \verb|math.dist(xs, ys)|
 
       $\sqrt{x^2+y^2}$ y distancia entre los vectores $n$-dimensionales  \verb|xs| y \verb|ys|
 
-    \item \verb|sum(xs)|; \verb|prod(xs)|
+    \item \verb|sum(xs)|; \verb|math.prod(xs)|
 
       Suma y producto de los elementos de la secuencia \verb|xs|.
 
@@ -339,47 +339,47 @@ Lo que se tiene es un subconjunto de constantes y funciones de python, y algunas
 \end{funcion}
 
 \begin{funcion}
-  \verb|pow(a, b)| \quad
+  \verb|pow(a, b), a**b| \quad
   $a^b$
 \end{funcion}
 
 \begin{funcion}
-  \verb|gcd(a,b)| \quad
+  \verb|math.gcd(a,b)| \quad
   M\'aximo com\'un divisor de $a$ y $b$.
 \end{funcion}
 
 \begin{funcion}
-  \verb|factores(a)| \\[1ex]
+  \verb|mate.factores(a)| \\[1ex]
   Factorizaci\'on de $a$. Por ejemplo \verb|factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
 \end{funcion}
 
 \begin{funcion}
-  \verb|txtFrac(a, b[, conSigno=False])| \\[1ex]
+  \verb|txt.frac(a, b[, conSigno=False])| \\[1ex]
   Simplifica y escribe la fracci\'on respectiva en \LaTeX\ usando \verb|dfrac|. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la fracci\'on si es positiva.
 \end{funcion}
 
 \begin{funcion}
-  \verb|txtRaiz(a[, n=2[, conSigno=False]])| \\[1ex]
+  \verb|txt.raiz(a[, n=2[, conSigno=False]])| \\[1ex]
   Simplifica y escribe la ra\'iz respectiva en \LaTeX. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la ra\'iz si es positiva.
 \end{funcion}
 
 \begin{funcion}
-  \verb|txtCoef(a[, conSigno=False])| \\[1ex]
+  \verb|txt.coef(a[, conSigno=False])| \\[1ex]
   Coeficiente que precede a una variable entera. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|). De manera similar ocurre si $a=-1$. En caso contrario imprime el valor.
 \end{funcion}
 
 \begin{funcion}
-  \verb|txtConSigno(n)| \\[1ex]
+  \verb|txt.conSigno(n)| \\[1ex]
   Imprime el n\'umero entero con signo.
 \end{funcion}
 
 \begin{funcion}
-  \verb|txtExpo(n)| \\[1ex]
+  \verb|txt.expo(n)| \\[1ex]
   Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
 \end{funcion}
 
 \begin{funcion}
-  \verb|txtNumero(n)| \\[1ex]
+  \verb|txt.numero(n)| \\[1ex]
   Para $n > 0$, devuelve el texto que representa al valor de $n$.
 \end{funcion}
 
