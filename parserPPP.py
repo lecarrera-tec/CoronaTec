@@ -1,8 +1,7 @@
 """Funciones que ayudan a leer opciones y parámetros."""
 import logging
-from math import log10
 from typing import Any, List, Dict
-from sys import exit
+import sys
 
 from diccionarios import DGlobal, DFunRandom, DFunciones
 from fmate import digSignif
@@ -97,7 +96,7 @@ def evaluarParam(linea: str, dLocal: Dict[str, Any],
     else:
         logging.critical('El numero de iterables no coincide:')
         logging.critical('%s = %s' % (','.join(variables), str(resultado)))
-        exit()
+        sys.exit()
 
 def update(linea: str, dLocal: Dict[str, Any], cifras: int = 3) -> str:
     """Actualiza cualquier @-expresión que haya que evaluar en el texto.
@@ -145,71 +144,12 @@ def update(linea: str, dLocal: Dict[str, Any], cifras: int = 3) -> str:
             fin = texpr.find('>', 1)
         else:
             fin = texpr.find(key, 1)
-        assert(fin > 0)
+        if fin == -1:
+            logging.critical('No se encontr\'o cierre de @-expresi\'on:')
+            logging.critical('   %s', texpr)
+            sys.exit()
         logging.debug('Expresion a evaluar: `%s`' % texpr[1:fin])
         expr = eval(texpr[1:fin], DGlobal, dLocal)
-        if isinstance(expr, str):
-            unir.append('%s%s' % (expr, texpr[fin+1:]))
-        elif isinstance(expr, int):
-            unir.append('%d%s' % (expr, texpr[fin+1:]))
-        elif isinstance(expr, float):
-            unir.append('%s%s' % (txt.decimal(expr, cifras), texpr[fin+1:]))
-        elif isinstance(expr, set):
-            unir.append('\\{%s\\}%s' % (str(expr)[1:-1].replace('\'', ''), texpr[fin+1:]))
-        # No tenemos idea de qué tipo es.
-        else:
-            unir.append('%s%s' % (str(expr), texpr[fin+1:]))
-    return ''.join(unir)
-
-
-def sustituir(linea: str, python, cifras: int = 3) -> str:
-    """Actualiza cualquier @-expresión que haya que evaluar en el texto.
-
-    Las @-expresiones pueden ser de 3 tipos:
-    * Texto (string): simplemente se imprime igual.
-    * Entero (int): se imprime el texto del entero.
-    * Flotante (float): Aquí es donde hay que tomar decisiones. El
-    número de cifras significativas se da por la variable ``cifras``.
-    Argumentos
-    ----------
-    linea:
-        Línea de texto. La @-expresión debe estar completamente
-        contenida en una sola línea de texto.
-    python:
-        Codigo compilado para evaluar antes de la expresi\'on.
-    cifras:
-        Número de cifras significativas a utilizar con los números
-        de tipo flotante.
-    Devuelve
-    --------
-    El texto de la pregunta con las @-expresiones sustituidas por su
-    respectivo valor.
-    """
-
-    separar: List[str] = linea.split('@')
-    if len(separar) == 1:
-        return linea
-    unir: List[str] = [separar.pop(0)]
-    key: str
-    fin: int
-    texpr: str
-    expr: Any
-    exec(python)
-    for texpr in separar:
-        key = texpr[0]
-        if key == '(':
-            fin = texpr.find(')', 1)
-        elif key == '[':
-            fin = texpr.find(']', 1)
-        elif key == '{':
-            fin = texpr.find('}', 1)
-        elif key == '<':
-            fin = texpr.find('>', 1)
-        else:
-            fin = texpr.find(key, 1)
-        assert(fin > 0)
-        logging.debug('Expresion a evaluar: `%s`' % texpr[1:fin])
-        expr = eval(texpr[1:fin])
         if isinstance(expr, str):
             unir.append('%s%s' % (expr, texpr[fin+1:]))
         elif isinstance(expr, int):

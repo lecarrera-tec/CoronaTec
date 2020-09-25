@@ -257,7 +257,7 @@ def preguntas(lsTexto: List[str], dirTrabajo: str,
         if bloque and (len(lista) == 1 or lista[-2].es_ultima()
                         or not lista[-2].es_bloque()):
             lista[-1].set_primera()
-        logging.info('Se agrega pregunta: %s' % str(lista[-1]))
+        logging.info('Se agrega pregunta: %s' % origen)
     return lista
 
 

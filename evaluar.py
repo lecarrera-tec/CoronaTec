@@ -8,6 +8,7 @@ import sys
 from typing import List, Dict, Tuple
 
 import Info
+import fmate
 import latex
 from ppp import PPP
 from respuesta import Respuesta
@@ -261,6 +262,8 @@ for path in lestudiantes:
     todosPuntos.sort(key=lambda x: x[0])
     irow = 0
     assert(len(todasResp) == len(todosPuntos))
+    # List[(id_est, List[resp_est, Respuesta])]
+    resps: Tuple[str, List[Tuple[str, Respuesta]]]
     for i in range(len(todasResp)):
         resps = todasResp[i]
         puntos = todosPuntos[i][1]
@@ -271,7 +274,11 @@ for path in lestudiantes:
             temp = resps[1][j]
             infoSheet.write(irow,   icol, temp[0])
             infoSheet.write(irow+1, icol, puntos[j][0])
-            infoSheet.write(irow+2, icol, temp[1].get_respuesta())
+            valor = temp[1].get_respuesta()
+            if isinstance(valor, float):
+                cifras = 1 + math.ceil(-math.log10(temp[1].get_error()))
+                valor = fmate.digSignif(valor, cifras)
+            infoSheet.write(irow+2, icol, valor)
             infoSheet.write(irow+3, icol, puntos[j][1])
             icol += 1
         #@ Se suman los puntos

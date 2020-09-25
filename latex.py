@@ -1,6 +1,7 @@
 from typing import List
+from ppp import PPP
 
-def get_encabezadoExamen(examen) -> str:
+def get_encabezadoExamen(examen: PPP) -> str:
     """Se genera el encabezado del examen."""
     # Se comienza con el encabezado del archivo LaTeX
     texto: List[str] = [
@@ -45,7 +46,7 @@ def get_inicioExamen(nombre: str, examen) -> List[str]:
     texto.append('\\noindent \\textsc{Instituto Tecnol\\\'ogico de Costa Rica} \hfill \\textsc{%s}\\\\\n' % examen.semestre)
     texto.append('\\textsc{%s} \hfill \\textsc{Tiempo: %s}\\\\\n' % (examen.cursos[0], examen.tiempo))
     for temp in examen.cursos[1:]:
-        texto.append('\\textsc{%s}}\\\\[1ex]\n' % temp)
+        texto.append('\\textsc{%s}\\\\[1ex]\n' % temp)
     texto.append('\\textsc{%s} \hfill \\textsc{Puntaje Total:} %d pts\\\\\n' % (examen.escuelas[0], examen.get_puntaje()))
     for temp in examen.escuelas[1:]:
         texto.append('\\textsc{%s}\\bigskip\n\n' % temp)

@@ -1,10 +1,10 @@
-from math import gcd, log10
+import math
 from typing import List, Tuple
 
 from fmate import factores
 
 def fraccion(num: int, den: int, conSigno: bool = False) -> str:
-    """Texto en LaTeX de una fracci\'on.
+    """Texto en LaTeX de una fracción.
 
     Argumentos
     ----------
@@ -18,11 +18,11 @@ def fraccion(num: int, den: int, conSigno: bool = False) -> str:
 
     Devuelve
     --------
-    Simplifica y devuelve el texto en LaTeX de una fracci\'on,
+    Simplifica y devuelve el texto en LaTeX de una fracción,
     utilizando el comando dfrac.
     """
 
-    # Se determina el signo de la fracci\'on.
+    # Se determina el signo de la fracción.
     signo: int = 1
     assert(den != 0)
     if num < 0:
@@ -32,8 +32,8 @@ def fraccion(num: int, den: int, conSigno: bool = False) -> str:
         signo *= -1
         den = abs(den)
 
-    # Se determina el m\'aximo com\'un denominador, para simplificar.
-    factor: int = gcd(num, den)
+    # Se determina el máximo común denominador, para simplificar.
+    factor: int = math.gcd(num, den)
     num = num // factor
     den = den // factor
 
@@ -48,7 +48,7 @@ def fraccion(num: int, den: int, conSigno: bool = False) -> str:
     else:
         txt = '-'
 
-    # No es una fracci\'on.
+    # No es una fracción.
     if den == 1:
         txt = '%s%d' % (txt, num)
     else:
@@ -62,9 +62,9 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
     Argumentos
     ----------
     arg:
-        Argumento de la ra\'iz. Debe ser positivo si `indice` es par.
+        Argumento de la raíz. Debe ser positivo si `indice` es par.
     indice:
-        Opcional. \'Indice de la ra\'iz. 2 es el valor predeterminado.
+        Opcional. Índice de la raíz. 2 es el valor predeterminado.
     conSigno:
         Opcional. Imprime un signo '+' en caso de ser positivo. El
         predeterminado es False.
@@ -73,7 +73,7 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
     --------
     """
 
-    # Se determina el signo. Negativo solo si el \'indice de la ra\'iz
+    # Se determina el signo. Negativo solo si el índice de la raíz
     # es impar.
     signo: int = 1
     assert(indice >= 2)
@@ -113,9 +113,9 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
 def coef(numero: int, conSigno: bool = False) -> str:
     """ Imprime el coeficiente para una variable.
 
-    Si el n\'umero es 1 no imprime nada o s\'olo un +. Si el n\'umero es
-    -1 imprime solo un menos. En caso contrario imprime el n\'umero (con
-    signo, si as\'i se especifica.
+    Si el número es 1 no imprime nada o sólo un +. Si el número es
+    -1 imprime solo un menos. En caso contrario imprime el número (con
+    signo, si así se especifica.
     """
 
     txtSigno: str
@@ -132,7 +132,7 @@ def coef(numero: int, conSigno: bool = False) -> str:
         return '%s%d' % (txtSigno, numero)
 
 def expo(expo: int) -> str:
-    """ Escribe la expresi\'on como exponente si se requiere (!= 1)
+    """ Escribe la expresión como exponente si se requiere (!= 1)
 
     Si exp == 1 no devuelve nada. En cualquier otro caso devuelve
     "^{exp}".
@@ -143,7 +143,7 @@ def expo(expo: int) -> str:
         Valor del exponente.
     Devuelve
     --------
-    Un string vac\'io si expo == 1, "^{expo}" en cualquier otro caso.
+    Un string vacío si expo == 1, "^{expo}" en cualquier otro caso.
     """
 
     if expo == 1:
@@ -152,25 +152,55 @@ def expo(expo: int) -> str:
         return '^{%d}' % expo
 
 def conSigno(numero: int) -> str:
+    """ Imprime un número con signo.  """
     return '%+d' % numero
 
-def decimal(numero: float, cifras: int) -> str:
-    if numero < pow(10, -2*cifras-1) or numero >= pow(10, cifras - 1):
+def decimal(numero: float, cifras: int, conSigno = False) -> str:
+    """ Imprime un número flotante con las cifras indicadas.
+
+    Si el número es muy pequeño, o demasiado grande, utiliza
+    notación científica para imprimirlo.
+
+    Argumentos
+    ----------
+    numero:
+        Número a imprimir.
+    cifras:
+        Cifras significativas a utilizar.
+    conSigno:
+        Opcional. Si el número es positivo, se agrega un + al inicio.
+        El predeterminado es False.
+
+    Devuelve
+    --------
+    El string del número a imprimir.
+    """
+    assert(cifras > 0)
+    if numero == 0:
+        return '0'
+    signo: int = 1
+    ndig: int
+    if numero < 0:
+        numero = -numero
+        signo = -1
+    if numero < pow(10, -cifras-6) or numero >= pow(10, cifras - 1):
         ftxt = '%%.%de' % (cifras - 1)
     elif numero >= 1:
-        ftxt = '%%.%df' % (cifras - int(log10(numero)) - 1)
+        ndig = cifras - int(math.ceil(math.log10(numero))) - 1
+        ftxt = '%%.%df' % max(0, ndig)
     else:
-        ftxt = '%%.%df' % (cifras + int(-log10(numero)))
-    return ftxt % numero
+        ndig = cifras + int(math.ceil(-math.log10(numero))) - 1
+        ftxt = '%%.%df' % ndig
+    return ftxt % (signo * numero)
 
 def texto(numero: int, mil: bool = False) -> str:
     assert(numero > 0 and numero <= 999999999999)
     txt: str
     teens: List[str] = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco',
             'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
-            'catorce', 'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho',
-            'diecinueve', 'veinte', 'veintiuno', 'veintid\\\'os',
-            'veintitr\\\'es', 'veinticuatro', 'veinticinco', 'veintis\\\'eis',
+            'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho',
+            'diecinueve', 'veinte', 'veintiuno', 'veintidós',
+            'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis',
             'veintisiete', 'veintiocho', 'veintinueve']
     decenas: List[str] = ['treinta', 'cuarenta', 'cincuenta', 'sesenta',
             'setenta', 'ochenta', 'noventa', 'cien']
@@ -179,9 +209,9 @@ def texto(numero: int, mil: bool = False) -> str:
             'ochocientos', 'novecientos', 'mil']
     miles: List[str] = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco',
             'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
-            'catorce', 'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho',
-            'diecinueve', 'veinte', 'veintiun', 'veintid\\\'os',
-            'veintitr\\\'es', 'veinticuatro', 'veinticinco', 'veintis\\\'eis',
+            'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho',
+            'diecinueve', 'veinte', 'veintiun', 'veintidós',
+            'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis',
             'veintisiete', 'veintiocho', 'veintinueve']
     resp = ''
     if numero >= 2000000:

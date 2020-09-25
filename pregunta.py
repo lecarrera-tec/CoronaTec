@@ -4,13 +4,15 @@ import logging
 import os
 import random
 import sys
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Union
 
 import parserPPP
 import Info
 import TPreg
 from respuesta import Respuesta
 from diccionarios import DFunRandom, DFunciones, DGlobal
+
+Numero = Union[int, float]
 
 class Pregunta:
     """Informaci\'on b\'asica de una pregunta.
@@ -299,6 +301,7 @@ def latex_unica(opciones: str, lsTexto: List[str],
 
     # Desordenamos los items.
     elif orden == 'aleatorio':
+        logging.debug('Random: Desordenando texto de items.')
         random.shuffle(litems)
     # Construimos el latex
     lista.append('    \\begin{enumerate}%s\n' % Info.FORMATO_ITEM)
@@ -481,21 +484,6 @@ def respuesta_corta(opciones: str, lsTexto: List[str],
     # Se inicializa el objeto Respuesta.
     resp = Respuesta(TPreg.RESP_CORTA)
 
-    # Ver si la respuesta es un entero, o de tipo flotante. El tipo
-    # entero es el predeterminado.
-    texto = parserPPP.derechaIgual(opciones, 'respuesta')
-    esEntero: bool
-    if len(texto) == 0 or texto == 'entero':
-        esEntero = True
-        resp.add_opcion(TPreg.ENTERO)
-    elif texto == 'flotante':
-        esEntero = False
-        resp.add_opcion(TPreg.FLOTANTE)
-    else:
-        logging.critical('Tipo de respuesta desconocido: `%s`', texto)
-        esEntero = True
-        resp.add_opcion(TPreg.ENTERO)
-
     linea: str
     # Se ignoran los comentarios.
     ignorar: bool = True
@@ -523,7 +511,7 @@ def respuesta_corta(opciones: str, lsTexto: List[str],
         linea = lsTexto.pop(0)
 
     # Ahora siguen los items.
-    flotante: float
+    valor: Numero
     error: float
     # Se redefine el diccionario para eliminar las funciones random.
     dLocal = {**dParams, **DFunciones}
@@ -534,35 +522,29 @@ def respuesta_corta(opciones: str, lsTexto: List[str],
     while True:
         if linea.strip().startswith(Info.LITEM):
             linea = linea.strip(Info.STRIP)
-            if esEntero:
-                # No hay que leer opciones. Se obtiene la siguiente
-                # línea y se lee la expresión.
-                linea = lsTexto.pop(0).strip()
-                entero = eval(linea, DGlobal, dLocal)
-                resp.add_respuesta(entero)
+            texto = parserPPP.derechaIgual(linea, 'error')
+            if len(texto) == 0:
+                error = 0
             else:
-                # Es de tipo flotante. Hay que leer error aceptable y
-                # factor del puntaje.
-                texto = parserPPP.derechaIgual(linea, 'error')
                 try:
                     error = float(texto)
                 except ValueError:
                     logging.error('No se pudo leer error: `%s`' % linea)
                     error = 0.01
-                texto = parserPPP.derechaIgual(linea, 'factor')
-                if len(texto) == 0:
+            texto = parserPPP.derechaIgual(linea, 'factor')
+            if len(texto) == 0:
+                factor = 1.0
+            else:
+                try:
+                    factor = float(texto)
+                except ValueError:
+                    logging.error('No se pudo leer factor: `%s`' % linea)
                     factor = 1.0
-                else:
-                    try:
-                        factor = float(texto)
-                    except ValueError:
-                        logging.error('No se pudo leer factor: `%s`' % linea)
-                        factor = 1.0
-                # Ya se puede leer la siguiente línea y evaluar la
-                # expresión.
-                linea = lsTexto.pop(0).strip()
-                flotante = eval(linea, DGlobal, dLocal)
-                resp.add_respuesta((flotante, error, factor))
+            # Ya se puede leer la siguiente línea y evaluar la
+            # expresión.
+            linea = lsTexto.pop(0).strip()
+            valor = eval(linea, DGlobal, dLocal)
+            resp.add_respuesta((valor, error, factor))
         if len(lsTexto) == 0:
             break
         linea = lsTexto.pop(0)
@@ -684,6 +666,7 @@ def respuesta_unica(opciones: str, lsTexto: List[str],
 
     # Desordenamos los items.
     if orden == 'aleatorio':
+        loggin.debug('Random: Desordenando resp items.')
         resp.add_opcion(TPreg.ALEATORIO)
         random.shuffle(indices)
     resp.add_respuesta(indices.index(indice))

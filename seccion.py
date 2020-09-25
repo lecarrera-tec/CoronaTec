@@ -127,7 +127,7 @@ class Seccion:
         # Si las preguntas se requieren en orden aleatorio, entonces
         # las reordenamos
         if self.aleatorias:
-            logging.debug('Reordenando las preguntas.')
+            logging.debug('Random: Reordenando las preguntas.')
             random.shuffle(templs)
 
         # Eliminando sublistas.
@@ -145,12 +145,11 @@ class Seccion:
         """
         logging.debug('Entrando a Seccion.get_respuestas ...')
         # Diccionario de variables definidas por el usuario. Se define
-        # en general para la sección, porque en caso de que el orden
-        # de la sección **no** sea aleatorio, permite generar preguntas
-        # en cascada.
+        # en general para la sección.
         dParams: Dict[str, Any] = {}
-        # Se genera la lista de instancias del objeto Respuesta. Si se
-        # requiere que sean aleatorias, se reordenan.
+        # Se genera la lista de instancias del objeto Respuesta, y una
+        # sublista en el caso de que haya un bloque. Si se requiere que 
+        # sean aleatorias, se reordenan (sin reordenar los bloques).
         lista: List[Resps] = []
         sublista: List[Respuesta] = []
         # Vamos agregando la instancia de cada respuesta de la sección.
@@ -161,13 +160,11 @@ class Seccion:
             filelist = __muestra__(preg)
             # Obtenemos la lista de respuestas.
             __lista_resps__(preg, filelist, lista, sublista, dParams)
-
         # Si las preguntas se requieren en orden aleatorio, entonces
         # se reordenan igual las respuestas.
         if self.aleatorias:
-            logging.debug('Reordenando las respuestas.')
+            logging.debug('Random: Reordenando las respuestas.')
             random.shuffle(lista)
-
         nueva: List[Respuesta] = __flatten_resps__(lista)
 
         # Nada más que hacer.
@@ -213,6 +210,7 @@ def __muestra__(preg: Pregunta) -> List[str]:
     if muestra < len(lista):
         # Devolviendo una muestra ordenada.
         idx: List[int]
+        logging.debug('Random: Muestra = %d' % muestra)
         idx = random.sample([*range(len(lista))], muestra)
         idx.sort()
         resp = [lista[i] for i in idx]
@@ -233,7 +231,7 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
     fin: str
     for filename in filelist:
         texto = pregunta.get_latex(filename, dParams)
-        # Estamos en un bloque y no es la \'ultima pregunta.
+        # Estamos en un bloque y no es la última pregunta.
         if preg.bloque > 0:
             fin = '\\bigskip'
         else:
@@ -251,13 +249,13 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
         else:
             lista.append(texto)
 
-        # Es la \'ultima pregunta del bloque. Agregamos la lista de
+        # Es la última pregunta del bloque. Agregamos la lista de
         # preguntas del bloque al bloque principal y reiniciamos
         if preg.es_ultima():
             lista.append(sublista)
             sublista = []
 
-        # No estamos en un bloque o es la \'ultima pregunta.
+        # No estamos en un bloque o es la última pregunta.
         if preg.bloque <= 0:
             dParams = {}
 
@@ -267,8 +265,8 @@ def __lista_resps__(preg: Pregunta, filelist: List[str], lista: List[Resps],
     filename: str
     for filename in filelist:
         resp = pregunta.get_respuesta(filename, dParams)
-        # Es un encabezado. Despu\'es de haber le\'ido las variables
-        # podemos continuar.
+        # Es un encabezado. Después de haber leído las variables podemos 
+        # continuar.
         if (resp.tipoPreg & TPreg.ENCABEZADO):
             assert(preg.get_muestra() == 0)
             continue
@@ -278,13 +276,13 @@ def __lista_resps__(preg: Pregunta, filelist: List[str], lista: List[Resps],
         else:
             lista.append(resp)
 
-    # Es la \'ultima pregunta del bloque. Agregamos la lista de
+    # Es la última pregunta del bloque. Agregamos la lista de
     # preguntas del bloque al bloque principal y reiniciamos
     if preg.es_ultima():
         lista.append(sublista)
         sublista = []
 
-    # No estamos en un bloque o es la \'ultima pregunta.
+    # No estamos en un bloque o es la última pregunta.
     if preg.bloque <= 0:
         logging.debug('Borrando parámetros anteriores')
         dParams = {}

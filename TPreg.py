@@ -14,10 +14,6 @@ TODOS: int = 16
 
 # Pregunta de respuesta corta
 RESP_CORTA: int = 64
-# Pregunta de respuesta corta, de tipo entero
-ENTERO: int = 128
-# Pregunta de respuesta corta, para punto flotante.
-FLOTANTE: int = 256
 
 # Tipo de encabezado
 ENCABEZADO: int = 512

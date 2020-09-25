@@ -19,9 +19,7 @@ class Respuesta:
         respectivo.
         - Selección única: varios elementos con el índice 0-indexado de 
           las respuestas correctas.
-        - Respuesta corta entera: un sólo elemento con la respuesta
-          correcta.
-        - Respuesta corta flotante: Una lista de tuplas de la forma
+        - Respuesta corta: Una lista de tuplas de la forma
           (<resp>, <error>, <fraccion del puntaje>)
     puntaje:
         Puntaje de la pregunta.
@@ -52,10 +50,13 @@ class Respuesta:
             opcion = self.respuestas[0]
             return chr(ord('A') + opcion)
         elif self.tipoPreg & TPreg.RESP_CORTA:
-            if self.tipoPreg & TPreg.ENTERO:
-                return self.respuestas[0]
-            elif self.tipoPreg & TPreg.FLOTANTE:
-                return self.respuestas[0][0]
+            return self.respuestas[0][0]
+
+    def get_error(self) -> float:
+        if not self.tipoPreg & TPreg.RESP_CORTA:
+            logging.error('El error es sólo para respuesta única')
+            return -1.0
+        return self.respuestas[0][1]
 
     def add_opcion(self, opcion: int) -> None:
         """ Agrega una opcion a la pregunta.
@@ -72,7 +73,7 @@ class Respuesta:
             assert(opcion & (TPreg.ALEATORIO + TPreg.CRECIENTE
                              + TPreg.INDICES + TPreg.TODOS))
         elif self.tipoPreg & TPreg.RESP_CORTA:
-            assert(opcion & (TPreg.ENTERO + TPreg.FLOTANTE))
+            assert(opcion & (TPreg.TODOS))
         else:
             assert(False)
         # TPreg se define como *intFlag*, así que las opciones se pueden
@@ -109,14 +110,9 @@ class Respuesta:
         elif self.tipoPreg & TPreg.UNICA:
             puntos = __calificar_unica__(self.respuestas, texto,
                                          self.puntaje)
-        elif self.tipoPreg & TPreg.ENTERO:
-            assert(self.tipoPreg & TPreg.RESP_CORTA)
-            puntos = __calificar_entero__(self.respuestas, texto,
-                                          self.puntaje)
-        elif self.tipoPreg & TPreg.FLOTANTE:
-            assert(self.tipoPreg & TPreg.RESP_CORTA)
-            puntos = __calificar_flotante__(self.respuestas, texto,
-                                            self.puntaje)
+        elif self.tipoPreg & TPreg.RESP_CORTA:
+            puntos = __calificar_resp_corta__(self.respuestas, texto,
+                                              self.puntaje)
         return (puntos, self.puntaje)
 
     def textoResp(self) -> str:
@@ -128,11 +124,11 @@ class Respuesta:
             opcion = self.respuestas[0]
             return chr(ord('A') + opcion)
         elif self.tipoPreg & TPreg.RESP_CORTA:
-            if self.tipoPreg & TPreg.ENTERO:
-                return str(self.respuestas[0])
-            elif self.tipoPreg & TPreg.FLOTANTE:
+            resp = self.respuestas[0][0]
+            if isinstance(resp, float):
                 cifras: int = int(ceil(-log10(self.respuestas[0][1])))
-                return txt.decimal(self.respuestas[0][0], cifras)
+                resp = txt.decimal(resp, cifras)
+            return resp
         logging.error('No se pudo determinar el tipo de pregunta')
         return ''
 
@@ -153,18 +149,8 @@ def __calificar_unica__(respuestas, texto: str, puntaje: int) -> float:
     return puntos
 
 
-def __calificar_entero__(respuestas, texto: str, puntaje: int) -> float:
-    expr = eval(texto, DGlobal, DFunciones)
-    puntos: float = 0.0
-    for resp in respuestas:
-        if expr == resp:
-            puntos = 1.0 * puntaje
-            break
-    return puntos
-
-
-def __calificar_flotante__(respuestas, texto: str, puntaje: int) -> float:
-    logging.debug('Calificar flotante [%d pt]: `%s`' % (puntaje, texto))
+def __calificar_resp_corta__(respuestas, texto: str, puntaje: int) -> float:
+    logging.debug('Calificar respuesta corta [%d pt]: `%s`' % (puntaje, texto))
     expr = eval(texto, DGlobal, DFunciones)
     puntos: float = 0.0
     for resp, error, factor in respuestas:
