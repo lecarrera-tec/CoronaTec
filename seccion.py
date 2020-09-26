@@ -2,6 +2,7 @@ import logging
 import os
 import random
 from typing import Any, Dict, List, Union
+import sys
 
 import Info
 import leer
@@ -148,7 +149,7 @@ class Seccion:
         # en general para la sección.
         dParams: Dict[str, Any] = {}
         # Se genera la lista de instancias del objeto Respuesta, y una
-        # sublista en el caso de que haya un bloque. Si se requiere que 
+        # sublista en el caso de que haya un bloque. Si se requiere que
         # sean aleatorias, se reordenan (sin reordenar los bloques).
         lista: List[Resps] = []
         sublista: List[Respuesta] = []
@@ -202,25 +203,20 @@ def __muestra__(preg: Pregunta) -> List[str]:
         path = '%s/' % path
     # Generando la lista de archivos de tipo pregunta. Se asume que
     # la dirección es una carpeta.
-    lista: List[str] = []
-    for me in os.listdir(path):
-        if me.endswith(Info.EXTENSION):
-            lista.append('%s%s' % (path, me))
-
+    lista: List[str] = sorted(['%s%s' % (path, me) for me in os.listdir(path)
+                               if me.endswith(Info.Extension)])
+    logging.debug('Lista de archivos (se requieren %d):' % muestra)
+    logging.debug('%s' % str(lista))
     if muestra < len(lista):
         # Devolviendo una muestra ordenada.
-        idx: List[int]
         logging.debug('Random: Muestra = %d' % muestra)
-        idx = random.sample([*range(len(lista))], muestra)
-        idx.sort()
-        resp = [lista[i] for i in idx]
-    else:
+        resp = sorted(random.sample(lista, muestra))
+    elif muestra == len(lista):
         resp = lista
-
-    if muestra > len(lista):
-        logging.error(
+    else:
+        logging.critical(
                 'La carpeta no tiene la cantidad de preguntas requeridas.')
-
+        sys.exit()
     return resp
 
 
@@ -265,7 +261,7 @@ def __lista_resps__(preg: Pregunta, filelist: List[str], lista: List[Resps],
     filename: str
     for filename in filelist:
         resp = pregunta.get_respuesta(filename, dParams)
-        # Es un encabezado. Después de haber leído las variables podemos 
+        # Es un encabezado. Después de haber leído las variables podemos
         # continuar.
         if (resp.tipoPreg & TPreg.ENCABEZADO):
             assert(preg.get_muestra() == 0)
