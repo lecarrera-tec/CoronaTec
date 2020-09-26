@@ -84,7 +84,7 @@ class PPP:
         # Guardamos el texto del tiempo. Obligatorio.
         self.tiempo: str
         self.tiempo, linea = leer.tiempo(linea, lsTexto)
-        logging.info('%s: %s' % (Info.TIEMPO, self.semestre))
+        logging.info('%s: %s' % (Info.TIEMPO, self.tiempo))
 
         # Ahora sigue el nombre de los cursos. Obligatorio.
         self.cursos: List[str]

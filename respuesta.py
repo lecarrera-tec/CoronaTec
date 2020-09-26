@@ -154,13 +154,20 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: int) -> float:
     expr = eval(texto, DGlobal, DFunciones)
     puntos: float = 0.0
     for resp, error, factor in respuestas:
-        assert(error >= 0)
-        mantisa, expo = descomponer(resp)
-        menor = (mantisa - error) * 10**expo
-        mayor = (mantisa + error) * 10**expo
-        logging.debug('@@@ (error = %.5f) %.5f en [%.5f, %.5f]?'\
-                      % (error, expr, menor, mayor))
-        if menor <= expr and expr <= mayor:
-            puntos = factor * puntaje
-            break
+        if error == 0:
+            assert(isinstance(resp, int))
+            logging.debug('@@@ %s (usuario) == %d (correcta)?'\
+                          % (str(expr), resp))
+            if expr == resp:
+                puntos = factor * puntaje
+                break
+        else:
+            mantisa, expo = descomponer(resp)
+            menor = (mantisa - error) * 10**expo
+            mayor = (mantisa + error) * 10**expo
+            logging.debug('@@@ (error = %.5f) %.5f en [%.5f, %.5f]?'\
+                          % (error, expr, menor, mayor))
+            if menor <= expr and expr <= mayor:
+                puntos = factor * puntaje
+                break
     return puntos

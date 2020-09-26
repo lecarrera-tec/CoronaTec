@@ -5,5 +5,7 @@
   reajustar el valor del índice.
 
 - Agregar a la documentación:
-  * txtFloat 
+  * txt.decimal 
   * digSignif
+
+- Ordenar os.listdir()

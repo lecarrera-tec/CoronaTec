@@ -666,7 +666,7 @@ def respuesta_unica(opciones: str, lsTexto: List[str],
 
     # Desordenamos los items.
     if orden == 'aleatorio':
-        loggin.debug('Random: Desordenando resp items.')
+        logging.debug('Random: Desordenando resp items.')
         resp.add_opcion(TPreg.ALEATORIO)
         random.shuffle(indices)
     resp.add_respuesta(indices.index(indice))

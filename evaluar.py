@@ -225,6 +225,7 @@ for path in lestudiantes:
         # por una constante, según el índice de repetición dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
         logging.debug('numero de carnet: %s' % idstr)
+        logging.debug('Random: seed = %d' % seed)
         random.seed(seed)
 
         # Se comienzan a agregar las instancias de los objetos de tipo

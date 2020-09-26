@@ -99,6 +99,7 @@ for path in lestudiantes:
         # una constante, seg\'un el \'indice de repetici\'on dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
         logging.debug('numero de carnet: %s' % idstr)
+        logging.debug('Random: seed = %d' % seed)
         random.seed(seed)
 
         # Se comienza a generar el archivo.
