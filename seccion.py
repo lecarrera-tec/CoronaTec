@@ -203,10 +203,11 @@ def __muestra__(preg: Pregunta) -> List[str]:
         path = '%s/' % path
     # Generando la lista de archivos de tipo pregunta. Se asume que
     # la dirección es una carpeta.
-    lista: List[str] = sorted(['%s%s' % (path, me) for me in os.listdir(path)
-                               if me.endswith(Info.Extension)])
+    lista: List[str] = sorted(['%s%s' % (path, yo) for yo in os.listdir(path)
+                               if yo.endswith(Info.EXTENSION)])
     logging.debug('Lista de archivos (se requieren %d):' % muestra)
-    logging.debug('%s' % str(lista))
+    logging.debug('Path = %s' % path)
+    logging.debug('%s' % str([yo.replace(path, '') for yo in lista]))
     if muestra < len(lista):
         # Devolviendo una muestra ordenada.
         logging.debug('Random: Muestra = %d' % muestra)
