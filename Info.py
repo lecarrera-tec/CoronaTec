@@ -5,7 +5,7 @@ Claves para el texto de los archivos de entrada.
 Cuando la clave puede incluir opciones, se utiliza la letra L al inicio
 para aclarar que es la parte izquierda (Left) del texto.
 """
-CSV_SEP: str = ','
+CSV_SEP: str = ';'
 CSV_ICOL: int = 5
 CSV_IROW: int = 1
 CSV_IKEY: int = -1
