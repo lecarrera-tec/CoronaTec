@@ -3,9 +3,9 @@ import logging
 from typing import Any, List, Dict
 import sys
 
-from diccionarios import DGlobal, DFunRandom, DFunciones
-from fmate import digSignif
+from diccionarios import DGlobal
 import ftexto as txt
+
 
 def derechaIgual(expresion: str, izq: str) -> str:
     """Extrae el expresión a la derecha de un igual.
@@ -45,6 +45,7 @@ def derechaIgual(expresion: str, izq: str) -> str:
         return temp
     # No se encontró nada.
     return ''
+
 
 def evaluarParam(linea: str, dLocal: Dict[str, Any],
                  dparams: Dict[str, Any]) -> None:
@@ -98,6 +99,7 @@ def evaluarParam(linea: str, dLocal: Dict[str, Any],
         logging.critical('%s = %s' % (','.join(variables), str(resultado)))
         sys.exit()
 
+
 def update(linea: str, dLocal: Dict[str, Any], cifras: int = 3) -> str:
     """Actualiza cualquier @-expresión que haya que evaluar en el texto.
 
@@ -128,37 +130,47 @@ def update(linea: str, dLocal: Dict[str, Any], cifras: int = 3) -> str:
     if len(separar) == 1:
         return linea
     unir: List[str] = [separar.pop(0)]
-    key: str
-    fin: int
-    texpr: str
-    expr: Any
-    for texpr in separar:
-        key = texpr[0]
-        if key == '(':
-            fin = texpr.find(')', 1)
-        elif key == '[':
-            fin = texpr.find(']', 1)
-        elif key == '{':
-            fin = texpr.find('}', 1)
-        elif key == '<':
-            fin = texpr.find('>', 1)
-        else:
-            fin = texpr.find(key, 1)
-        if fin == -1:
-            logging.critical('No se encontr\'o cierre de @-expresi\'on:')
-            logging.critical('   %s', texpr)
-            sys.exit()
-        logging.debug('Expresion a evaluar: `%s`' % texpr[1:fin])
-        expr = eval(texpr[1:fin], DGlobal, dLocal)
-        if isinstance(expr, str):
-            unir.append('%s%s' % (expr, texpr[fin+1:]))
-        elif isinstance(expr, int):
-            unir.append('%d%s' % (expr, texpr[fin+1:]))
-        elif isinstance(expr, float):
-            unir.append('%s%s' % (txt.decimal(expr, cifras), texpr[fin+1:]))
-        elif isinstance(expr, set):
-            unir.append('\\{%s\\}%s' % (str(expr)[1:-1].replace('\'', ''), texpr[fin+1:]))
-        # No tenemos idea de qué tipo es.
-        else:
-            unir.append('%s%s' % (str(expr), texpr[fin+1:]))
+    ind_fin: int
+    txt_expr: str
+    evaluada: Any
+    txt_evaluacion: str
+    for txt_expr in separar:
+        ind_fin = __fin_expr_arroba__(txt_expr)
+        logging.debug('Expresion a evaluar: `%s`' % txt_expr[1:ind_fin])
+        evaluada = eval(txt_expr[1:ind_fin], DGlobal, dLocal)
+        txt_evaluacion = __convertir_a_texto__(evaluada, cifras)
+        txt_expr = txt_expr[ind_fin+1:]
+        unir.append('%s%s' % (txt_evaluacion, txt_expr))
     return ''.join(unir)
+
+
+def __fin_expr_arroba__(txt_expr: str) -> int:
+    key: str
+    key = txt_expr[0]
+    if key == '(':
+        ind_fin = txt_expr.find(')', 1)
+    elif key == '[':
+        ind_fin = txt_expr.find(']', 1)
+    elif key == '{':
+        ind_fin = txt_expr.find('}', 1)
+    elif key == '<':
+        ind_fin = txt_expr.find('>', 1)
+    else:
+        ind_fin = txt_expr.find(key, 1)
+    if ind_fin == -1:
+        logging.critical('No se encontr\'o cierre de @-expresi\'on:')
+        logging.critical('   %s', txt_expr)
+        sys.exit()
+    return ind_fin
+
+
+def __convertir_a_texto__(expr: Any, cifras: int) -> str:
+    """ Se convierte a texto la expresi\'on."""
+    resp: str
+    if isinstance(expr, float):
+        resp = txt.decimal(expr, cifras)
+    elif isinstance(expr, set):
+        resp = '\\{%s\\}' % str(expr)[1:-1].replace('\'', '')
+    else:
+        resp = str(expr)
+    return resp

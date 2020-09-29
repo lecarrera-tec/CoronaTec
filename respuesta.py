@@ -7,6 +7,7 @@ import TPreg
 from fmate import descomponer
 import ftexto as txt
 
+
 class Respuesta:
     """ Información necesaria para evaluar las respuestas.
 
@@ -17,7 +18,7 @@ class Respuesta:
     respuestas:
         Lista de posibles respuestas, con el porcentaje de puntuación
         respectivo.
-        - Selección única: varios elementos con el índice 0-indexado de 
+        - Selección única: varios elementos con el índice 0-indexado de
           las respuestas correctas.
         - Respuesta corta: Una lista de tuplas de la forma
           (<resp>, <error>, <fraccion del puntaje>)
@@ -156,7 +157,7 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: int) -> float:
     for resp, error, factor in respuestas:
         if error == 0:
             assert(isinstance(resp, int))
-            logging.debug('@@@ %s (usuario) == %d (correcta)?'\
+            logging.debug('@@@ %s (usuario) == %d (correcta)?'
                           % (str(expr), resp))
             if expr == resp:
                 puntos = factor * puntaje
@@ -165,7 +166,7 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: int) -> float:
             mantisa, expo = descomponer(resp)
             menor = (mantisa - error) * 10**expo
             mayor = (mantisa + error) * 10**expo
-            logging.debug('@@@ (error = %.5f) %.5f en [%.5f, %.5f]?'\
+            logging.debug('@@@ (error = %.5f) %.5f en [%.5f, %.5f]?'
                           % (error, expr, menor, mayor))
             if menor <= expr and expr <= mayor:
                 puntos = factor * puntaje

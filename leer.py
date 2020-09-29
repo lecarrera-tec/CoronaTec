@@ -218,13 +218,12 @@ def preguntas(lsTexto: List[str], dirTrabajo: str,
         if len(linea) == 0:
             break
         # Si es un comentario, continuamos con la siguiente línea.
-        if linea[0] == Info.COMMENT:
+        elif linea[0] == Info.COMMENT:
             continue
         # Inicio de bloque. Solamente en caso de las preguntas no
         # estén en orden aleatorio.
-        if linea == Info.INICIO_BLOQUE:
+        elif linea == Info.INICIO_BLOQUE:
             assert(not bloque)
-            assert(not aleatorio)
             bloque = True
             continue
         elif linea == Info.FIN_BLOQUE:
@@ -246,16 +245,14 @@ def preguntas(lsTexto: List[str], dirTrabajo: str,
         # Origen de la pregunta.
         texto = parserPPP.derechaIgual(linea, 'origen')
         if len(texto) == 0:
-            texto = '%s "%s".\n%s' % (
-                    'No se pudo leer origen de pregunta en', linea,
-                    'La pregunta no se pudo incluir.')
-            logging.error(texto)
+            logging.error('No se pudo leer origen de pregunta en "%s"' % linea
+                          + 'La pregunta no se pudo incluir.')
             continue
         origen = '%s%s' % (dirTrabajo, texto)
         lista.append(Pregunta(puntos, origen, muestra, bloque))
         # Es la primera pregunta de un bloque.
         if bloque and (len(lista) == 1 or lista[-2].es_ultima()
-                        or not lista[-2].es_bloque()):
+                       or not lista[-2].es_bloque()):
             lista[-1].set_primera()
         logging.info('Se agrega pregunta: %s' % origen)
     return lista

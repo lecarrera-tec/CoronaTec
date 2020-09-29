@@ -9,10 +9,8 @@ from typing import List, Dict, Tuple
 
 import Info
 import fmate
-import latex
 from ppp import PPP
 from respuesta import Respuesta
-from seccion import Seccion
 import tabla
 
 import xlsxwriter
@@ -28,8 +26,54 @@ De manera opcional se puede dar el índice de repetición del examen. Esto
 es para que genere un examen diferente con el mismo número de carnet.
 """
 
-logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
 
+def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
+    infoBook = xlsxwriter.Workbook('%s/%s_reporte.xlsx' % (carpeta, filename))
+    infoSheet = infoBook.add_worksheet()
+    bold = infoBook.add_format({'bold': 1})
+    infoSheet.set_column('A:Z', 10)
+    todasResp.sort(key=lambda x: x[0])
+    todosPuntos.sort(key=lambda x: x[0])
+    irow = 0
+    assert(len(todasResp) == len(todosPuntos))
+    # List[(id_est, List[resp_est, Respuesta])]
+    resps: Tuple[str, List[Tuple[str, Respuesta]]]
+    for i in range(len(todasResp)):
+        resps = todasResp[i]
+        puntos = todosPuntos[i][1]
+        infoSheet.write(irow, 0, resps[0])
+        infoSheet.write(irow+2, 0, 'Correcta')
+        icol = 1
+        for j in range(len(resps[1])):
+            temp = resps[1][j]
+            infoSheet.write(irow,   icol, temp[0])
+            infoSheet.write(irow+1, icol, puntos[j][0])
+            valor = temp[1].get_respuesta()
+            if isinstance(valor, float):
+                cifras = 1 + math.ceil(-math.log10(temp[1].get_error()))
+                valor = fmate.digSignif(valor, cifras)
+            infoSheet.write(irow+2, icol, valor)
+            infoSheet.write(irow+3, icol, puntos[j][1])
+            icol += 1
+        # @ Se suman los puntos
+        formula = '=SUM(B%d:%c%d)' % (irow+2, chr(ord('A')+icol-1), irow+2)
+        infoSheet.write(irow+1, icol, formula)
+        # @ y se calcula la nota
+        formula = '= 100 * %c%d / %c%d'\
+                  % (chr(ord('A') + icol),
+                     irow+2,
+                     chr(ord('A') + icol),
+                     irow+4)
+        infoSheet.write(irow+1, icol+1, formula, bold)
+        formula = '=SUM(B%d:%c%d)' % (irow+4, chr(ord('A')+icol-1), irow+4)
+        infoSheet.write(irow+3, icol, formula)
+        infoSheet.write(irow+3, icol+1, 100)
+        irow += 5
+    infoBook.close()
+    logging.debug('Fin de examen\n')
+
+
+logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
 # Estructura de la función.
 #
 # A. Se determina si el número de argumentos dados es el requerido.
@@ -59,37 +103,37 @@ logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
 #             archivo de notas, y se sigue con el siguiente estudiante.
 #          2. Se genera la lista con las Respuesta's, y se califica.
 
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # A. Verificando el número de argumentos.
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Si no se tienen la cantidad de argumentos correcta, se sale.
 if len(sys.argv) < 4 or len(sys.argv) > 5:
     print('%s%s%s' % (
             'Se espera como argumentos el archivo ppp, la carpeta con las \n',
-            'listas de los estudiantes. y el archivo `.csv` de las respuestas,\n',
+            'listas de estudiantes. y el archivo `.csv` de las respuestas,\n',
             'y de manera opcional el índice de repetición del examen.\n'))
     sys.exit()
 
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # B. Índice de repetición. 0 es el valor predeterminado.
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 indRepeticion: int = 0
 if len(sys.argv) == 5:
     indRepeticion = int(sys.argv[4])
     assert(indRepeticion < len(Info.BY_SHIFT))
 
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # C. Estructura general del examen.
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 examen = PPP(sys.argv[1])
 
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # D. Se genera el diccionario de las respuestas.
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 assert(sys.argv[3].endswith('.csv'))
 try:
     fresp = open(sys.argv[3])
-except:
+except FileNotFoundError:
     logging.critical('No se pudo abrir el archivo con las respuestas.')
     sys.exit()
 
@@ -127,9 +171,9 @@ for fila in lineas:
     else:
         todxs[cols[Info.CSV_IKEY]] = cols[Info.CSV_ICOL:]
 
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # E. Se genera la lista con las listas de los grupos dados.
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 lestudiantes: List[str] = []
 path: str = sys.argv[2]
 if path.endswith('.csv'):
@@ -139,7 +183,7 @@ else:
     # Si no fue un archivo .csv, suponemos que es una carpeta.
     try:
         listdir = os.listdir(path)
-    except:
+    except FileNotFoundError:
         logging.critical('%s "%s" %s' % (
             'No se pudo abrir carpeta',
             sys.argv[2],
@@ -151,11 +195,12 @@ else:
         if me.endswith('.csv'):
             lestudiantes.append('%s%s' % (path, me))
 
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # E. Se trabaja grupo por grupo.
-#-----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 carpeta: str    # Carpeta donde se guardan los reportes y la nota.
 filename: str
+formula: str
 lista: List[str]
 linea: str    # Un estudiante de la lista.
 idstr: str    # String del identificador del estudiante (# de carnet).
@@ -175,7 +220,7 @@ for path in lestudiantes:
     if not os.path.exists(carpeta):
         os.mkdir(carpeta)
 
-    #@ Para construir el archivo de notas.
+    # @ Para construir el archivo de notas.
     notasBook = xlsxwriter.Workbook('%s/%s_notas.xlsx' % (carpeta, filename))
     notasSheet = notasBook.add_worksheet()
     bold = notasBook.add_format({'bold': 1})
@@ -184,7 +229,7 @@ for path in lestudiantes:
     # Se lee el archivo de los estudiantes.
     try:
         finput = open(path, 'r')
-    except:
+    except FileNotFoundError:
         logging.error('No se pudo abrir lista "%s"' % path)
         continue
 
@@ -203,8 +248,8 @@ for path in lestudiantes:
         separar = linea.split(',')
         idstr = separar[0].strip()
         nombre = ' '.join([palabra.capitalize()
-                             for palabra in separar[1].strip().split()])
-        #@
+                           for palabra in separar[1].strip().split()])
+        # @
         notasSheet.write(irow, 0, idstr)
         notasSheet.write(irow, 1, nombre)
 
@@ -214,11 +259,15 @@ for path in lestudiantes:
         # la suma y la nota igual. Sigo con el siguiente.
         if len(misResp) == 0:
             tabla.notasNull(notasSheet, sum(numPreguntas), irow)
-            #@ Se suman los puntos ;)
-            notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1,
-                              chr(ord('E') + sum(numPreguntas) - 1), irow + 1))
-            #@ y se calcula la nota
-            notasSheet.write(irow, 2, '= 100 * D%d / %d' % (irow + 1, totalPts), bold)
+            # @ Se suman los puntos ;)
+            formula = '=SUM(E%d:%c%d)'\
+                      % (irow + 1,
+                         chr(ord('E') + sum(numPreguntas) - 1),
+                         irow + 1)
+            notasSheet.write(irow, 3, formula)
+            # @ y se calcula la nota
+            formula = '= 100 * D%d / %d' % (irow + 1, totalPts)
+            notasSheet.write(irow, 2, formula, bold)
             continue
 
         # Se inicializa la semilla usando el identificador multiplicado
@@ -235,64 +284,27 @@ for path in lestudiantes:
 
         # Ahora probamos a calificar.
         assert(len(respuestas) == len(misResp))
-        unir: List[Tuple[str,Respuesta]] = []
+        unir: List[Tuple[str, Respuesta]] = []
         puntos: List[Tuple[float, int]] = []
-        for i in range(len(misResp)):
-            unir.append((misResp[i], respuestas[i]))
+        unir = [(misResp[i], respuestas[i]) for i in range(len(misResp))]
         todasResp.append((idstr[-6:], unir))
         icol: int = 3
         for elem, resp in unir:
             icol += 1
             pts = resp.calificar(elem.strip())
             puntos.append(pts)
-            #@ Se escribe el puntaje obtenido en el excel.
+            # @ Se escribe el puntaje obtenido en el excel.
             notasSheet.write(irow, icol, pts[0])
         todosPuntos.append((idstr[-6:], puntos))
-        #@ Se suman los puntos
-        notasSheet.write(irow, 3, '=SUM(E%d:%c%d)' % (irow + 1,
-                            chr(ord('E') + sum(numPreguntas) - 1), irow + 1))
-        #@ y se calcula la nota
-        notasSheet.write(irow, 2, '= 100 * D%d / %d' % (irow + 1, totalPts), bold)
+        # @ Se suman los puntos
+        formula = '=SUM(E%d:%c%d)'\
+                  % (irow + 1,
+                     chr(ord('E') + sum(numPreguntas) - 1),
+                     irow + 1)
+        notasSheet.write(irow, 3, )
+        # @ y se calcula la nota
+        formula = '= 100 * D%d / %d' % (irow + 1, totalPts)
+        notasSheet.write(irow, 2, formula, bold)
     notasBook.close()
-    #< Para construir el archivo del reporte
-    infoBook = xlsxwriter.Workbook('%s/%s_reporte.xlsx' % (carpeta, filename))
-    infoSheet = infoBook.add_worksheet()
-    bold = infoBook.add_format({'bold': 1})
-    infoSheet.set_column('A:Z', 10)
-    todasResp.sort(key=lambda x: x[0])
-    todosPuntos.sort(key=lambda x: x[0])
-    irow = 0
-    assert(len(todasResp) == len(todosPuntos))
-    # List[(id_est, List[resp_est, Respuesta])]
-    resps: Tuple[str, List[Tuple[str, Respuesta]]]
-    for i in range(len(todasResp)):
-        resps = todasResp[i]
-        puntos = todosPuntos[i][1]
-        infoSheet.write(irow, 0, resps[0])
-        infoSheet.write(irow+2, 0, 'Correcta')
-        icol = 1
-        for j in range(len(resps[1])):
-            temp = resps[1][j]
-            infoSheet.write(irow,   icol, temp[0])
-            infoSheet.write(irow+1, icol, puntos[j][0])
-            valor = temp[1].get_respuesta()
-            if isinstance(valor, float):
-                cifras = 1 + math.ceil(-math.log10(temp[1].get_error()))
-                valor = fmate.digSignif(valor, cifras)
-            infoSheet.write(irow+2, icol, valor)
-            infoSheet.write(irow+3, icol, puntos[j][1])
-            icol += 1
-        #@ Se suman los puntos
-        infoSheet.write(irow+1, icol, '=SUM(B%d:%c%d)' % (irow + 2,
-                            chr(ord('A') + icol - 1), irow + 2))
-        #@ y se calcula la nota
-        infoSheet.write(irow+1, icol+1, '= 100 * %c%d / %c%d' %
-                          (chr(ord('A') + icol), irow+2,
-                              chr(ord('A') + icol), irow+4), bold)
-        infoSheet.write(irow+3, icol, '=SUM(B%d:%c%d)' % (irow+4,
-                            chr(ord('A') + icol - 1), irow + 4))
-        infoSheet.write(irow+3, icol+1, 100)
-
-        irow += 5
-    infoBook.close()
-    logging.debug('Fin de examen\n')
+    # < Para construir el archivo del reporte
+    __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos)

@@ -1,12 +1,15 @@
 from typing import List
 from ppp import PPP
 
+
 def get_encabezadoExamen(examen: PPP) -> str:
     """Se genera el encabezado del examen."""
     # Se comienza con el encabezado del archivo LaTeX
     texto: List[str] = [
         '\\documentclass[12pt]{article}\n\n',
-        '\\usepackage[scale=0.85,top=1in,papersize={8.5in,30in},head=14.5pt]{geometry}\n',
+        '\\usepackage[%s,%s,%s,%s]{geometry}\n' % ('scale=0.85', 'top=1in',
+                                                   'papersize={8.5in,30in}',
+                                                   'head=14.5pt]{geometry}'),
         '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
         '\\usepackage[spanish]{babel}\n',
@@ -40,20 +43,25 @@ def get_inicioExamen(nombre: str, examen) -> List[str]:
     t\'itulo.
     """
     texto = []
+    txt_temp: str
     # Se agrega el nombre al examen, se comienza el documento y se
     # imprime el puntaje total.
     texto.append('\\begin{document}\n\n')
-    texto.append('\\noindent \\textsc{Instituto Tecnol\\\'ogico de Costa Rica} \hfill \\textsc{%s}\\\\\n' % examen.semestre)
-    texto.append('\\textsc{%s} \hfill \\textsc{Tiempo: %s}\\\\\n' % (examen.cursos[0], examen.tiempo))
+    texto.append('\\noindent \\textsc{Instituto Tecnológico de Costa Rica}')
+    texto.append('\\hfill \\textsc{%s}\\\\\n' % examen.semestre)
+    texto.append('\\textsc{%s} \\hfill \\textsc{Tiempo: %s}\\\\\n'
+                 % (examen.cursos[0], examen.tiempo))
     for temp in examen.cursos[1:]:
         texto.append('\\textsc{%s}\\\\[1ex]\n' % temp)
-    texto.append('\\textsc{%s} \hfill \\textsc{Puntaje Total:} %d pts\\\\\n' % (examen.escuelas[0], examen.get_puntaje()))
+    texto.append('\\textsc{%s} \\hfill \\textsc{Puntaje Total:} %d pts\\\\\n'
+                 % (examen.escuelas[0], examen.get_puntaje()))
     for temp in examen.escuelas[1:]:
         texto.append('\\textsc{%s}\\bigskip\n\n' % temp)
 
     texto.append('\n\\begin{center}\n  {\\Large %s}\\\\[1ex]' % examen.titulo)
     texto.append('{\\large %s}\n\\end{center}\n\n' % nombre)
     return texto
+
 
 def get_encabezadoInforme(numPreguntas: List[int]) -> str:
     """ Encabezado para el informe de las notas. """
@@ -80,7 +88,7 @@ def get_encabezadoInforme(numPreguntas: List[int]) -> str:
     texto.append('} \\\\ \\toprule \n')
     texto.append('    ID & Nombre & \\textbf{Nota} & Pts')
     for cada in numPreguntas:
-        for i in range(1,cada+1):
+        for i in range(1, cada+1):
             texto.append(' & %d' % i)
     texto.append(' \\\\ \\midrule \n')
     return ''.join(texto)
