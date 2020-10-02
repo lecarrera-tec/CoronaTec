@@ -9,10 +9,11 @@ def get_encabezadoExamen(examen: PPP) -> str:
         '\\documentclass[12pt]{article}\n\n',
         '\\usepackage[%s,%s,%s,%s]{geometry}\n' % ('scale=0.85', 'top=1in',
                                                    'papersize={8.5in,30in}',
-                                                   'head=14.5pt]{geometry}'),
+                                                   'head=14.5pt'),
         '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
         '\\usepackage[spanish]{babel}\n',
+        '\\decimalpoint\n',
         '\\usepackage{paralist}\n',
         '\\usepackage{graphicx}\n\n',
         # Esto es para el cintillo en la parte superior
