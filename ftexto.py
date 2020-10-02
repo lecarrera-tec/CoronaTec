@@ -3,6 +3,7 @@ from typing import List, Tuple
 
 from fmate import factores
 
+
 def fraccion(num: int, den: int, conSigno: bool = False) -> str:
     """Texto en LaTeX de una fracción.
 
@@ -56,6 +57,7 @@ def fraccion(num: int, den: int, conSigno: bool = False) -> str:
 
     return txt
 
+
 def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
     """ Texto de latex para una raiz.
 
@@ -79,7 +81,7 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
     assert(indice >= 2)
     assert(indice % 2 == 1 or arg >= 0)
     if (arg < 0):
-        arg = abs(arg)
+        arg = -arg
         signo = -1
 
     # Se obtienen los factores, y se determina lo que queda afuera
@@ -92,12 +94,11 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
         afuera *= pow(primo, exp_afuera)
         adentro *= pow(primo, exp_adentro)
 
+    txt: str = ''
     if signo == -1:
         txt = '-'
     elif conSigno:
         txt = '+'
-    else:
-        txt = ''
 
     if afuera > 1:
         txt = '%s%d' % (txt, afuera)
@@ -109,6 +110,7 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
             txt = '%s\\sqrt[%d]{%d}' % (txt, indice, adentro)
 
     return txt
+
 
 def coef(numero: int, conSigno: bool = False) -> str:
     """ Imprime el coeficiente para una variable.
@@ -131,6 +133,7 @@ def coef(numero: int, conSigno: bool = False) -> str:
     else:
         return '%s%d' % (txtSigno, numero)
 
+
 def expo(expo: int) -> str:
     """ Escribe la expresión como exponente si se requiere (!= 1)
 
@@ -151,11 +154,13 @@ def expo(expo: int) -> str:
     else:
         return '^{%d}' % expo
 
+
 def conSigno(numero: int) -> str:
     """ Imprime un número con signo.  """
     return '%+d' % numero
 
-def decimal(numero: float, cifras: int, conSigno = False) -> str:
+
+def decimal(numero: float, cifras: int, conSigno: bool = False) -> str:
     """ Imprime un número flotante con las cifras indicadas.
 
     Si el número es muy pequeño, o demasiado grande, utiliza
@@ -193,26 +198,49 @@ def decimal(numero: float, cifras: int, conSigno = False) -> str:
         ftxt = '%%.%df' % ndig
     return ftxt % (signo * numero)
 
+
 def texto(numero: int, mil: bool = False) -> str:
+    """ Convierte un número a texto.
+
+    Argumentos
+    ----------
+    numero:
+        Número que se quiere convertir a texto.
+    mil:
+        Como es una función recursiva, en caso de que siga el texto
+        'mil' al final del texto que se está traduciendo.
+
+    Devuelve
+    --------
+    Número como texto.
+    """
     assert(numero > 0 and numero <= 999999999999)
     txt: str
-    teens: List[str] = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco',
-            'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
-            'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho',
-            'diecinueve', 'veinte', 'veintiuno', 'veintidós',
-            'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis',
-            'veintisiete', 'veintiocho', 'veintinueve']
-    decenas: List[str] = ['treinta', 'cuarenta', 'cincuenta', 'sesenta',
-            'setenta', 'ochenta', 'noventa', 'cien']
-    centenas: List[str] = ['ciento', 'doscientos', 'trescientos',
-            'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos',
-            'ochocientos', 'novecientos', 'mil']
-    miles: List[str] = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco',
-            'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece',
-            'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho',
-            'diecinueve', 'veinte', 'veintiun', 'veintidós',
-            'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis',
-            'veintisiete', 'veintiocho', 'veintinueve']
+    menores: List[str] = [
+            'cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete',
+            'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce',
+            'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve',
+            'veinte', 'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro',
+            'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho',
+            'veintinueve'
+            ]
+    decenas: List[str] = [
+            'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta',
+            'ochenta', 'noventa', 'cien'
+            ]
+    centenas: List[str] = [
+            'ciento', 'doscientos', 'trescientos', 'cuatrocientos',
+            'quinientos', 'seiscientos', 'setecientos', 'ochocientos',
+            'novecientos', 'mil'
+            ]
+    miles: List[str] = [
+            'cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete',
+            'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce',
+            'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve',
+            'veinte', 'veintiun', 'veintidós', 'veintitrés', 'veinticuatro',
+            'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho',
+            'veintinueve'
+            ]
     resp = ''
     if numero >= 2000000:
         temp = numero // 1000000
@@ -225,10 +253,7 @@ def texto(numero: int, mil: bool = False) -> str:
     if numero >= 2000:
         temp = numero // 1000
         numero = numero % 1000
-        if mil:
-            resp = '%s %s mil' % (resp, miles[temp])
-        else:
-            resp = '%s %s mil' % (resp, teens[temp])
+        resp = '%s %s mil' % (resp, miles[temp])
     if numero >= 1000:
         numero = numero % 1000
         resp = 'mil'
@@ -247,5 +272,5 @@ def texto(numero: int, mil: bool = False) -> str:
         if mil:
             resp = '%s %s' % (resp, miles[numero])
         else:
-            resp = '%s %s' % (resp, teens[numero])
+            resp = '%s %s' % (resp, menores[numero])
     return resp.strip()
