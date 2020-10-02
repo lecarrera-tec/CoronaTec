@@ -43,4 +43,5 @@ DFunciones = {
         'div': math.nan,
         'C': math.comb,
         'P': math.perm,
+        'factorial': math.factorial,
         }
