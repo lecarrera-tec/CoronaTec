@@ -301,7 +301,7 @@ for path in lestudiantes:
                   % (irow + 1,
                      chr(ord('E') + sum(numPreguntas) - 1),
                      irow + 1)
-        notasSheet.write(irow, 3, )
+        notasSheet.write(irow, 3, formula)
         # @ y se calcula la nota
         formula = '= 100 * D%d / %d' % (irow + 1, totalPts)
         notasSheet.write(irow, 2, formula, bold)
