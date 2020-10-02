@@ -27,7 +27,7 @@ def blancos(lsTexto: List[str]) -> str:
     ignorar = True
     while ignorar:
         linea = lsTexto.pop(0).strip()
-        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
     return linea
 
 
@@ -218,7 +218,7 @@ def preguntas(lsTexto: List[str], dirTrabajo: str,
         if len(linea) == 0:
             break
         # Si es un comentario, continuamos con la siguiente línea.
-        elif linea[0] == Info.COMMENT:
+        elif linea.startswith(Info.COMMENT):
             continue
         # Inicio de bloque. Solamente en caso de las preguntas no
         # estén en orden aleatorio.
