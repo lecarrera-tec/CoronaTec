@@ -150,13 +150,16 @@ row_number += 1
 entry_file_pregunta_vp = tk.Entry(master=frame_generar, width=80)
 entry_file_pregunta_vp.grid(column=2, row=row_number, padx=5, sticky='e')
 
+
 # Boton para abrir el archivo
-ftemp = lambda: open_file_dir(entry_file_pregunta_vp,
-                              [('Archivo de la pregunta .tex', '*.tex')])
+def __open_preg__():
+    open_file_dir(entry_file_pregunta_vp,
+                  [('Archivo de la pregunta .tex', '*.tex')])
+
+
 button_open_file_pregunta_vp = tk.Button(
-        master=frame_generar,
-        text='Pregunta .tex',
-        command=ftemp)
+        master=frame_generar, text='Pregunta .tex',
+        command=__open_preg__)
 button_open_file_pregunta_vp.grid(column=1, row=row_number, padx=5)
 row_number += 1
 
@@ -186,11 +189,16 @@ row_number += 1
 entry_file_encabezado_vp = tk.Entry(master=frame_generar, width=80)
 entry_file_encabezado_vp.grid(column=2, row=row_number, padx=5, sticky='e')
 
+
 # Boton para abrir el archivo
-ftemp = lambda: open_file_dir(entry_file_encabezado_vp,
-                              [('Archivo del encabezado .tex', '*.tex')])
+def __open_encabezado__():
+    open_file_dir(entry_file_encabezado_vp,
+                  [('Archivo del encabezado .tex', '*.tex')])
+
+
 button_open_file_encabezado_vp = tk.Button(
-        master=frame_generar, text='Encabezado .tex', command=ftemp)
+        master=frame_generar, text='Encabezado .tex',
+        command=__open_encabezado__)
 button_open_file_encabezado_vp.grid(column=1, row=row_number, padx=5)
 
 row_number += 1
@@ -217,12 +225,15 @@ row_number += 1
 entry_file_ppp = tk.Entry(master=frame_generar, width=80)
 entry_file_ppp.grid(column=2, row=row_number, padx=5, sticky='e')
 
+
 # Boton para abrir el archivo
-ftemp = lambda: open_file_dir(entry_file_ppp,
-                              [('Prueba de Preguntas Parametrizadas .ppp',
-                                '*.ppp')])
+def __open_ppp__():
+    open_file_dir(entry_file_ppp,
+                  [('Prueba de Preguntas Parametrizadas .ppp', '*.ppp')])
+
+
 button_open_file_ppp = tk.Button(master=frame_generar, text='Abrir .ppp',
-                                 command=ftemp)
+                                 command=__open_ppp__)
 button_open_file_ppp.grid(column=1, row=row_number, padx=5)
 
 row_number += 1
@@ -236,16 +247,29 @@ row_number += 1
 # Campo de texto para mostrar la ruta seleccionada
 entry_file_estudents = tk.Entry(master=frame_generar, width=80)
 entry_file_estudents.grid(column=2, row=row_number, padx=5, sticky='e')
+
+
 # Boton para abrir el archivo
-ftemp = lambda: open_file_dir(entry_file_estudents,
-                              [('Lista de estudiantes .csv', '*.csv')])
+def __open_lista__():
+    open_file_dir(entry_file_estudents,
+                  [('Lista de estudiantes .csv', '*.csv')])
+
+
 button_open_file_estudents = tk.Button(
-        master=frame_generar, text='Lista estudiantes .csv', command=ftemp)
+        master=frame_generar, text='Lista estudiantes .csv',
+        command=__open_lista__)
+
 button_open_file_estudents.grid(column=0, row=row_number, padx=5)
+
+
 # Boton para abrir el directorio
-ftemp = lambda: open_file_dir(entry_file_estudents, [], True)
+def __open_dir__():
+    open_file_dir(entry_file_estudents, [], True)
+
+
 button_open_file_estudents = tk.Button(
-        master=frame_generar, text='Directorio', command=ftemp)
+        master=frame_generar, text='Directorio',
+        command=__open_dir__)
 button_open_file_estudents.grid(column=1, row=row_number, padx=5)
 
 row_number += 1
@@ -282,11 +306,15 @@ label_file_respuestas.grid(column=0, row=row_number, columnspan=3, sticky='w')
 entry_file_respuestas = tk.Entry(master=frame_generar, width=80)
 entry_file_respuestas.grid(column=2, row=row_number, padx=5, sticky='e')
 
+
 # Boton para abrir el archivo
-ftemp = lambda: open_file_dir(entry_file_respuestas,
-                              [('Respuestas .csv', '*.csv')])
+def __open_resps__():
+    open_file_dir(entry_file_respuestas, [('Respuestas .csv', '*.csv')])
+
+
 button_open_file_respuestas = tk.Button(
-        master=frame_generar, text='Respuestas .csv', command=ftemp)
+        master=frame_generar, text='Respuestas .csv',
+        command=__open_resps__)
 button_open_file_respuestas.grid(column=1, row=row_number, padx=5)
 
 row_number += 1
