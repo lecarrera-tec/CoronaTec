@@ -1,11 +1,12 @@
 import math
 from typing import List, Tuple
 
+
 def factores(numero: int) -> List[Tuple[int, int]]:
     """ Lista de factores de un entero positivo.
 
     Devuelve una lista de Tuplas, donde el primer valor es el factor
-    primo, y el segundo el n\'umero de veces que se repite.
+    primo, y el segundo el número de veces que se repite.
 
     Argumentos
     ----------
@@ -15,8 +16,8 @@ def factores(numero: int) -> List[Tuple[int, int]]:
     Devulve
     -------
         Lista de tuplas, donde el primer elemento de cada tupla es el
-        n\'umero primo que es factor, y el segundo el n\'umero de veces
-        que est\'a presente.
+        número primo que es factor, y el segundo el número de veces
+        que está presente.
     """
 
     assert(numero >= 0)
@@ -40,7 +41,21 @@ def factores(numero: int) -> List[Tuple[int, int]]:
     factores.append((numero, 1))
     return factores
 
-def digSignif(numero: float, digitos: int):
+
+def digSignif(numero: float, digitos: int) -> float:
+    """ Redondeo de un número según dígitos significativos.
+
+    Argumentos
+    ----------
+    numero:
+        Número a redondear.
+    digitos:
+        Número de dígitos significativos.
+
+    Devuelve
+    --------
+        Número redondeado.
+    """
     signo: int = 1
     if numero == 0:
         return numero
@@ -53,6 +68,7 @@ def digSignif(numero: float, digitos: int):
     assert(1 <= numero and numero < 10)
     numero = round(numero, digitos - 1)
     return signo * numero * pot10
+
 
 def descomponer(numero: float) -> Tuple[float, int]:
     if numero == 0:
