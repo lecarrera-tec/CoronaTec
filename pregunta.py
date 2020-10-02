@@ -98,7 +98,7 @@ def get_latex(filename: str, dParams: Dict[str, Any],
     ignorar: bool = True
     while ignorar:
         linea = lsTexto.pop(0).strip()
-        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
     assert(linea.startswith(Info.LTIPO))
@@ -152,7 +152,7 @@ def get_respuesta(filename: str, dParams: Dict[str, Any]) -> Respuesta:
     ignorar: bool = True
     while ignorar:
         linea: str = lsTexto.pop(0).strip()
-        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
 
     # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
     assert(linea.startswith(Info.LTIPO))
@@ -204,7 +204,8 @@ def latex_unica(opciones: str, lsTexto: List[str],
     while ignorar:
         linea = lsTexto[contador].strip()
         contador += 1
-        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
+    contador =- 1
 
     # Se lee el número de cifras significativas.
     cifras = __leer_cifras__(opciones)
@@ -283,7 +284,8 @@ def latex_corta(opciones: str, lsTexto: List[str], dParams: Dict[str, Any],
     while ignorar:
         linea = lsTexto[contador].strip()
         contador += 1
-        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
+    contador -= 1
 
     # Se lee el número de cifras significativas.
     cifras = __leer_cifras__(opciones)
@@ -308,7 +310,7 @@ def latex_corta(opciones: str, lsTexto: List[str], dParams: Dict[str, Any],
         while ignorar:
             linea = lsTexto[contador].strip()
             contador += 1
-            ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+            ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
         lista.append('\\bigskip\n\n\\noindent R/ %s\n'
                      % str(eval(linea, DGlobal, dLocal)))
 
@@ -344,7 +346,8 @@ def latex_encabezado(opciones: str, lsTexto: List[str],
     while ignorar:
         linea = lsTexto[contador].strip()
         contador += 1
-        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
+    contador -= 1
 
     # Se lee el número de cifras significativas.
     cifras = __leer_cifras__(opciones)
@@ -403,7 +406,7 @@ def respuesta_corta(opciones: str, lsTexto: List[str],
 
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.
-    linea = lsTexto[contador]
+    linea = lsTexto[contador].strip()
     contador += 1
     assert(linea == Info.PREGUNTA)
     linea = lsTexto[contador]
@@ -523,7 +526,7 @@ def respuesta_encabezado(opciones: str, lsTexto: List[str],
     ignorar = True
     while ignorar:
         linea = lsTexto[contador].strip()
-        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
 
     # Definiendo diccionario.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
@@ -663,7 +666,7 @@ def __path_graphics__(filename: str, texto: str):
         # Ponemos el path en terminos absolutos.
         cwd = os.getcwd()
         os.chdir(path)
-        path = os.getcwd()
+        path = os.getcwd().replace('\\', '/')
         os.chdir(cwd)
 
         # Ahora buscamos cada includegraphics, y le agregamos el path.
@@ -697,12 +700,15 @@ def __leer_variables__(contador: int, lsTexto: List[str],
         Evalúa las variables, las guarda en dParams, y devuelve el
         índice de la siguiente línea a trabajar.
     """
+    linea = lsTexto[contador].strip()
+    contador += 1
+    assert(linea == Info.VARIABLES)
     while True:
         linea = lsTexto[contador].strip()
         contador += 1
         if linea == Info.PREGUNTA:
             break
-        elif len(linea) == 0 or linea[0] == Info.COMMENT:
+        elif len(linea) == 0 or linea.startswith(Info.COMMENT):
             continue
         parserPPP.evaluarParam(linea, dLocal, dParams)
     return contador - 1
@@ -728,7 +734,7 @@ def __leer_pregunta__(contador: int, lsTexto: List[str],
     --------
         Contador, y cada una de las líneas de la pregunta.
     """
-    linea: str = lsTexto[contador]
+    linea: str = lsTexto[contador].strip()
     contador += 1
     lista: List[str] = []
     assert(linea == Info.PREGUNTA)
@@ -767,7 +773,7 @@ def __ignorar__(contador: int, lsTexto: List[str]) -> int:
     while ignorar:
         linea = lsTexto[contador].strip()
         contador += 1
-        ignorar = len(linea) == 0 or linea[0] == Info.COMMENT
+        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
     return contador - 1
 
 
