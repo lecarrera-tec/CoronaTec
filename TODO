@@ -3,9 +3,3 @@
   examen. Eso podría ahorrar algunos dolores de cabeza. Incluso poner la 
   versión *en* el pdf, junto con el nombre del estudiante. Se debe
   reajustar el valor del índice.
-
-- Agregar a la documentación:
-  * txt.decimal 
-  * digSignif
-
-- Ordenar os.listdir()

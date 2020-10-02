@@ -1,3 +1,10 @@
+v0.4.2
+- Se modifica el acceso a las funciones
+- Se cambia ',' por ';' para leer el archivo de repuesta .csv. Se hace
+  el cambio para poder leer C(n, r), P(n, r), y conjuntos, cuyos
+  elementos deben estar separados por comas.
+- Poniendo el punto decimal por defecto.
+
 v0.4.0
 - Se agrega la función `txtNumero`.
 - Se agregan múltiples variables en las definiciones.
