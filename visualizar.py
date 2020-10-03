@@ -33,13 +33,9 @@ if len(sys.argv) < 3 or len(sys.argv) > 4:
 
 # Carpeta donde se va a guardar el pdf
 lista: List[str] = sys.argv[1].rsplit(sep='/', maxsplit=1)
-print(lista)
 origen: str = lista[1]
-print(origen)
 output: str = '%s-vp' % origen.rsplit(sep='.', maxsplit=1)[0]
-print(output)
 carpeta: str = lista[0]
-print(carpeta)
 
 # Se comienza por el encabezado.
 if len(sys.argv) == 4:
