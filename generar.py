@@ -16,7 +16,7 @@ def __primera_seccion__(tex, examen, seccion):
         tex.append('  \\newpage\n')
         tex.append('  \\section{%s %s %d puntos)}}\n\n'
                    % (seccion.titulo,
-                      '{\\normalsize (total de la secci\\ón:',
+                      '{\\normalsize (total de la sección:',
                       seccion.get_puntaje()))
     else:
         # Solamente se tiene una sección sin titulo.
@@ -29,7 +29,7 @@ def __resto_secciones__(tex, examen, seccion):
         tex.append('  \\newpage\n')
         tex.append('  \\section{%s %s %d puntos)}}\n\n'
                    % (seccion.titulo,
-                      '{\\normalsize (total de la secci\\ón:',
+                      '{\\normalsize (total de la sección:',
                       seccion.get_puntaje()))
         tex.append(seccion.get_latex())
     # Cerrando el documento.
