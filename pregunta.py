@@ -115,7 +115,7 @@ def get_latex(filename: str, dParams: Dict[str, Any],
         sys.exit()
 
     # Modificar path de figuras
-    __path_graphics__(filename, texto)
+    texto = __path_graphics__(filename, texto)
     return texto
 
 
@@ -205,7 +205,7 @@ def latex_unica(opciones: str, lsTexto: List[str],
         linea = lsTexto[contador].strip()
         contador += 1
         ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
-    contador =- 1
+    contador -= 1
 
     # Se lee el número de cifras significativas.
     cifras = __leer_cifras__(opciones)
@@ -214,7 +214,8 @@ def latex_unica(opciones: str, lsTexto: List[str],
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
 
     # Se leen variables.
-    contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
+    if linea == Info.VARIABLES:
+        contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
 
     # Redefinimos el diccionario, eliminando las funciones que generan
     # números aleatorios.
@@ -294,7 +295,8 @@ def latex_corta(opciones: str, lsTexto: List[str], dParams: Dict[str, Any],
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
 
     # Se leen variables.
-    contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
+    if linea == Info.VARIABLES:
+        contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
 
     # Redefinimos el diccionario, eliminando las funciones que generan
     # números aleatorios.
@@ -356,7 +358,8 @@ def latex_encabezado(opciones: str, lsTexto: List[str],
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
 
     # Se leen variables.
-    contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
+    if linea == Info.VARIABLES:
+        contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
 
     # Redefinimos el diccionario, eliminando las funciones que generan
     # números aleatorios.
@@ -402,7 +405,8 @@ def respuesta_corta(opciones: str, lsTexto: List[str],
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
 
     # Se leen variables.
-    contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
+    if lsTexto[contador].strip() == Info.VARIABLES:
+        contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
 
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.
@@ -463,11 +467,13 @@ def respuesta_unica(opciones: str, lsTexto: List[str],
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
 
     # Se leen las variables
-    contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
+    if lsTexto[contador].strip() == Info.VARIABLES:
+        contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
 
     # Deberíamos estar en la pregunta. Nos la brincamos, porque no se
     # debería de llamar a ninguna función random aquí.
-    linea = lsTexto[contador]
+    linea = lsTexto[contador].strip()
+    contador += 1
     assert(linea == Info.PREGUNTA)
     linea = lsTexto[contador]
     contador += 1
@@ -532,7 +538,8 @@ def respuesta_encabezado(opciones: str, lsTexto: List[str],
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
 
     # Se leen variables.
-    contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
+    if linea == Info.VARIABLES:
+        contador = __leer_variables__(contador, lsTexto, dLocal, dParams)
 
     # No hay nada más que hacer por acá.
     return resp
@@ -648,7 +655,7 @@ def __items_unica__(contador: int, lsTexto: List[str], dLocal: Dict[str, Any],
     return (contador, litems)
 
 
-def __path_graphics__(filename: str, texto: str):
+def __path_graphics__(filename: str, texto: str) -> str:
     """ Modifica el path de cada figura al path absoluto.
 
     Argumentos
@@ -678,6 +685,7 @@ def __path_graphics__(filename: str, texto: str):
             idx = texto.find('{', idx)
             assert(idx != -1)
             texto = '%s{%s/%s' % (texto[:idx], path, texto[idx+1:])
+    return texto
 
 
 def __leer_variables__(contador: int, lsTexto: List[str],
@@ -702,7 +710,6 @@ def __leer_variables__(contador: int, lsTexto: List[str],
     """
     linea = lsTexto[contador].strip()
     contador += 1
-    assert(linea == Info.VARIABLES)
     while True:
         linea = lsTexto[contador].strip()
         contador += 1
