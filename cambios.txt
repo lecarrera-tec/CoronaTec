@@ -1,3 +1,9 @@
+v0.4.3
+- Se agregan las primeras 4 letras del segundo apellido a los últimos
+  seis dígitos del número de carnet.
+- Se verifica que el nombre de usuario coincida con el nombre de la
+  lista.
+
 v0.4.2
 - Se modifica el acceso a las funciones
 - Se cambia ',' por ';' para leer el archivo de repuesta .csv. Se hace
