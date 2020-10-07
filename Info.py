@@ -9,6 +9,7 @@ CSV_SEP: str = ';'
 CSV_ICOL: int = 5
 CSV_IROW: int = 1
 CSV_IKEY: int = -1
+CSV_INAME: int = 4
 
 COMMENT: Tuple[str, str] = ('#', '%')
 
