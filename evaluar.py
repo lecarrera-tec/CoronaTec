@@ -241,7 +241,7 @@ for path in lestudiantes:
     irow: int = 0
     for linea in Lista:
         irow = irow + 1
-        logging.debug('Nueva respuesta.')
+        logging.debug('Nueva respuesta: %s' % linea)
         respuestas: List[Respuesta] = []
         # Separamos el número de identificación del resto del nombre.
         # ##-id-##, <apellidos/nombres>, xxxxx
