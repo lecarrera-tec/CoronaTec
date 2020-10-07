@@ -155,7 +155,7 @@ for path in lestudiantes:
         # Se cambia el identificador.
         idx = 1 + nombre.find(' ')
         filename = '%s%s' % (idstr[-6:],
-                             nombre[idx:idx+5].lower().replace(' ', '_'))
+                             nombre[idx:idx+4].lower().replace(' ', '_'))
         fout = open('%s.tex' % filename, 'w')
         fout.write(encabezado)
         fout.writelines(tex)

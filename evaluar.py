@@ -72,6 +72,17 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
     infoBook.close()
 
 
+def __comparar_usuario__(nombre, texto, notasSheet):
+    # Se imprime el usuario si no coincide con el nombre
+    ls_nombre = set([palabra.lower().replace('ñ', 'n')
+                    for palabra in nombre.split()])
+    usuario = [palabra.capitalize() for palabra in texto.strip().split()]
+    ls_usuario = set([palabra.lower().replace('ñ', 'n')
+                     for palabra in usuario])
+    if not ls_nombre == ls_usuario:
+        notasSheet.write(irow, 2, ' '.join(usuario))
+
+
 logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
 # Estructura de la función.
 #
@@ -273,12 +284,8 @@ for path in lestudiantes:
             notasSheet.write(irow, 2, 'ausente')
             continue
 
-        # Se imprime el usuario si no coincide con el nombre
-        con_nombre = set(nombre.split())
-        usuario = [palabra.capitalize().replace('ñ', 'n')
-                   for palabra in par[1].strip().split()]
-        if not con_nombre == set(usuario):
-            notasSheet.write(irow, 2, ' '.join(usuario))
+        __comparar_usuario__(nombre, par[1], notasSheet)
+
         # Se inicializa la semilla usando el identificador multiplicado
         # por una constante, según el índice de repetición dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
@@ -299,7 +306,7 @@ for path in lestudiantes:
         # Se cambia el identificador a partir de acá.
         idx = 1 + nombre.find(' ')
         idstr = '%s%s' % (idstr[-6:],
-                          nombre[idx:idx+5].lower().replace(' ', '_'))
+                          nombre[idx:idx+4].lower().replace(' ', '_'))
         todasResp.append((idstr, unir))
         icol: int = 4
         for elem, resp in unir:
