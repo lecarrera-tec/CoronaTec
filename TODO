@@ -3,3 +3,12 @@
   examen. Eso podría ahorrar algunos dolores de cabeza. Incluso poner la 
   versión *en* el pdf, junto con el nombre del estudiante. Se debe
   reajustar el valor del índice.
+
+- Agregar el nombre del estudiante, tomado del formulario, en las notas 
+  para el profesor.
+
+- Agregar un tipo de respuesta corta que lo que haga es llamar a una
+  función para evaluar la respuesta de la persona estudiante.
+
+- Modificar el bloque, de manera que se pueda definir desde un sólo
+  archivo. Tal vez una llamada recursiva.
