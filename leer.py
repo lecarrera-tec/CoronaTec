@@ -6,7 +6,7 @@ import parserPPP
 from pregunta import Pregunta
 from seccion import Seccion
 
-# TODO ¿Ser\'a posible estandarizar todas las funciones en una sola?
+# TODO ¿Será posible estandarizar todas las funciones en una sola?
 
 
 def blancos(lsTexto: List[str]) -> str:
@@ -218,22 +218,24 @@ def preguntas(lsTexto: List[str], dirTrabajo: str,
         if len(linea) == 0:
             break
         # Si es un comentario, continuamos con la siguiente línea.
-        elif linea.startswith(Info.COMMENT):
+        if linea.startswith(Info.COMMENT):
             continue
         # Inicio de bloque. Solamente en caso de las preguntas no
         # estén en orden aleatorio.
-        elif linea == Info.INICIO_BLOQUE:
+        if linea == Info.INICIO_BLOQUE:
             assert(not bloque)
+            logging.debug('Ingresando a un bloque')
             bloque = True
             continue
-        elif linea == Info.FIN_BLOQUE:
+        if linea == Info.FIN_BLOQUE:
             assert(bloque)
+            logging.debug('Fin de bloque')
             bloque = False
             # Modificamos la pregunta anterior, para avisar que es la
-            # \'ultima pregunta.
+            # última pregunta.
             lista[-1].set_ultima()
             logging.info(
-                    'Se modifica pregunta anterior: %s' % str(lista[-1]))
+                    'Se modifica pregunta anterior: %s' % lista[-1].origen)
             continue
 
         # Puntos de la pregunta.
