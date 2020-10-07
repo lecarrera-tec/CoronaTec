@@ -1,7 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage[scale=0.85]{geometry}
-\usepackage{amsmath,amsthm}
+\usepackage{amsmath,amsthm,amssymb}
 \usepackage[spanish]{babel}
 
 \usepackage{multicol}
@@ -180,6 +180,15 @@ __respuesta__
   \item Si no se da un factor, entonces se toma 1 como factor. Se utiliza para ir relajando el error, pero castigar entonces el puntaje de la pregunta. Cada radio del error debe ser mayor, y cada puntaje no debe ser mayor al anterior, porque se toma como correcto el primero que se encuentre.
 \end{enumerate}
 
+\subsubsection{Consideraciones sobre el error}
+En general, es complicado determinar el rango de error admitido en una pregunta de respuesta corta cuando la respuesta \emph{no} es un número entero. Por ejemplo Moodle utiliza 2 técnicas distintas. Una opción que es 'Error nominal', el cual es una medida de error absoluto. El inconveniente que tiene en una pregunta parametrizada, es que si todas las respuestas no están en el mismo rango, es decir, entre $1.00\times 10^n$ y $9.99\times 10^n$, con $n\in\mathbb Z$ fijo, la exigencia de la respuesta sería distinto, dependiendo del valor de $n$. La otra forma que tiene es el error relativo, que al menos, sin profundizar mucho si es o no la forma correcta de evaluar, tiene un comportamiento que se considera no deseado, y es el siguiente:
+
+Si la respuesta correcta es 1.38532 y la persona estudiante responde 1.38 (que está mal redondeado), se tiene un error del 0.43\%. Si se utiliza un 0.2\% de error válido, esta respuesta sería calificada como mala. Por otro lado, si la respuesta correcta es 9.38532 y la persona estudiante responde con 9.38, la respuesta dada tendría un error del 0.06\%, y la respuesta se tomaría como buena.
+
+Esta plataforma implementa un error nominal pero en término de cifras significativas. Aceptar por ejemplo un 0.2\% de error, es definir el error en la pregunta igual a 0.01. Lo que hace es tomar la mantisa de la respuesta, y sumar y restar el error dado. Si la respuesta dada está en dicho rango, se toma como buena.
+
+¿Qué se debe considerar al respecto? Que al momento de presentar el reporte a la persona estudiante, se da la respuesta redondeada que se esperaba. Volviendo a nuestro ejemplo anterior, con 1.38532 y un error de 0.01, se toma el rango de la repuesta correcta entre [1.37532, 1.39532]. Al usuario se le muestra como 1.39 la respuesta correcta. Si responde 1.38 tiene la respuesta correcta. Si responde 1.40 tiene la respuesta mala.
+
 \section{Funciones}
 
 Se tienen dos tipos de funciones. Las funciones que únicamente se pueden llamar para definir variables, y las funciones generales que se pueden llamar en las variables, en la pregunta, y en los ítemes.
@@ -193,7 +202,7 @@ En las variables se define de manera normal. En la pregunta y los items cualquie
   \item Una \verb|@| seguida de cualquier símbolo, que es el mismo que se utiliza para cerrar, por ejemplo podría ser \verb/@|__expr__|/. 
 \end{itemize}
 
-!`El único requisito, es que el símbolo para cerrar \textbf{no} debe aparecer en la expresión a evaluar! Bueno, no es el único. Toda expresión a evaluar debe estar contenida en una sola línea.
+¡El único requisito, es que el símbolo para cerrar \textbf{no} debe aparecer en la expresión a evaluar! Bueno, no es el único. Toda expresión a evaluar debe estar contenida en una sola línea.
 
 Si el resultado de una @-expresión es un \verb|string| o un entero, entonces se concatena al texto; si es un punto flotante, entonces se trabaja de manera predeterminada con 3 cifras significativas, y se imprime el número en notación decimal o en notación científica, dependiendo de cómo se permita saber de la forma más clara que se tienen 3 cifras significativas. Si el resultado de la @-expresión es otra cosa, entonces se deja que python lo convierta a texto, y se concatena.
 
@@ -298,7 +307,7 @@ Esta implementación no permite el uso de funciones recursivas. Sin embargo se p
 <variables>
 i = randrange(3)
 h = [math.cos, math.sin, lambda x: math.exp(-x)][i]
-txt = ['\cos(x)', '\sin(x)', 'e^{-x}'][i]
+txt = ['\\cos(x)', '\\sin(x)', 'e^{-x}'][i]
 x0 = [0, 1, 2][i]
 n = randint(2, 5)
 
