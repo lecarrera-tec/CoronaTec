@@ -751,6 +751,8 @@ def __leer_pregunta__(contador: int, lsTexto: List[str],
     while not linea.strip().startswith(Info.LITEM):
         # Agregamos la línea de texto actualizando las @-expresiones.
         texto.append('    %s' % parserPPP.update(linea, dLocal, cifras))
+        if contador == len(lsTexto):
+            break
         linea = lsTexto[contador]
         contador += 1
     lista.append('%s\n%s' % (''.join(texto).rstrip(), '    \\nopagebreak\n'))
