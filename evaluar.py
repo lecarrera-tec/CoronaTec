@@ -275,7 +275,8 @@ for path in lestudiantes:
 
         # Se imprime el usuario si no coincide con el nombre
         con_nombre = set(nombre.split())
-        usuario = [palabra.capitalize() for palabra in par[1].strip().split()]
+        usuario = [palabra.capitalize().replace('ñ', 'n')
+                   for palabra in par[1].strip().split()]
         if not con_nombre == set(usuario):
             notasSheet.write(irow, 2, ' '.join(usuario))
         # Se inicializa la semilla usando el identificador multiplicado
