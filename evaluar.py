@@ -70,7 +70,6 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
         infoSheet.write(irow+3, icol+1, 100)
         irow += 5
     infoBook.close()
-    logging.debug('Fin de examen\n')
 
 
 logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
@@ -149,7 +148,7 @@ for i in range(Info.CSV_IROW):
 texto: str
 cols: List[str]
 # Diccionario!!!
-todxs: Dict[str, List[str]] = {}
+todxs: Dict[str, Tuple[List[str], str]] = {}
 for fila in lineas:
     # Se eliminan espacios en blanco y las comillas, en caso que
     # hubieran.
@@ -167,9 +166,11 @@ for fila in lineas:
     # que las respuestas son hasta el final, al menos que la última
     # columna sea la que corresponda al # de carnet).
     if Info.CSV_IKEY == -1:
-        todxs[cols[Info.CSV_IKEY]] = cols[Info.CSV_ICOL:-1]
+        todxs[cols[Info.CSV_IKEY]] = (cols[Info.CSV_ICOL:-1],
+                                      cols[Info.CSV_INAME])
     else:
-        todxs[cols[Info.CSV_IKEY]] = cols[Info.CSV_ICOL:]
+        todxs[cols[Info.CSV_IKEY]] = (cols[Info.CSV_ICOL:],
+                                      cols[Info.CSV_INAME])
 
 # ----------------------------------------------------------------------
 # E. Se genera la lista con las listas de los grupos dados.
@@ -254,22 +255,29 @@ for path in lestudiantes:
         notasSheet.write(irow, 1, nombre)
 
         # Localizo las respuestas del estudiante
-        misResp: List[str] = todxs.get(idstr, [])
+        par: Tuple[List[str], str] = todxs.get(idstr, ([], 'ausente'))
+        misResp: List[str] = par[0]
         # Si no tiene respuestas, lleno el excel de ceros, y calculo
         # la suma y la nota igual. Sigo con el siguiente.
         if len(misResp) == 0:
             tabla.notasNull(notasSheet, sum(numPreguntas), irow)
             # @ Se suman los puntos ;)
-            formula = '=SUM(E%d:%c%d)'\
+            formula = '=SUM(F%d:%c%d)'\
                       % (irow + 1,
-                         chr(ord('E') + sum(numPreguntas) - 1),
+                         chr(ord('F') + sum(numPreguntas) - 1),
                          irow + 1)
-            notasSheet.write(irow, 3, formula)
+            notasSheet.write(irow, 4, formula)
             # @ y se calcula la nota
-            formula = '= 100 * D%d / %d' % (irow + 1, totalPts)
-            notasSheet.write(irow, 2, formula, bold)
+            formula = '= 100 * E%d / %d' % (irow + 1, totalPts)
+            notasSheet.write(irow, 3, formula, bold)
+            notasSheet.write(irow, 2, 'ausente')
             continue
 
+        # Se imprime el usuario si no coincide con el nombre
+        con_nombre = set(nombre.split())
+        usuario = [palabra.capitalize() for palabra in par[1].strip().split()]
+        if not con_nombre == set(usuario):
+            notasSheet.write(irow, 2, ' '.join(usuario))
         # Se inicializa la semilla usando el identificador multiplicado
         # por una constante, según el índice de repetición dado.
         seed = Info.BY_SHIFT[indRepeticion] * int(idstr)
@@ -287,24 +295,29 @@ for path in lestudiantes:
         unir: List[Tuple[str, Respuesta]] = []
         puntos: List[Tuple[float, int]] = []
         unir = [(misResp[i], respuestas[i]) for i in range(len(misResp))]
-        todasResp.append((idstr[-6:], unir))
-        icol: int = 3
+        # Se cambia el identificador a partir de acá.
+        idx = 1 + nombre.find(' ')
+        idstr = '%s%s' % (idstr[-6:],
+                          nombre[idx:idx+5].lower().replace(' ', '_'))
+        todasResp.append((idstr, unir))
+        icol: int = 4
         for elem, resp in unir:
             icol += 1
             pts = resp.calificar(elem.strip())
             puntos.append(pts)
             # @ Se escribe el puntaje obtenido en el excel.
             notasSheet.write(irow, icol, pts[0])
-        todosPuntos.append((idstr[-6:], puntos))
+        todosPuntos.append((idstr, puntos))
         # @ Se suman los puntos
-        formula = '=SUM(E%d:%c%d)'\
+        formula = '=SUM(F%d:%c%d)'\
                   % (irow + 1,
-                     chr(ord('E') + sum(numPreguntas) - 1),
+                     chr(ord('F') + sum(numPreguntas) - 1),
                      irow + 1)
-        notasSheet.write(irow, 3, formula)
+        notasSheet.write(irow, 4, formula)
         # @ y se calcula la nota
-        formula = '= 100 * D%d / %d' % (irow + 1, totalPts)
-        notasSheet.write(irow, 2, formula, bold)
+        formula = '= 100 * E%d / %d' % (irow + 1, totalPts)
+        notasSheet.write(irow, 3, formula, bold)
     notasBook.close()
     # < Para construir el archivo del reporte
     __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos)
+    logging.debug('Fin de evaluación.\n')
