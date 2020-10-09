@@ -234,7 +234,8 @@ def latex_unica(opciones: str, lsTexto: List[str],
     if revisar:
         # Se obtiene cuáles items son respuesta correcta.
         __respuestas_unica__(litems, opciones)
-        litems = [(True, 'R/ %s' % tupla[1]) for tupla in litems if tupla[0]]
+        litems = [(tupla[0], '%s%s' % ('R/ ' if tupla[0] else '', tupla[1]))
+                  for tupla in litems]
 
     # Desordenamos los items.
     if orden == 'aleatorio':
@@ -588,7 +589,7 @@ def __respuestas_unica__(litems: List[Item], opciones: str):
     elif len(opcion) == 0:
         # La respuesta predeterminada.
         litems[0] = (True, litems[0][1])
-    txts = opcion.split(',')
+    txts = opcion.split('&')
     for yo in txts:
         try:
             indice = int(yo)
