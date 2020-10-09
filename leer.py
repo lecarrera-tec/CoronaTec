@@ -6,201 +6,156 @@ import parserPPP
 from pregunta import Pregunta
 from seccion import Seccion
 
-# TODO ¿Será posible estandarizar todas las funciones en una sola?
 
-
-def blancos(lsTexto: List[str]) -> str:
+def blancos(contador: int, lsTexto: List[str]) -> int:
     """ Se ignoran las líneas en blanco o comentarios.
 
     Argumentos
     ----------
+    contador:
+        Índice inicial.
     lsTexto:
         Texto de entrada como una lista, donde cada elemento es un
         renglón.
 
     Devuelve
     --------
-    Un texto con la primera línea que *no* es un comentario o una línea
+    Índice de la siguiente línea que *no* es un comentario o una línea
     en blanco.
     """
     linea: str
     ignorar = True
     while ignorar:
-        linea = lsTexto.pop(0).strip()
+        linea = lsTexto[contador].strip()
+        contador += 1
         ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
-    return linea
+    return contador - 1
 
 
-def escuelas(linea: str, lsTexto: List[str]) -> Tuple[List[str], str]:
-    """ Se leen las escuelas participantes.
+def unaLinea(contador: int, lsTexto: List[str],
+             etiqueta: str) -> Tuple[int, str]:
+    """ Se lee una línea según la etiqueta dada.
 
     Argumentos
     ----------
+    contador:
+        Índice inicial.
     lsTexto:
         Texto de entrada como una lista, donde cada elemento es un
         renglón.
+    etiqueta:
+        Etiqueta que se espera.
 
     Devuelve
     --------
-    Una lista con cada una de las escuelas.
+    Una tupla formada por el contador en el valor que se debe seguir,
+    y el texto solicitado en caso de que estuviera la etiqueta.
     """
-    assert(linea == Info.ESCUELAS)
-    escuelas: List[str] = []
+    contador = blancos(contador, lsTexto)
+    linea: str = lsTexto[contador].strip()
+    contador += 1
+    # No se encontró la etiqueta. Terminamos
+    if linea != etiqueta:
+        return contador - 1, ''
+    contador = blancos(contador, lsTexto)
+    linea = lsTexto[contador].strip()
+    contador += 1
+    return contador, linea
+
+
+def variasLineas(contador: int, lsTexto: List[str],
+                 etiqueta: str) -> Tuple[int, List[str]]:
+    """ Se leen varias líneas según la etiqueta dada.
+
+    Argumentos
+    ----------
+    contador:
+        Índice inicial.
+    lsTexto:
+        Texto de entrada como una lista, donde cada elemento es un
+        renglón.
+    etiqueta:
+        Etiqueta que se espera.
+
+    Devuelve
+    --------
+    Una tupla formada por el contador en el valor que se debe seguir,
+    y una lista con el texto solicitado en caso de que estuviera la
+    etiqueta.
+    """
+    lista: List[str] = []
+    contador = blancos(contador, lsTexto)
+    linea: str = lsTexto[contador].strip()
+    contador += 1
+    # No se encontró la etiqueta. Terminamos
+    if linea != etiqueta:
+        return contador - 1, []
     while True:
-        linea = blancos(lsTexto)
-        if linea[0] == '<':
+        contador = blancos(contador, lsTexto)
+        linea = lsTexto[contador].strip()
+        contador += 1
+        if linea.startswith(Info.ABRIR):
             break
-        escuelas.append(linea)
-    return escuelas, linea
-
-
-def semestre(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
-    """ Se lee el semestre y el año.
-
-    Argumentos
-    ----------
-    lsTexto:
-        Texto de entrada como una lista, donde cada elemento es un
-        renglón.
-
-    Devuelve
-    --------
-    Texto del semestre y año.
-    """
-    assert(linea == Info.SEMESTRE)
-    linea = blancos(lsTexto)
-    return linea, blancos(lsTexto)
-
-
-def tiempo(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
-    """ Se lee el tiempo asignado al examen.
-
-    Argumentos
-    ----------
-    lsTexto:
-        Texto de entrada como una lista, donde cada elemento es un
-        renglón.
-
-    Devuelve
-    --------
-    El tiempo ingresado por el usuario.
-    """
-    assert(linea == Info.TIEMPO)
-    linea = blancos(lsTexto)
-    return linea, blancos(lsTexto)
-
-
-def cursos(linea: str, lsTexto: List[str]) -> Tuple[List[str], str]:
-    """ Se lee los cursos para los cuales aplica el examen.
-
-    Argumentos
-    ----------
-    lsTexto:
-        Texto de entrada como una lista, donde cada elemento es un
-        renglón.
-
-    Devuelve
-    --------
-    Una lista con cada uno de los cursos.
-    """
-    assert(linea == Info.CURSOS)
-    # Agregamos todas las líneas que no comiencen con comentario
-    # hasta llegar a una línea en blanco.
-    lista: List[str] = []
-    linea = blancos(lsTexto)
-    while not linea[0] == '<':
         lista.append(linea)
-        linea = blancos(lsTexto)
-    return lista, linea
+    return contador - 1, lista
 
 
-def titulo(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
-    """ Se lee el título del examen o de la sección. Puede ser opcional.
-
-    Si no tiene título, entonces se devuelve el título en blanco y la
-    línea de texto original, porque tiene la siguiente etiqueta.
+def verbatim(contador: int, lsTexto: List[str],
+             etiqueta: str) -> Tuple[int, str]:
+    """ Se lee verbatim el texto de la etiqueta dada.
 
     Argumentos
     ----------
+    contador:
+        Índice inicial.
     lsTexto:
         Texto de entrada como una lista, donde cada elemento es un
         renglón.
+    etiqueta:
+        Etiqueta que se espera.
 
     Devuelve
     --------
-    Una tupla con el título (si había) y la siguiente línea de texto.
-    """
-    if linea == Info.TITULO:
-        resp = blancos(lsTexto)
-        linea = blancos(lsTexto)
-    else:
-        resp = ''
-    return (resp, linea)
-
-
-def encabezado(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
-    """ Se lee el encabezado de LaTeX para el examen. Es opcional.
-
-    Argumentos
-    ----------
-    lsTexto:
-        Texto de entrada como una lista, donde cada elemento es un
-        renglón.
-
-    Devuelve
-    --------
-    El encabezado y la siguiente línea de texto.
+    Verbatim el texto de la etiqueta dada, hasta el inicio de la
+    próxima etiqueta.
     """
     lista: List[str] = []
-    if linea == Info.ENCABEZADO:
-        linea = lsTexto.pop(0)
-        while linea.find(Info.ABRIR) == -1:
-            lista.append(linea)
-            linea = lsTexto.pop(0)
-        resp = '%s\n' % ''.join(lista).strip()
-    else:
-        resp = ''
-    return (resp, linea.strip())
+    contador = blancos(contador, lsTexto)
+    linea: str = lsTexto[contador].strip()
+    contador += 1
+    # No se encontró la etiqueta. Terminamos
+    if linea != etiqueta:
+        return contador - 1, ''
+    linea = lsTexto[contador]
+    contador += 1
+    while not linea.strip().startswith(Info.ABRIR):
+        lista.append(linea)
+        linea = lsTexto[contador]
+        contador += 1
+    linea = '%s\n' % ''.join(lista).strip()
+    return contador - 1, linea
 
 
-def instrucciones(linea: str, lsTexto: List[str]) -> Tuple[str, str]:
-    # Revisamos si son las instrucciones. Pueden abarcar varias
-    # líneas de texto. Si no hubiera instrucciones, observe que
-    # entonces la variable estaría en blanco.
-    lista: List[str] = []
-    if linea.strip() == Info.INSTRUCCIONES:
-        linea = lsTexto.pop(0)
-        while linea.find(Info.ABRIR) == -1:
-            lista.append(linea)
-            linea = lsTexto.pop(0)
-        resp = '%s\n' % ''.join(lista).strip()
-    else:
-        resp = ''
-    return (resp, linea.strip())
-
-
-def secciones(linea: str, lsTexto: List[str],
+def secciones(contador: int, lsTexto: List[str],
               dirTrabajo: str) -> List[Seccion]:
-    # No queda de otra. Tienen que seguir las secciones. Una lista
-    # de instancias de la clase Seccion.
-    counter: int = 0
     respuesta: List[Seccion] = []
     es_aleatorio: bool = False
+    linea: str = lsTexto[contador]
+    contador += 1
     while linea.startswith(Info.LSECCION):
         linea = linea.strip(Info.STRIP)
-        counter += 1
-        logging.info('%d: Llamando a seccion ...' % counter)
+        logging.info('Llamando a seccion ...')
         linea = parserPPP.derechaIgual(linea, 'orden')
         es_aleatorio = linea == 'aleatorio'
         # Creando la nueva seccion.
-        respuesta.append(Seccion(lsTexto, dirTrabajo, es_aleatorio))
+        respuesta.append(Seccion(contador, lsTexto, dirTrabajo, es_aleatorio))
         if len(lsTexto) == 0:
             break
         linea = lsTexto.pop(0).strip()
     return respuesta
 
 
-def preguntas(lsTexto: List[str], dirTrabajo: str,
+def preguntas(contador: int, lsTexto: List[str], dirTrabajo: str,
               aleatorio: bool) -> List[Pregunta]:
     lista: List[Pregunta] = []
     # Guardamos cada línea, hasta que encontremos la primera
@@ -212,8 +167,9 @@ def preguntas(lsTexto: List[str], dirTrabajo: str,
     origen: str
     # El usuario puede definir bloques, para no hacer página nueva.
     bloque: bool = False
-    while len(lsTexto) > 0:
-        linea = lsTexto.pop(0).strip()
+    while contador < len(lsTexto):
+        linea = lsTexto[contador].strip()
+        contador += 1
         # Línea en blanco, terminamos.
         if len(linea) == 0:
             break
