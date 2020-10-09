@@ -124,7 +124,7 @@ Las cifras significativas se utilizan en caso de que se deba imprimir un número
 
 \small
 \begin{verbatim}
-<tipo = seleccion unica[, opcion = (__indice__[, __indice__]* | todos)][, cifras = ...]>
+<tipo = seleccion unica[, opcion = (__indice__[& __indice__]* | todos)][, cifras = ...]>
 
 <variables>
 __nombre_de_variables__ = __expresion__
@@ -419,7 +419,7 @@ pf(pf, h, x0, n)
 \end{funcion}
 
 \begin{funcion}
-  \verb|txt.frac(a, b[, conSigno=False])| \\[1ex]
+  \verb|txt.fraccion(a, b[, conSigno=False])| \\[1ex]
   Simplifica y escribe la fracción respectiva en \LaTeX\ usando \verb|dfrac|. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la fracción si es positiva.
 \end{funcion}
 

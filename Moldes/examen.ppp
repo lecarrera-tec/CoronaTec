@@ -1,0 +1,46 @@
+<Escuelas>
+Escuela de Matemática
+Escuela de Ciencias Naturales y Exactas
+
+<Semestre>
+X Semestre, 202X
+
+<Tiempo>
+X:X0 hora(s)
+
+<Cursos>
+MA-XXXX Nombre del Curso
+
+<Titulo>
+N-Esimo Examen Parcial
+
+% <Encabezado>
+% Si se requieren agregar paquetes de latex. Sólo trae
+% graphicx, amsmath y amssymb como predeterminados.
+
+<Instrucciones>
+Esta prueba consta de M preguntas de selección única y N preguntas de respuesta corta, organizadas en dos secciones. Cada pregunta vale X un punto(s).
+
+Se le recomienda escribir en un cuaderno u hojas blancas la respuesta a cada una de las preguntas, y al finalizar el tiempo del examen, abrir el formulario con la hoja de respuestas, y responder ahí las preguntas.
+
+% <Seccion, orden = aleatorio>
+<Seccion>
+  <Titulo>
+  Selección única
+
+  <Instrucciones>
+  En cada una de las siguientes preguntas, seleccione la opción que considere correcta.
+
+  <Preguntas>
+    origen = seleccion.tex
+
+% <Seccion, orden = aleatorio>
+<Seccion>
+  <Titulo>
+  Preguntas de respuesta corta. 
+
+  <Instrucciones>
+  Introduzca la expresión correspondiente. En caso de que la respuesta \textbf{no} sea un entero, puede responder utilizando fracciones o decimales. Si utiliza decimales, debe contestar con al menos 3 cifras significativas correctas. Así por ejemplo si la probabilidad es de $\dfrac{1}{23} \approx 0.04347826$, debe responder con 1/23 o con 0.0435.
+
+  <Preguntas>
+    origen = resp_corta.tex

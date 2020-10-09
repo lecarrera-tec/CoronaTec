@@ -1,0 +1,25 @@
+<tipo = seleccion unica>
+
+<variables>
+n = randint(10, 25)
+total = n * (n+1) // 2
+
+<pregunta>
+Una urna contiene @|total| bolitas, de las cuales una de ellas tiene anotado un 1; dos tienen anotado un 2; tres tienen anotado un 3; y así sucesivamente hasta completar @|txt.texto(n)| de ellas con un @|n| anotado. Se extraen, sin reposici\'on, dos bolitas una tras otra de la urna. \smallskip
+
+Si usamos el par ordenado $(p, q)$ para representar cada uno de los elementos del espacio muestral, donde $p$ es el número anotado en la primera bola extraída y $q$ es el número anotado en la segunda bola extraída, entonces el espacio muestral cumple:
+
+<item>
+$\Omega \subset \{(x,y):  x,y \text{ enteros  tales que } 1\leq x \leq @|n|, 1\leq y \leq @|n|\}$
+
+<item>
+$\Omega = \{(x,y):  x,y \text{ enteros tales que } 1 < x \leq @|n|, 1\leq y \leq @|n|\}$
+
+<item>
+$\Omega = \{(x,y):  x,y \text{ enteros tales que } 1\leq x \leq @|n|, 1\leq y \leq  @|n|\}$
+
+<item>
+$\Omega =  \{(x,y):  x,y \text{ enteros tales que } 1\leq x \leq @|total|, 1\leq y \leq  @|total|\}$
+
+<item>
+$\Omega \subset \{(x,y):  x\neq y \text{ enteros tales que } 1\leq x \leq @|total|, 1\leq y \leq @|total|\}$
