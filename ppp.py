@@ -67,37 +67,47 @@ class PPP:
         lsTexto: List[str] = finp.readlines()
         finp.close()
 
-        linea: str = leer.blancos(lsTexto)
+        contador: int = 0
+        linea: str
         hayEtiqueta: bool
 
         # Lo primero que deberíamos encontrar en el archivo es el nombre
         # de las escuelas. Obligatorio.
         self.escuelas: List[str]
-        self.escuelas, linea = leer.escuelas(linea, lsTexto)
+        contador, self.escuelas = leer.variasLineas(contador, lsTexto,
+                                                    Info.ESCUELAS)
+        assert(len(self.escuelas) > 0)
         logging.info('<Escuelas>: %s' % ', '.join(self.escuelas))
 
         # Sigue el texto del semestre. Obligatorio.
         self.semestre: str
-        self.semestre, linea = leer.semestre(linea, lsTexto)
+        contador, self.semestre = leer.unaLinea(contador, lsTexto,
+                                                Info.SEMESTRE)
+        assert(len(self.semestre) > 0)
         logging.info('<Semestre>: %s' % self.semestre)
 
         # Guardamos el texto del tiempo. Obligatorio.
         self.tiempo: str
-        self.tiempo, linea = leer.tiempo(linea, lsTexto)
+        contador, self.tiempo = leer.unaLinea(contador, lsTexto, Info.TIEMPO)
+        assert(len(self.tiempo) > 0)
         logging.info('%s: %s' % (Info.TIEMPO, self.tiempo))
 
         # Ahora sigue el nombre de los cursos. Obligatorio.
         self.cursos: List[str]
-        self.cursos, linea = leer.cursos(linea, lsTexto)
+        contador, self.cursos = leer.variasLineas(contador, lsTexto,
+                                                  Info.CURSOS)
+        assert(len(self.cursos) > 0)
         logging.info('<Cursos>: %s' % ', '.join(self.cursos))
 
         # Sigue el título de la prueba. Obligatorio.
-        self.titulo, linea = leer.titulo(linea, lsTexto)
+        contador, self.titulo = leer.unaLinea(contador, lsTexto, Info.TITULO)
+        assert(len(self.titulo) > 0)
         logging.info('<Titulo>: %s' % self.titulo)
 
         # Ahora revisamos si existe encabezado para LaTeX. Si no
-        # hubiera encabezado, se tiene un texto vac\'io.
-        self.encabezado, linea = leer.encabezado(linea, lsTexto)
+        # hubiera encabezado, se tiene un texto vacío.
+        contador, self.encabezado = leer.verbatim(contador, lsTexto,
+                                                  Info.ENCABEZADO)
         if len(self.encabezado) > 0:
             logging.info('<Encabezado>')
             logging.info(self.encabezado)
@@ -107,7 +117,8 @@ class PPP:
         # Revisamos si siguen las instrucciones. Pueden abarcar varias
         # líneas de texto. Si no hubiera instrucciones, observe que
         # entonces la variable sería un texto vacío.
-        self.instrucciones, linea = leer.instrucciones(linea, lsTexto)
+        contador, self.instrucciones = leer.verbatim(contador, lsTexto,
+                                                     Info.INSTRUCCIONES)
         if len(self.instrucciones) > 0:
             logging.info('<Instrucciones>')
             logging.info(self.instrucciones)
@@ -116,9 +127,12 @@ class PPP:
 
         # No queda de otra. Tienen que seguir las secciones. Una lista
         # de instancias de la clase Seccion.
+        contador = leer.blancos(contador, lsTexto)
+        linea = lsTexto[contador]
+        contador += 1
         assert(linea.startswith(Info.LSECCION))
         self.secciones: List[Seccion]
-        self.secciones = leer.secciones(linea, lsTexto, self.dirTrabajo)
+        self.secciones = leer.secciones(contador - 1, lsTexto, self.dirTrabajo)
 
         # ¡¡¡Terminamos!!!
         logging.info('Fin de PPP\n')
