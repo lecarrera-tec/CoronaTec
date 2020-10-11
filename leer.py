@@ -26,6 +26,8 @@ def blancos(contador: int, lsTexto: List[str]) -> int:
     linea: str
     ignorar = True
     while ignorar:
+        if contador >= len(lsTexto):
+            return -1
         linea = lsTexto[contador].strip()
         contador += 1
         ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
@@ -138,7 +140,8 @@ def verbatim(contador: int, lsTexto: List[str],
 
 def secciones(contador: int, lsTexto: List[str],
               dirTrabajo: str) -> List[Seccion]:
-    respuesta: List[Seccion] = []
+    seccion: Seccion
+    lista: List[Seccion] = []
     es_aleatorio: bool = False
     linea: str = lsTexto[contador]
     contador += 1
@@ -148,11 +151,16 @@ def secciones(contador: int, lsTexto: List[str],
         linea = parserPPP.derechaIgual(linea, 'orden')
         es_aleatorio = linea == 'aleatorio'
         # Creando la nueva seccion.
-        respuesta.append(Seccion(contador, lsTexto, dirTrabajo, es_aleatorio))
-        if len(lsTexto) == 0:
+        lista.append(Seccion(contador, lsTexto, dirTrabajo, es_aleatorio))
+
+        linea = lsTexto[contador].strip()
+        contador += 1
+        while contador < len(lsTexto) and not linea.startswith(Info.LSECCION):
+            linea = lsTexto[contador].strip()
+            contador += 1
+        if contador == len(lsTexto):
             break
-        linea = lsTexto.pop(0).strip()
-    return respuesta
+    return lista
 
 
 def preguntas(contador: int, lsTexto: List[str], dirTrabajo: str,
