@@ -16,7 +16,7 @@ def __primera_seccion__(tex, examen, seccion):
         tex.append('  \\newpage\n')
         tex.append('  \\section{%s %s %d puntos)}}\n\n'
                    % (seccion.titulo,
-                      '{\\normalsize (total de la sección:',
+                      '{\\normalsize (total de la secci\\\'on:',
                       seccion.get_puntaje()))
     else:
         # Solamente se tiene una sección sin titulo.
@@ -29,7 +29,7 @@ def __resto_secciones__(tex, examen, seccion):
         tex.append('  \\newpage\n')
         tex.append('  \\section{%s %s %d puntos)}}\n\n'
                    % (seccion.titulo,
-                      '{\\normalsize (total de la sección:',
+                      '{\\normalsize (total de la secci\\\'on:',
                       seccion.get_puntaje()))
         tex.append(seccion.get_latex())
     # Cerrando el documento.
@@ -131,7 +131,8 @@ for path in lestudiantes:
         tex: List[str] = latex.get_inicioExamen(nombre, examen)
         tex.append('\\noindent\\rule{\\textwidth}{1pt}\\\\[1ex]\n')
         tex.append('\\noindent \\textbf{Instrucciones: }')
-        tex.append('%s\\\\\\rule{\\textwidth}{1pt}\n\n' % examen.instrucciones)
+        tex.append('%s\n\n\\noindent\\rule{\\textwidth}{1pt}\n\n'
+                   % examen.instrucciones)
 
         # Si es sólo una sección y no tiene título, entonces no agregamos
         # la etiqueta de sección en LaTeX. En caso contrario, se agrega
