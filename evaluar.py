@@ -50,8 +50,11 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
             infoSheet.write(irow+1, icol, puntos[j][0])
             valor = temp[1].get_respuesta()
             if isinstance(valor, float):
-                cifras = 1 + math.ceil(-math.log10(temp[1].get_error()))
-                valor = fmate.digSignif(valor, cifras)
+                if valor.is_integer():
+                    valor = int(valor)
+                elif temp[1].get_error() > 0:
+                    cifras = 1 + math.ceil(-math.log10(temp[1].get_error()))
+                    valor = fmate.digSignif(valor, cifras)
             infoSheet.write(irow+2, icol, valor)
             infoSheet.write(irow+3, icol, puntos[j][1])
             icol += 1
