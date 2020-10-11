@@ -533,7 +533,9 @@ def respuesta_encabezado(opciones: str, lsTexto: List[str],
     ignorar = True
     while ignorar:
         linea = lsTexto[contador].strip()
+        contador += 1
         ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
+    contador -= 1
 
     # Definiendo diccionario.
     dLocal: Dict[str, Any] = {**dParams, **DFunRandom, **DFunciones}
@@ -811,6 +813,7 @@ def __items_corta__(contador: int, lsTexto: List[str], resp: Respuesta,
             # expresión.
             linea = lsTexto[contador].strip()
             contador += 1
+            logging.debug('__items_corta__ evaluar: `%s`' % linea)
             valor = eval(linea, DGlobal, dLocal)
             resp.add_respuesta((valor, error, factor))
         if contador == len(lsTexto):
