@@ -48,7 +48,7 @@ def get_inicioExamen(nombre: str, examen) -> List[str]:
     # Se agrega el nombre al examen, se comienza el documento y se
     # imprime el puntaje total.
     texto.append('\\begin{document}\n\n')
-    texto.append('\\noindent \\textsc{Instituto Tecnológico de Costa Rica}')
+    texto.append('\\noindent\\textsc{Instituto Tecnol\\\'ogico de Costa Rica}')
     texto.append('\\hfill \\textsc{%s}\\\\\n' % examen.semestre)
     texto.append('\\textsc{%s} \\hfill \\textsc{Tiempo: %s}\\\\\n'
                  % (examen.cursos[0], examen.tiempo))
