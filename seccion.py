@@ -39,7 +39,7 @@ class Seccion:
         El título de la sección.
     """
     def __init__(
-            self, lsTexto: List[str], dirTrabajo: str,
+            self, contador: int, lsTexto: List[str], dirTrabajo: str,
             aleatorio: bool = False):
         """Constructor a partir de archivo y el orden de las preguntas.
 
@@ -59,10 +59,10 @@ class Seccion:
         self.puntaje: int = 0
         self.aleatorias: bool = aleatorio
 
-        linea: str = leer.blancos(lsTexto)
+        linea: str
         # Se busca un título
         self.titulo: str
-        self.titulo, linea = leer.titulo(linea, lsTexto)
+        contador, self.titulo = leer.unaLinea(contador, lsTexto, Info.TITULO)
         if len(self.titulo) > 0:
             logging.info('<Titulo>: %s' % self.titulo)
         else:
@@ -70,7 +70,8 @@ class Seccion:
 
         # Se buscan instrucciones.
         self.instrucciones: str
-        self.instrucciones, linea = leer.instrucciones(linea, lsTexto)
+        contador, self.instrucciones = leer.verbatim(contador, lsTexto,
+                                                     Info.INSTRUCCIONES)
         if len(self.instrucciones) > 0:
             logging.info('<Instrucciones>: %s' % self.instrucciones)
         else:
@@ -78,11 +79,14 @@ class Seccion:
 
         # Deberían de seguir las direcciones a los archivos de las
         # preguntas.
+        linea = lsTexto[contador]
+        contador += 1
         assert(linea.strip().startswith(Info.PREGUNTAS))
         # Vamos a guardar una lista de tuplas, donde el primer
         # elemento es el puntaje, y el segundo la dirección.
         self.preguntas: List[Pregunta]
-        self.preguntas = leer.preguntas(lsTexto, dirTrabajo, aleatorio)
+        self.preguntas = leer.preguntas(contador, lsTexto, dirTrabajo,
+                                        aleatorio)
 
     def get_puntaje(self) -> int:
         """Devuelve el puntaje total de la sección."""
@@ -123,7 +127,8 @@ class Seccion:
                 sublista.append('%s\n\\bigskip\n\n' % texto)
                 continue
 
-            __lista_latex__(preg, filelist, templs, sublista, dParams)
+            sublista = __lista_latex__(preg, filelist, templs, sublista,
+                                       dParams)
 
         # Si las preguntas se requieren en orden aleatorio, entonces
         # las reordenamos
@@ -137,7 +142,13 @@ class Seccion:
 
         # Concatenamos las instrucciones y colocamos al
         # final todas las preguntas.
-        return '%s%s\n\n' % (self.instrucciones, ''.join(lista).strip())
+        if len(self.instrucciones) == 0:
+            return '%s\n\n' % ''.join(lista).strip()
+        return '%s%s%s%s%s\n\n' % ('\\noindent\\rule{\\textwidth}{1pt}\n\n',
+                                   self.instrucciones,
+                                   '\n\n\\noindent\\rule{\\textwidth}{1pt}',
+                                   '\n\n\\bigskip\n\n',
+                                   ''.join(lista).strip())
 
     def get_respuestas(self) -> List[Respuesta]:
         """
@@ -160,7 +171,8 @@ class Seccion:
             # Extraemos las preguntas.
             filelist = __muestra__(preg)
             # Obtenemos la lista de respuestas.
-            __lista_resps__(preg, filelist, lista, sublista, dParams)
+            sublista = __lista_resps__(preg, filelist, lista, sublista,
+                                       dParams)
         # Si las preguntas se requieren en orden aleatorio, entonces
         # se reordenan igual las respuestas.
         if self.aleatorias:
@@ -222,7 +234,7 @@ def __muestra__(preg: Pregunta) -> List[str]:
 
 
 def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
-                    sublista: List[str], dParams: Dict[str, Any]):
+                    sublista: List[str], dParams: Dict[str, Any]) -> List[str]:
     filename: str
     texto: str
     fin: str
@@ -233,6 +245,7 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
             fin = '\\bigskip'
         else:
             fin = '\\newpage'
+            dParams.clear()
 
         if preg.get_puntaje() > 1:
             txtPts = 'puntos'
@@ -251,21 +264,18 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
         if preg.es_ultima():
             lista.append(sublista)
             sublista = []
-
-        # No estamos en un bloque o es la última pregunta.
-        if preg.bloque <= 0:
-            dParams = {}
+    return sublista
 
 
 def __lista_resps__(preg: Pregunta, filelist: List[str], lista: List[Resps],
-                    sublista: List[Respuesta], dParams: Dict[str, Any]):
+                    sublista: List[Respuesta],
+                    dParams: Dict[str, Any]) -> List[Respuesta]:
     filename: str
     for filename in filelist:
         resp = pregunta.get_respuesta(filename, dParams)
         # Es un encabezado. Después de haber leído las variables podemos
         # continuar.
         if (resp.tipoPreg & TPreg.ENCABEZADO):
-            assert(preg.get_muestra() == 0)
             continue
         resp.set_puntaje(preg.get_puntaje())
         if preg.es_bloque():
@@ -283,6 +293,8 @@ def __lista_resps__(preg: Pregunta, filelist: List[str], lista: List[Resps],
     if preg.bloque <= 0:
         logging.debug('Borrando parámetros anteriores')
         dParams = {}
+
+    return sublista
 
 
 def __flatten_latex__(lista: List[Latex]) -> List[str]:
