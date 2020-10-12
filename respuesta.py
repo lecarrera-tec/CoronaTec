@@ -48,8 +48,11 @@ class Respuesta:
         if self.tipoPreg & TPreg.TODOS:
             return '*'
         if self.tipoPreg & TPreg.UNICA:
-            opcion = self.respuestas[0]
-            return chr(ord('A') + opcion)
+            try:
+                opcion = self.respuestas[0]
+                return chr(ord('A') + opcion)
+            except IndexError:
+                logging.debug('@@ self.respuestas = %s' % str(self.respuestas))
         elif self.tipoPreg & TPreg.RESP_CORTA:
             return self.respuestas[0][0]
 
@@ -152,7 +155,14 @@ def __calificar_unica__(respuestas, texto: str, puntaje: int) -> float:
 
 def __calificar_resp_corta__(respuestas, texto: str, puntaje: int) -> float:
     logging.debug('Calificar respuesta corta [%d pt]: `%s`' % (puntaje, texto))
-    expr = eval(texto, DGlobal, DFunciones)
+    try:
+        expr = eval(texto, DGlobal, DFunciones)
+    except (ValueError, TypeError, SyntaxError, AttributeError) as err:
+        print('\nError\n-----------')
+        print(err)
+        print('Expresión incorrecta: "%s"\n' % texto)
+        logging.error('Expresión incorrecta: "%s"' % texto)
+        expr = texto
     puntos: float = 0.0
     for resp, error, factor in respuestas:
         if error == 0:

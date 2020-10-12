@@ -16,7 +16,7 @@ import tabla
 import xlsxwriter
 
 """
-Función que realiza la evaluación de la prueba.
+Script que realiza la evaluación de la prueba.
 
 Se espera como argumentos el archivo ppp, la carpeta con las listas de
 los estudiantes (opcionalmente puede ser solamente un archivo de solo un
@@ -27,7 +27,10 @@ es para que genere un examen diferente con el mismo número de carnet.
 """
 
 
+# TODO Mejorar documentación de método.
 def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
+    """ Imprime el reporte que se comparte a los estudiantes.
+    """
     infoBook = xlsxwriter.Workbook('%s/%s_reporte.xlsx' % (carpeta, filename))
     infoSheet = infoBook.add_worksheet()
     bold = infoBook.add_format({'bold': 1})
@@ -58,10 +61,10 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
             infoSheet.write(irow+2, icol, valor)
             infoSheet.write(irow+3, icol, puntos[j][1])
             icol += 1
-        # @ Se suman los puntos
+        # Se suman los puntos
         formula = '=SUM(B%d:%c%d)' % (irow+2, chr(ord('A')+icol-1), irow+2)
         infoSheet.write(irow+1, icol, formula)
-        # @ y se calcula la nota
+        # y se calcula la nota
         formula = '= 100 * %c%d / %c%d'\
                   % (chr(ord('A') + icol),
                      irow+2,
@@ -75,6 +78,19 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
     infoBook.close()
 
 
+def __nombre_es_llave__(nombre: str) -> str:
+    """ Transforma el nombre en una llave única e igual.
+
+    El problema es que la lista del TecDigital y la lista de estudiantec
+    no coinciden. En la última, a veces intercambia un nombre con un
+    apellido. Se deja todo en minúsculas, se eliminan las ñ's y se
+    ordenan las palabras.
+    """
+    temp: List[str] = nombre.strip().split()
+    temp = sorted([pp.lower().replace('ñ', 'n') for pp in temp])
+    return '-'.join(temp)
+
+
 def __comparar_usuario__(nombre, texto, notasSheet):
     # Se imprime el usuario si no coincide con el nombre
     ls_nombre = set([palabra.lower().replace('ñ', 'n')
@@ -84,6 +100,48 @@ def __comparar_usuario__(nombre, texto, notasSheet):
                      for palabra in usuario])
     if not ls_nombre == ls_usuario:
         notasSheet.write(irow, 2, ' '.join(usuario))
+
+
+def __calificar__(respuestas, misResp, nombre, idstr, todasResp,
+                  todosPuntos, totalPts, sheet, irow, bold):
+    assert(len(respuestas) == len(misResp))
+    unir: List[Tuple[str, Respuesta]] = []
+    puntos: List[Tuple[float, int]] = []
+    unir = [(misResp[i], respuestas[i]) for i in range(len(misResp))]
+    # Se cambia el identificador a partir de acá.
+    idx = 1 + nombre.find(' ')
+    idstr = '%s%s' % (idstr[-6:],
+                      nombre[idx:idx+4].lower().replace(' ', '_'))
+    todasResp.append((idstr, unir))
+    icol: int = 4
+    for elem, resp in unir:
+        icol += 1
+        pts = resp.calificar(elem.strip())
+        puntos.append(pts)
+        # @ Se escribe el puntaje obtenido en el excel.
+        sheet.write(irow, icol, pts[0])
+    todosPuntos.append((idstr, puntos))
+    # @ Se suman los puntos
+    formula = '=SUM(F%d:%c%d)'\
+              % (irow + 1,
+                 chr(ord('F') + sum(numPreguntas) - 1),
+                 irow + 1)
+    sheet.write(irow, 4, formula)
+    # @ y se calcula la nota
+    formula = '= 100 * E%d / %d' % (irow + 1, totalPts)
+    notasSheet.write(irow, 3, formula, bold)
+
+
+try:
+    Info.CSV_IKEY
+except AttributeError:
+    print('ERROR\n-----')
+    print('Debe quitar el comentario en el archivo Info.py a alguna de las')
+    print('dos definiciones de CSV_IKEY. El valor de -1 es cuando se utiliza')
+    print('el número de carnet al final del formulario como identificador;')
+    print('el valor de 4 es cuando se utiliza el nombre como identificador')
+    print('cuando se utiliza una cuenta de Microsoft (estudiantec.cr)')
+    sys.exit()
 
 
 logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
@@ -162,6 +220,10 @@ for i in range(Info.CSV_IROW):
 texto: str
 cols: List[str]
 # Diccionario!!!
+# Se escriben los elementos del nombre en orden alfabético como llave
+# para el diccionario. Cada elemento es la lista de respuestas, junto
+# con el correo, que es el identificador único del usuario en el
+# formulario.
 todxs: Dict[str, Tuple[List[str], str]] = {}
 for fila in lineas:
     # Se eliminan espacios en blanco y las comillas, en caso que
@@ -171,20 +233,33 @@ for fila in lineas:
         continue
     # Dada una fila, separamos los elementos de cada columna.
     cols = texto.split(Info.CSV_SEP)
-    # Agregamos la llave y le asignamos las respuestas. Tiene la
-    # característica que si aparece el mismo carnet una segunda vez,
-    # la respuesta es la versión más reciente. No pareciera que
-    # importe.
+    # Agregamos la llave y le asignamos las respuestas. Si se repite
+    # la llave, se imprime la información en la salida.
     # Ignoramos las primeras columnas, damos el índice de la columna
     # de la llave, y la columna inicial de las respuestas (y asumimos
     # que las respuestas son hasta el final, al menos que la última
     # columna sea la que corresponda al # de carnet).
+
+    # Se utiliza el # de carnet como llave.
+    llave: str
     if Info.CSV_IKEY == -1:
+        llave = cols[Info.CSV_IKEY]
+        if llave in todxs:
+            usuario = todxs[llave][1]
+            print('%s tiene dos respuestas.' % llave)
+            print('Verifique usuario: "%s" vs "%s"'
+                  % (usuario, cols[Info.CSV_INAME]))
         todxs[cols[Info.CSV_IKEY]] = (cols[Info.CSV_ICOL:-1],
                                       cols[Info.CSV_INAME])
     else:
-        todxs[cols[Info.CSV_IKEY]] = (cols[Info.CSV_ICOL:],
-                                      cols[Info.CSV_INAME])
+        llave = __nombre_es_llave__(cols[Info.CSV_INAME])
+        if llave in todxs:
+            print('\nAdvertencia\n-----------')
+            print('%s ya existe. Compruebe que sea el mismo usuario.'
+                  % cols[Info.CSV_INAME])
+            usuario = todxs[llave][1]
+            print('"%s" vs "%s"\n' % (usuario, cols[Info.CSV_EMAIL]))
+        todxs[llave] = (cols[Info.CSV_ICOL:], cols[Info.CSV_EMAIL])
 
 # ----------------------------------------------------------------------
 # E. Se genera la lista con las listas de los grupos dados.
@@ -256,38 +331,35 @@ for path in lestudiantes:
     irow: int = 0
     for linea in Lista:
         irow = irow + 1
-        logging.debug('Nueva respuesta: %s' % linea)
+        logging.debug('Nueva respuesta: %s' % linea.strip())
         respuestas: List[Respuesta] = []
         # Separamos el número de identificación del resto del nombre.
         # ##-id-##, <apellidos/nombres>, xxxxx
         separar = linea.split(',')
         idstr = separar[0].strip()
+        if Info.CSV_IKEY == -1:
+            llave = idstr
+        else:
+            llave = __nombre_es_llave__(separar[1])
         nombre = ' '.join([palabra.capitalize()
                            for palabra in separar[1].strip().split()])
-        # @
+
         notasSheet.write(irow, 0, idstr)
         notasSheet.write(irow, 1, nombre)
 
-        # Localizo las respuestas del estudiante
-        par: Tuple[List[str], str] = todxs.get(idstr, ([], 'ausente'))
-        misResp: List[str] = par[0]
-        # Si no tiene respuestas, lleno el excel de ceros, y calculo
+        # El estudiante no aparece. Lleno el excel de ceros, y calculo
         # la suma y la nota igual. Sigo con el siguiente.
-        if len(misResp) == 0:
-            tabla.notasNull(notasSheet, sum(numPreguntas), irow)
-            # @ Se suman los puntos ;)
-            formula = '=SUM(F%d:%c%d)'\
-                      % (irow + 1,
-                         chr(ord('F') + sum(numPreguntas) - 1),
-                         irow + 1)
-            notasSheet.write(irow, 4, formula)
-            # @ y se calcula la nota
-            formula = '= 100 * E%d / %d' % (irow + 1, totalPts)
-            notasSheet.write(irow, 3, formula, bold)
-            notasSheet.write(irow, 2, 'ausente')
+        if llave not in todxs:
+            logging.info('No se encontró respuesta de "%s"' % nombre)
+            tabla.notasNull(notasSheet, sum(numPreguntas), irow, totalPts,
+                            bold)
             continue
 
-        __comparar_usuario__(nombre, par[1], notasSheet)
+        # Localizo las respuestas del estudiante
+        par: Tuple[List[str], str] = todxs.get(llave, ([], 'ausente'))
+        misResp: List[str] = par[0]
+        if Info.CSV_IKEY == -1:
+            __comparar_usuario__(nombre, par[1], notasSheet)
 
         # Se inicializa la semilla usando el identificador multiplicado
         # por una constante, según el índice de repetición dado.
@@ -302,32 +374,9 @@ for path in lestudiantes:
             respuestas += seccion.get_respuestas()
 
         # Ahora probamos a calificar.
-        assert(len(respuestas) == len(misResp))
-        unir: List[Tuple[str, Respuesta]] = []
-        puntos: List[Tuple[float, int]] = []
-        unir = [(misResp[i], respuestas[i]) for i in range(len(misResp))]
-        # Se cambia el identificador a partir de acá.
-        idx = 1 + nombre.find(' ')
-        idstr = '%s%s' % (idstr[-6:],
-                          nombre[idx:idx+4].lower().replace(' ', '_'))
-        todasResp.append((idstr, unir))
-        icol: int = 4
-        for elem, resp in unir:
-            icol += 1
-            pts = resp.calificar(elem.strip())
-            puntos.append(pts)
-            # @ Se escribe el puntaje obtenido en el excel.
-            notasSheet.write(irow, icol, pts[0])
-        todosPuntos.append((idstr, puntos))
-        # @ Se suman los puntos
-        formula = '=SUM(F%d:%c%d)'\
-                  % (irow + 1,
-                     chr(ord('F') + sum(numPreguntas) - 1),
-                     irow + 1)
-        notasSheet.write(irow, 4, formula)
-        # @ y se calcula la nota
-        formula = '= 100 * E%d / %d' % (irow + 1, totalPts)
-        notasSheet.write(irow, 3, formula, bold)
+        __calificar__(respuestas, misResp, nombre, idstr, todasResp,
+                      todosPuntos, totalPts, notasSheet, irow, bold)
+
     notasBook.close()
     # < Para construir el archivo del reporte
     __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos)

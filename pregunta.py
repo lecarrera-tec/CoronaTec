@@ -233,7 +233,7 @@ def latex_unica(opciones: str, lsTexto: List[str],
 
     if revisar:
         # Se obtiene cuáles items son respuesta correcta.
-        __respuestas_unica__(litems, opciones)
+        litems = __respuestas_unica__(litems, opciones)
         litems = [(tupla[0], '%s%s' % ('R/ ' if tupla[0] else '', tupla[1]))
                   for tupla in litems]
 
@@ -486,7 +486,7 @@ def respuesta_unica(opciones: str, lsTexto: List[str],
     contador, litems = __items_unica__(contador - 1, lsTexto, dLocal, 0)
 
     # Se obtiene cuáles items son respuesta correcta.
-    __respuestas_unica__(litems, opciones)
+    litems = __respuestas_unica__(litems, opciones)
 
     # Desordenamos los items.
     if orden == 'aleatorio':
@@ -585,25 +585,28 @@ def __respuestas_unica__(litems: List[Item], opciones: str):
         Opciones de la pregunta.
     """
     size = len(litems)
-    opcion: str = parserPPP.derechaIgual(opciones, 'opcion')
+    opcion: str = parserPPP.derechaIgual(opciones, 'opcion').strip()
     if opcion == 'todos':
-        [(True, tupla[1]) for tupla in litems]
+        litems = [(True, tupla[1]) for tupla in litems]
     elif len(opcion) == 0:
         # La respuesta predeterminada.
         litems[0] = (True, litems[0][1])
-    txts = opcion.split('&')
-    for yo in txts:
-        try:
-            indice = int(yo)
-        except ValueError:
-            logging.error('No se pudo leer indice en opcion: `%s`' % opciones)
-            continue
-        if indice >= size:
-            logging.error('Indice `%d` supera número de items `%d`.'
-                          % (indice, size))
-            logging.error('Recuerde que es 0-indexado!')
-            continue
-        litems[indice] = (True, litems[indice][1])
+    else:
+        txts = opcion.split('&')
+        for yo in txts:
+            try:
+                indice = int(yo)
+            except ValueError:
+                logging.error(
+                        'No se pudo leer indice en opcion: `%s`' % opciones)
+                continue
+            if indice >= size:
+                logging.error('Indice `%d` supera número de items `%d`.'
+                              % (indice, size))
+                logging.error('Recuerde que es 0-indexado!')
+                continue
+            litems[indice] = (True, litems[indice][1])
+    return litems
 
 
 def __items_unica__(contador: int, lsTexto: List[str], dLocal: Dict[str, Any],

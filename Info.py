@@ -8,8 +8,10 @@ para aclarar que es la parte izquierda (Left) del texto.
 CSV_SEP: str = ';'
 CSV_ICOL: int = 5
 CSV_IROW: int = 1
-CSV_IKEY: int = -1
+# CSV_IKEY: int = -1
+# CSV_IKEY: int = 4
 CSV_INAME: int = 4
+CSV_EMAIL: int = 3
 
 COMMENT: Tuple[str, str] = ('#', '%')
 
