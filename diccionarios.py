@@ -20,12 +20,16 @@ from typing import Any, Dict
 
 import ftexto
 import fmate
+import matriz
+import vector
 
 DGlobal: Dict[str, Any] = {
         '__builtins__': __builtins__,
         'math': math,
         'mate': fmate,
-        'txt': ftexto
+        'txt': ftexto,
+        'matriz': matriz,
+        'vector': vector,
         }
 
 DFunRandom: Dict[str, Any] = {
