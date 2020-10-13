@@ -4,8 +4,9 @@ from typing import List, Tuple
 from fmate import factores
 
 
-def fraccion(num: int, den: int, conSigno: bool = False) -> str:
-    """Texto en LaTeX de una fracción.
+def fraccion(num: int, den: int, conSigno: bool = False,
+             signoNum: bool = False, dfrac: bool = True) -> str:
+    """ Texto en LaTeX de una fracción.
 
     Argumentos
     ----------
@@ -14,8 +15,14 @@ def fraccion(num: int, den: int, conSigno: bool = False) -> str:
     den:
         Denominador (se asume distinto de 0)
     conSigno:
-        Opcional. Imprime un signo '+' en caso de ser positivo. El
+        Opcional. Imprime un signo '+' en caso de ser True. El
         predeterminado es False.
+    signoNum:
+        Opcional. Coloca el signo en el numerador, y no de manera
+        externa.
+    dfrac:
+        Opcional. Utiliza dfrac de manera predeterminada para construir
+        una fracción. Si False utiliza \\frac.
 
     Devuelve
     --------
@@ -49,11 +56,15 @@ def fraccion(num: int, den: int, conSigno: bool = False) -> str:
     else:
         txt = '-'
 
+    tipo = 'dfrac' if dfrac else 'frac'
+
     # No es una fracción.
     if den == 1:
         txt = '%s%d' % (txt, num)
+    elif signoNum:
+        txt = '\\%s{%s%d}{%d}' % (tipo, txt, num, den)
     else:
-        txt = '%s\\dfrac{%d}{%d}' % (txt, num, den)
+        txt = '%s\\%s{%d}{%d}' % (txt, tipo, num, den)
 
     return txt
 
@@ -219,10 +230,10 @@ def texto(numero: int, mil: bool = False) -> str:
     menores: List[str] = [
             'cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete',
             'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce',
-            'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve',
-            'veinte', 'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro',
-            'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho',
-            'veintinueve'
+            'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho', 'diecinueve',
+            'veinte', 'veintiuno', 'veintid\\\'os', 'veintitr\\\'es',
+            'veinticuatro', 'veinticinco', 'veintis\\\'eis', 'veintisiete',
+            'veintiocho', 'veintinueve'
             ]
     decenas: List[str] = [
             'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta',
@@ -236,10 +247,10 @@ def texto(numero: int, mil: bool = False) -> str:
     miles: List[str] = [
             'cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete',
             'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce',
-            'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve',
-            'veinte', 'veintiun', 'veintidós', 'veintitrés', 'veinticuatro',
-            'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho',
-            'veintinueve'
+            'quince', 'diecis\\\'eis', 'diecisiete', 'dieciocho', 'diecinueve',
+            'veinte', 'veintiun', 'veintid\\\'os', 'veintitr\\\'es',
+            'veinticuatro', 'veinticinco', 'veintis\\\'eis', 'veintisiete',
+            'veintiocho', 'veintinueve'
             ]
     resp = ''
     if numero >= 2000000:
@@ -274,3 +285,20 @@ def texto(numero: int, mil: bool = False) -> str:
         else:
             resp = '%s %s' % (resp, menores[numero])
     return resp.strip()
+
+
+def minCifras(numero: float, ceros: int = 3) -> str:
+    """ Imprime con el mínimo número de cifras distintas de 0.
+
+    El valor de ceros es el que decide cuando parar. Por ejemplo,
+    si ceros es 2, entonces 0.20070001 se imprime como 0.2;
+    si ceros es 3, entonces se imprime como 0.2007;
+    y si ceros es 4 o más, imprime 0.20070001
+    """
+    n = 0
+    temp = numero
+    while not round(temp, ceros).is_integer():
+        temp *= 10
+        n += 1
+    print('%f: %d' % (numero, n))
+    return ('%%.%df' % n) % numero
