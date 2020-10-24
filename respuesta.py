@@ -165,6 +165,9 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: int) -> float:
         expr = texto
     puntos: float = 0.0
     for resp, error, factor in respuestas:
+        if isinstance(expr, str):
+            puntos = 0.0
+            break
         if error == 0:
             logging.debug('@@@ %s (usuario) == %d (correcta)?'
                           % (str(expr), resp))
