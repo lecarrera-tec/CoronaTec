@@ -63,9 +63,14 @@ def digSignif(numero: float, digitos: int) -> float:
         signo = -1
         numero = -numero
     exp: int = math.ceil(math.log10(numero)) - 1
-    pot10: int = pow(10, exp)
+    pot10: float = pow(10, exp)
     numero /= pot10
-    assert(1 <= numero and numero < 10)
+    while numero < 1:
+        numero *= 10
+        pot10 /= 10
+    while numero >= 10:
+        numero /= 10
+        pot10 *= 10
     numero = round(numero, digitos - 1)
     return signo * numero * pot10
 
