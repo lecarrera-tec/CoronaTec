@@ -33,6 +33,21 @@ def aleatorio(nfilas: int, ncols: int, vmin: int, vmax: int,
     return mat
 
 
+def cambiar(A: Matriz, irow: int, icol: int, valor: float) -> Matriz:
+    """ Se actualiza el valor de la matriz. """
+    B = copia(A)
+    B[irow][icol] = valor
+    return B
+
+
+def copia(A: Matriz) -> Matriz:
+    """ Devuelve una copia de la matriz. """
+    B: Matriz = []
+    for fila in A:
+        B.append(fila.copy())
+    return B
+
+
 def dominante(n: int, vmin: int, vmax: int, factor: float = 1) -> Matriz:
     """ Construye una matriz cuadrada diagonalmente dominante.
 
