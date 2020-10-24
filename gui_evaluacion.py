@@ -5,7 +5,7 @@ import os
 from sys import platform
 
 if platform == 'darwin' or platform.startswith('linux'):
-    python = 'python3.8'
+    python = 'python3'
 else:
     python = 'python'
 
