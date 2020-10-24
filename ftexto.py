@@ -202,7 +202,7 @@ def decimal(numero: float, cifras: int, conSigno: bool = False) -> str:
     if numero < pow(10, -cifras-6) or numero >= pow(10, cifras - 1):
         ftxt = '%%.%de' % (cifras - 1)
     elif numero >= 1:
-        ndig = cifras - int(math.ceil(math.log10(numero))) - 1
+        ndig = cifras - int(math.ceil(math.log10(numero)))
         ftxt = '%%.%df' % max(0, ndig)
     else:
         ndig = cifras + int(math.ceil(-math.log10(numero))) - 1
@@ -300,5 +300,4 @@ def minCifras(numero: float, ceros: int = 3) -> str:
     while not round(temp, ceros).is_integer():
         temp *= 10
         n += 1
-    print('%f: %d' % (numero, n))
     return ('%%.%df' % n) % numero
