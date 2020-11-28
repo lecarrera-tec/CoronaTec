@@ -33,18 +33,18 @@ def aleatorio(nfilas: int, ncols: int, vmin: int, vmax: int,
     return mat
 
 
-def cambiar(A: Matriz, irow: int, icol: int, valor: float) -> Matriz:
-    """ Se actualiza el valor de la matriz. """
-    B = copia(A)
-    B[irow][icol] = valor
-    return B
-
-
 def copia(A: Matriz) -> Matriz:
     """ Devuelve una copia de la matriz. """
     B: Matriz = []
     for fila in A:
         B.append(fila.copy())
+    return B
+
+
+def cambiar(A: Matriz, irow: int, icol: int, valor: float) -> Matriz:
+    """ Se actualiza el valor de la matriz. """
+    B = copia(A)
+    B[irow][icol] = valor
     return B
 
 
@@ -177,3 +177,28 @@ def permutar(A: Matriz, perm: List[int]) -> Matriz:
     """ Coloca los índices de las filas de A, según la permutación. """
     B = [A[j] for j in perm]
     return B
+
+
+def sistema(A: Matriz, b: v.Vector) -> v.Vector:
+    """ Resuelve Ax = b """
+    A = copia(A)
+    b = b.copy()
+    n = len(A)
+    xs = n * [0]
+    assert(n > 0)
+    assert(n == len(A[0]))
+    for i in range(n - 1):
+        _, ipiv = max([(abs(A[i+k][i]), i+k) for k in range(n - i)])
+        if i != ipiv:
+            A = intercambiar(A, i, ipiv)
+            b[i], b[ipiv] = b[ipiv], b[i]
+        for iFila in range(i + 1, n):
+            if A[iFila][i] != 0.0:
+                k = A[iFila][i] / A[i][i]
+                A[iFila][i] = 0
+                for iCol in range(i + 1, n):
+                    A[iFila][iCol] -= k * A[i][iCol]
+                b[iFila] -= k * b[i]
+    for i in range(n-1,-1,-1):
+        xs[i] = (b[i] - sum([A[i][j] * xs[j] for j in range(i+1, n)])) / A[i][i]
+    return xs
