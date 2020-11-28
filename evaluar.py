@@ -120,9 +120,11 @@ def __calificar__(respuestas, misResp, nombre, idstr, todasResp,
     puntos: List[Tuple[float, int]] = []
     unir = [(misResp[i], respuestas[i]) for i in range(len(misResp))]
     # Se cambia el identificador a partir de acá.
-    idx = 1 + nombre.find(' ')
-    idstr = '%s%s' % (idstr[-6:],
-                      nombre[idx:idx+4].lower().replace(' ', '_'))
+    # idx = 1 + nombre.find(' ')
+    # idstr = '%s%s' % (idstr[-6:],
+    #                   nombre[idx:idx+4].lower().replace(' ', '_'))
+    idstr = '%s%s' % (nombre[:4].lower().replace(' ', '_'),
+                         idstr[-6:])
     todasResp.append((idstr, unir))
     icol: int = 4
     for elem, resp in unir:

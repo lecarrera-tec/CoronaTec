@@ -154,9 +154,11 @@ for path in lestudiantes:
 
         # Se imprime el documento.
         # Se cambia el identificador.
-        idx = 1 + nombre.find(' ')
-        filename = '%s%s' % (idstr[-6:],
-                             nombre[idx:idx+4].lower().replace(' ', '_'))
+        # idx = 1 + nombre.find(' ')
+        # filename = '%s%s' % (idstr[-6:],
+        #                      nombre[idx:idx+4].lower().replace(' ', '_'))
+        filename = '%s%s' % (nombre[:4].lower().replace(' ', '_'),
+                             idstr[-6:])
         fout = open('%s.tex' % filename, 'w')
         fout.write(encabezado)
         fout.writelines(tex)
