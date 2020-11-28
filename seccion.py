@@ -188,7 +188,8 @@ class Seccion:
         resp: int = 0
         preg: Pregunta
         for preg in self.preguntas:
-            resp += preg.get_muestra()
+            if preg.get_puntaje() > 0:
+                resp += preg.get_muestra()
         return resp
 
 

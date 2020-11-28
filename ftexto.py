@@ -297,7 +297,7 @@ def minCifras(numero: float, ceros: int = 3) -> str:
     """
     n = 0
     temp = numero
-    while not round(temp, ceros).is_integer():
+    while isinstance(temp, float) and not round(temp, ceros).is_integer():
         temp *= 10
         n += 1
     return ('%%.%df' % n) % numero

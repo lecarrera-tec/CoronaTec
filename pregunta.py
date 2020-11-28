@@ -307,6 +307,8 @@ def latex_corta(opciones: str, lsTexto: List[str], dParams: Dict[str, Any],
     contador, lista = __leer_pregunta__(contador, lsTexto, dLocal, cifras)
 
     if revisar:
+        linea = lsTexto[contador].strip()
+        contador += 1
         logging.debug('Respuesta corta -> Revisar: Imprimiendo respuesta')
         assert(linea.strip().startswith(Info.LITEM))
         ignorar = True
