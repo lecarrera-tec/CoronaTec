@@ -35,6 +35,7 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
     infoSheet = infoBook.add_worksheet()
     bold = infoBook.add_format({'bold': 1})
     infoSheet.set_column('A:Z', 10)
+    infoSheet.set_column('AA:AZ', 10)
     todasResp.sort(key=lambda x: x[0])
     todosPuntos.sort(key=lambda x: x[0])
     irow = 0
@@ -62,18 +63,28 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
             infoSheet.write(irow+3, icol, puntos[j][1])
             icol += 1
         # Se suman los puntos
-        formula = '=SUM(B%d:%c%d)' % (irow+2, chr(ord('A')+icol-1), irow+2)
+        letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ind1 = (icol - 1) // 26
+        ind2 = (icol - 1) % 26
+        if ind1 > 0:
+            txtFormula = '%s%s' % (letras[ind1 - 1], letras[ind2])
+        else:
+            txtFormula = letras[ind2]
+        formula = '=SUM(B%d:%s%d)' % (irow+2, txtFormula, irow+2)
         infoSheet.write(irow+1, icol, formula)
         # y se calcula la nota
-        formula = '= 100 * %c%d / %c%d'\
-                  % (chr(ord('A') + icol),
-                     irow+2,
-                     chr(ord('A') + icol),
-                     irow+4)
-        infoSheet.write(irow+1, icol+1, formula, bold)
-        formula = '=SUM(B%d:%c%d)' % (irow+4, chr(ord('A')+icol-1), irow+4)
+        formula = '=SUM(B%d:%s%d)' % (irow+4, txtFormula, irow+4)
         infoSheet.write(irow+3, icol, formula)
         infoSheet.write(irow+3, icol+1, 100)
+        ind1 = icol // 26
+        ind2 = icol % 26
+        if ind1 > 0:
+            txtFormula = '%s%s' % (letras[ind1 - 1], letras[ind2])
+        else:
+            txtFormula = letras[ind2]
+        formula = '= 100 * %s%d / %s%d'\
+                  % (txtFormula, irow+2, txtFormula, irow+4)
+        infoSheet.write(irow+1, icol+1, formula, bold)
         irow += 5
     infoBook.close()
 
@@ -122,10 +133,15 @@ def __calificar__(respuestas, misResp, nombre, idstr, todasResp,
         sheet.write(irow, icol, pts[0])
     todosPuntos.append((idstr, puntos))
     # @ Se suman los puntos
-    formula = '=SUM(F%d:%c%d)'\
-              % (irow + 1,
-                 chr(ord('F') + sum(numPreguntas) - 1),
-                 irow + 1)
+    letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    icol = ord('F') + sum(numPreguntas) - 1 - ord('A')
+    ind1 = icol // 26
+    ind2 = icol % 26
+    if ind1 > 0:
+        txtFormula = '%c%c' % (letras[ind1 - 1], letras[ind2])
+    else:
+        txtFormula = letras[ind2]
+    formula = '=SUM(F%d:%s%d)' % (irow + 1, txtFormula, irow + 1)
     sheet.write(irow, 4, formula)
     # @ y se calcula la nota
     formula = '= 100 * E%d / %d' % (irow + 1, totalPts)
