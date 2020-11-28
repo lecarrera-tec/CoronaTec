@@ -18,6 +18,7 @@ import random
 import math
 from typing import Any, Dict
 
+import distrib
 import ftexto
 import fmate
 import matriz
@@ -25,6 +26,7 @@ import vector
 
 DGlobal: Dict[str, Any] = {
         '__builtins__': __builtins__,
+        'distrib': distrib,
         'math': math,
         'mate': fmate,
         'txt': ftexto,
