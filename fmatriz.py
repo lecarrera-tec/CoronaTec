@@ -2,7 +2,7 @@ import random
 from typing import List
 
 from ftexto import minCifras
-import vector as v
+import fvector as v
 
 
 # Definición del tipo matriz.
@@ -184,7 +184,7 @@ def sistema(A: Matriz, b: v.Vector) -> v.Vector:
     A = copia(A)
     b = b.copy()
     n = len(A)
-    xs = n * [0]
+    xs: List[float] = n * [0.0]
     assert(n > 0)
     assert(n == len(A[0]))
     for i in range(n - 1):

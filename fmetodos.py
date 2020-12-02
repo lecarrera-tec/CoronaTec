@@ -1,5 +1,5 @@
 import math
-import matriz
+import fmatriz
 
 w0 = 11
 w1 = 81
