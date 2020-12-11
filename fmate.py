@@ -42,6 +42,16 @@ def factores(numero: int) -> List[Tuple[int, int]]:
     return factores
 
 
+def divisores(numero: int) -> List[int]:
+    """ Devuelve la lista de todos los divisores del numero. """
+    numero = abs(numero)
+    ls = [1]
+    for i in range(2, numero + 1):
+        if numero % i == 0:
+            ls.append(i)
+    return ls
+
+
 def digSignif(numero: float, digitos: int) -> float:
     """ Redondeo de un número según dígitos significativos.
 
