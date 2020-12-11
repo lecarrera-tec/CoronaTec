@@ -1,6 +1,7 @@
 """Archivos de preguntas."""
 
 import logging
+from math import inf
 import os
 import random
 import sys
@@ -758,7 +759,7 @@ def __leer_pregunta__(contador: int, lsTexto: List[str],
     texto: List[str] = []
     while not linea.strip().startswith(Info.LITEM):
         # Agregamos la línea de texto actualizando las @-expresiones.
-        texto.append('    %s' % parserPPP.update(linea, dLocal, cifras))
+        texto.append(parserPPP.update(linea, dLocal, cifras))
         if contador == len(lsTexto):
             break
         linea = lsTexto[contador]
