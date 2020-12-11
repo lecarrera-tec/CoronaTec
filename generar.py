@@ -26,8 +26,8 @@ def __primera_seccion__(tex, examen, seccion):
 
 def __resto_secciones__(tex, examen, seccion):
     for seccion in examen.secciones[1:]:
-        tex.append('  \\newpage\n')
-        tex.append('  \\section{%s %s %d puntos)}}\n\n'
+        tex.append('\\newpage\n')
+        tex.append('\\section{%s %s %d puntos)}}\n\n'
                    % (seccion.titulo,
                       '{\\normalsize (total de la secci\\\'on:',
                       seccion.get_puntaje()))
