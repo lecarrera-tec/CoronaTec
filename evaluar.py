@@ -56,10 +56,12 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
             if isinstance(valor, float):
                 if valor.is_integer():
                     valor = int(valor)
+                elif temp[1].get_error() == math.inf:
+                    valor = '*'
                 elif temp[1].get_error() > 0:
                     cifras = 1 + math.ceil(-math.log10(temp[1].get_error()))
                     valor = fmate.digSignif(valor, cifras)
-            infoSheet.write(irow+2, icol, valor)
+            infoSheet.write(irow+2, icol, str(valor))
             infoSheet.write(irow+3, icol, puntos[j][1])
             icol += 1
         # Se suman los puntos
@@ -94,31 +96,39 @@ def __nombre_es_llave__(nombre: str) -> str:
 
     El problema es que la lista del TecDigital y la lista de estudiantec
     no coinciden. En la última, a veces intercambia un nombre con un
-    apellido. Se deja todo en minúsculas, se eliminan las ñ's y se
-    ordenan las palabras.
+    apellido. Se deja todo en minúsculas, se eliminan las ñ's, las tildes
+    y se ordenan las palabras.
     """
     temp: List[str] = nombre.strip().split()
-    temp = sorted([pp.lower().replace('ñ', 'n') for pp in temp])
+    temp = sorted([__reemplazar__(pp.lower()) for pp in temp])
     return '-'.join(temp)
+
+def __reemplazar__(txt: str) ->str:
+    resp = txt.replace('ñ', 'n').replace('á', 'a')
+    resp = resp.replace('é', 'e').replace('í', 'i')
+    resp = resp.replace('ó', 'o').replace('ú', 'u')
+    return resp
 
 
 def __comparar_usuario__(nombre, texto, notasSheet):
     # Se imprime el usuario si no coincide con el nombre
-    ls_nombre = set([palabra.lower().replace('ñ', 'n')
+    ls_nombre = set([__reemplazar__(palabra.lower())
                     for palabra in nombre.split()])
     usuario = [palabra.capitalize() for palabra in texto.strip().split()]
-    ls_usuario = set([palabra.lower().replace('ñ', 'n')
+    ls_usuario = set([__reemplazar__(palabra.lower())
                      for palabra in usuario])
     if not ls_nombre == ls_usuario:
         notasSheet.write(irow, 2, ' '.join(usuario))
 
 
-def __calificar__(respuestas, misResp, nombre, idstr, todasResp,
+def __calificar__(respuestas, respEstud, nombre, idstr, todasResp,
                   todosPuntos, totalPts, sheet, irow, bold):
-    assert(len(respuestas) == len(misResp))
+    if len(respuestas) != len(respEstud):
+        logging.error('len(respuestas) %d; len(respEstud) = %d\n' % (len(respuestas), len(respEstud)))
+        logging.error('Son las respuestas del formulario equivocado?\n')
     unir: List[Tuple[str, Respuesta]] = []
     puntos: List[Tuple[float, int]] = []
-    unir = [(misResp[i], respuestas[i]) for i in range(len(misResp))]
+    unir = [(respEstud[i], respuestas[i]) for i in range(len(respEstud))]
     # Se cambia el identificador a partir de acá.
     # idx = 1 + nombre.find(' ')
     # idstr = '%s%s' % (idstr[-6:],
@@ -375,7 +385,7 @@ for path in lestudiantes:
 
         # Localizo las respuestas del estudiante
         par: Tuple[List[str], str] = todxs.get(llave, ([], 'ausente'))
-        misResp: List[str] = par[0]
+        respEstud: List[str] = par[0]
         if Info.CSV_IKEY == -1:
             __comparar_usuario__(nombre, par[1], notasSheet)
 
@@ -392,7 +402,7 @@ for path in lestudiantes:
             respuestas += seccion.get_respuestas()
 
         # Ahora probamos a calificar.
-        __calificar__(respuestas, misResp, nombre, idstr, todasResp,
+        __calificar__(respuestas, respEstud, nombre, idstr, todasResp,
                       todosPuntos, totalPts, notasSheet, irow, bold)
 
     notasBook.close()
