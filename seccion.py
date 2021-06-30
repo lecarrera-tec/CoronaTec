@@ -92,7 +92,7 @@ class Seccion:
         """Devuelve el puntaje total de la sección."""
         if self.puntaje == 0:
             for preg in self.preguntas:
-                self.puntaje += preg.get_puntaje()
+                self.puntaje += preg.get_muestra() * preg.get_puntaje()
         return self.puntaje
 
     def get_latex(self) -> str:
@@ -152,7 +152,7 @@ class Seccion:
 
     def get_respuestas(self) -> List[Respuesta]:
         """
-        Genera una lista de intancias del objeto Respuesta,
+        Genera una lista de instancias del objeto Respuesta,
         correspondiente a las preguntas de la sección.
         """
         logging.debug('Entrando a Seccion.get_respuestas ...')
