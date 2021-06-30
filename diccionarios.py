@@ -17,6 +17,7 @@ DFunRandom:
 import random
 import math
 from typing import Any, Dict
+import fractions
 
 import fdistrib
 import ftexto
@@ -27,6 +28,7 @@ import fvector
 DGlobal: Dict[str, Any] = {
         '__builtins__': __builtins__,
         'distrib': fdistrib,
+        'Fraction': fractions.Fraction,
         'math': math,
         'mate': fmate,
         'txt': ftexto,
