@@ -31,8 +31,8 @@ class Pregunta:
     bloque: int
         0 si no se está en un bloque.
         1 si es el inicio de un bloque.
-        2 si es está en el medio de un bloque.
-        -1 si es está en la última pregunta de un bloque.
+        2 si se está en el medio de un bloque.
+        -1 si se está en la última pregunta de un bloque.
     """
     def __init__(self, puntaje: int, origen: str, muestra: int,
                  bloque: bool):
@@ -485,8 +485,10 @@ def respuesta_unica(opciones: str, lsTexto: List[str],
         linea = lsTexto[contador]
         contador += 1
 
-    # Generamos los items. No nos interesan las cifras.
-    contador, litems = __items_unica__(contador - 1, lsTexto, dLocal, 0)
+    # Generamos los items. No nos interesan las cifras?
+    # TODO: Revisar el uso de cifras. Poner 0, gener\'o un error
+    # en el Cuiz04 de Metodos Numericos!!
+    contador, litems = __items_unica__(contador - 1, lsTexto, dLocal, 3)
 
     # Se obtiene cuáles items son respuesta correcta.
     litems = __respuestas_unica__(litems, opciones)
