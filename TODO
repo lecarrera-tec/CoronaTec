@@ -1,3 +1,8 @@
+- Falta documentar la funci\'on descUnid en fmate.py
+
+- Falta documentar el paquete 'fractions' en cheatsheet. Adem\'as,
+  no s\'e si pueda incluir en 'txt.fraccion'.
+
 - Faltan documentar "fdistrib.py", "fmetodos.py", "fmate.divisores",
   y me parece que algunos métodos de matriz.
 
