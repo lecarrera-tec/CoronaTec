@@ -120,6 +120,9 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
         else:
             txt = '%s\\sqrt[%d]{%d}' % (txt, indice, adentro)
 
+    if afuera == 1 and adentro == 1:
+        txt = '%s1' % txt
+
     return txt
 
 
