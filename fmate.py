@@ -86,6 +86,8 @@ def digSignif(numero: float, digitos: int) -> float:
 
 
 def descomponer(numero: float) -> Tuple[float, int]:
+    """ Dado un flotante, descompone el número en su
+    mantisa y su exponente. """
     if numero == 0:
         return (0, 0)
     signo: int = 1
@@ -94,4 +96,21 @@ def descomponer(numero: float) -> Tuple[float, int]:
         numero = -numero
     exp: int = math.ceil(math.log10(numero)) - 1
     numero /= pow(10, exp)
+    while numero >= 10:
+        numero /= 10
+        exp += 1
+    while numero < 1:
+        numero *= 10
+        exp -= 1
     return (signo * numero, exp)
+
+def descUnid(numero: float) -> Tuple[float, str]:
+    (mant, expo) = descomponer(numero)
+    kk = expo // 3
+    uni : str
+    if kk >= 0:
+        uni = ['', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'][kk]
+    else:
+        uni = ['', 'm', r'\ensuremath{\mu}', 'n', 'p', 'f', 'a', 'z', 'y'][-kk]
+    expo = expo - kk * 3
+    return (mant * 10**expo, uni)
