@@ -165,13 +165,22 @@ Toda tupla, lista o conjunto, es 0-indexado.
   \item Listas por comprensi\'on:\\
     \quad \verb|ls = [i**2 for i in range(1, 11) if i % 5]| \\
     \qquad R/ \verb|[1, 4, 9, 16, 36, 49, 64, 81]|
-
-  \item \verb|mate.factores(a)| \\
-\quad Factorización de $a$. Por ejemplo \verb|mate.factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
 \end{asparaitem}
 
 \section{Funciones CoronaTec}
 Funciones creadas en el proyecto. Se pueden ir agregando seg\'un se requiera.
+
+\subsection{Biblioteca \texttt{mate}}
+\begin{asparaitem}
+  \item \verb|mate.factores(a)| \\
+\quad Factorización de $a$. Por ejemplo \verb|mate.factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
+
+\item \verb|mate.descomponer(f)| \\
+  \quad Dado un n\'umero flotante $f$, lo descompone en su mantisa y su exponente. Devuelve un par ordenado, donde el primer valor es un flotante en el intervalo $[1, 10)$, y el segundo es un entero.
+
+\item \verb|descUnid(f)| \\
+  \quad Dado un n\'umero flotante $f$, lo descompone en un valor y unidades. Devuelve un par ordenado, donde el primer valor es un flotante en el intervalo $[1, 1000)$, y el segundo es una cadena de texto a utilizar.
+\end{asparaitem}
 
 \subsection{Biblioteca \texttt{txt}}
 Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \'unica. Texto en \LaTeX. Se asume que se est\'a en modo matem\'atico.
@@ -223,11 +232,11 @@ Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \
 \item \verb|matriz.latex(mat: Matriz, cifras = -1, ceros = 3)| \\
   \quad Imprime una matriz. El encabezado \LaTeX\  lo especifica el usuario.
 
-    \item \verb|matriz.intercambiar(mat, fila1: int, fila2: int)| \\
-      \quad Matriz resultante al intercambiar dos filas de una matriz.
+\item \verb|matriz.intercambiar(mat, fila1: int, fila2: int)| \\
+  \quad Matriz resultante al intercambiar dos filas de una matriz.
 
-    \item \verb|matriz.permutar(A: Matriz, perm: List[int])| \\
-    \quad Coloca las filas de A, según la permutación dada.
+\item \verb|matriz.permutar(A: Matriz, perm: List[int])| \\
+\quad Coloca las filas de A, según la permutación dada.
 
 \item \verb|matriz.dominante(n, vmin, vmax, factor = 1)| \\
     \quad Matriz cuadrada diagonalmente dominante. El rango de valores es solamente para los elementos fuera de la diagonal.
@@ -236,8 +245,11 @@ Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \
       \verb|                npasos: int)| \\
       \quad Vector que se obtiene al aplicar \verb|npasos| de Jacobi.
 
-    \item \verb|matriz.gaussSeidel(A, bb, x0, npasos)|\\
-      \quad Vector que se obtiene al aplicar \verb|npasos| de Gauss-Seidel.
+\item \verb|matriz.gaussSeidel(A, bb, x0, npasos)|\\
+  \quad Vector que se obtiene al aplicar \verb|npasos| de Gauss-Seidel.
+
+\item \verb|matriz.sistema(A, bb)|\\
+  \quad Resuelve el sistema. Devuelve una lista de valores.
 \end{asparaitem}
 
 
