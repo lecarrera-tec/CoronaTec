@@ -35,6 +35,11 @@ def __resto_secciones__(tex, examen, seccion):
     # Cerrando el documento.
     tex.append('\\end{document}\n')
 
+def __reemplazar__(txt: str) ->str:
+    resp = txt.replace('ñ', 'n').replace('á', 'a')
+    resp = resp.replace('é', 'e').replace('í', 'i')
+    resp = resp.replace('ó', 'o').replace('ú', 'u')
+    return resp
 
 logging.basicConfig(filename='_generar.log', level=logging.DEBUG, filemode='w')
 
@@ -159,6 +164,7 @@ for path in lestudiantes:
         #                      nombre[idx:idx+4].lower().replace(' ', '_'))
         filename = '%s%s' % (nombre[:4].lower().replace(' ', '_'),
                              idstr[-6:])
+        filename = __reemplazar__(filename)
         fout = open('%s.tex' % filename, 'w')
         fout.write(encabezado)
         fout.writelines(tex)
