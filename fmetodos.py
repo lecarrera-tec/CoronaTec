@@ -19,6 +19,8 @@ def newton(f, fp, x0, nmax = math.inf, eps = 1e-16) -> float:
         Aproximación inicial.
     nmax:
         Máximo número de iteraciones.
+    eps:
+        Error m\'aximo
     """
     xn: float = x0
     err: float = 1
@@ -34,12 +36,16 @@ def newton(f, fp, x0, nmax = math.inf, eps = 1e-16) -> float:
     return xn
 
 
-def integral(f, a, b, ys = [], aprox = 0, eps = 1e-12, prof = math.inf):
+def integral(f, a, b, eps = 1e-12, prof = math.inf):
     m = 0.5 * (b - a)
     k = 0.5 * (a + b)
-    if len(ys) == 0:
-        ys = [f(-m + k), f(-m/3 + k), f(k), f(m/3+k), f(m+k)]
-        aprox = m * (w0 * ys[0] + w1 * ys[1] + w2 * ys[2] + w1 * ys[3] + w0 * ys[4]) / 60
+    ys = [f(-m + k), f(-m/3 + k), f(k), f(m/3+k), f(m+k)]
+    aprox = m * (w0 * ys[0] + w1 * ys[1] + w2 * ys[2] + w1 * ys[3] + w0 * ys[4]) / 60
+    return _integral_rec(f, a, b, eps, prof, ys, aprox)
+
+def _integral_rec(f, a, b, eps, prof, ys, aprox):
+    m = 0.5 * (b - a)
+    k = 0.5 * (a + b)
 
     a1 = a
     b1 = k
@@ -55,12 +61,16 @@ def integral(f, a, b, ys = [], aprox = 0, eps = 1e-12, prof = math.inf):
     I2 = m * (w0 * y2[0] + w1 * y2[1] + w2 * y2[2] + w1 * y2[3] + w0 * y2[4]) / 20
 
     ap2 = I1 + I2
-    err = abs((ap2 - aprox)/ap2)
+    if ap2 == 0:
+        err = abs(aprox)
+    else:
+        err = abs((ap2 - aprox)/ap2)
 
     if err > eps and prof > 0:
-        I1 = integral(f, a1, b1, y1, I1, eps, prof - 1)
-        I2 = integral(f, a2, b2, y2, I2, eps, prof - 1)
+        I1 = _integral_rec(f, a1, b1, eps, prof - 1, y1, I1)
+        I2 = _integral_rec(f, a2, b2, eps, prof - 1, y2, I2)
         ap2 = I1 + I2
+
     return ap2
 
 
@@ -109,3 +119,67 @@ def cero(f, a, b):
             fa = fp
         m = 0.5 * (a + b)
         fm = f(m)
+
+def fmin(f, aa: float, bb: float, tries: int = 3, eps: float = 1e-6, delta = 0.5) -> tuple[float, float]:
+    A: set = set([aa, bb])
+    B: set
+    C: set
+    X: list[float]
+    fmin: float
+    xmin: float
+    fmin, xmin = min((f(aa), aa), (f(bb), bb))
+    npart: int = 1
+    jump: float = bb - aa
+    dif: float = (bb - aa)
+    vals: list[float]
+    ntries: int = 0
+    x1: float
+    x2: float
+    x3: float
+    vx: float
+    vy: float
+    while ntries < tries:
+        ntries += 1
+        npart = 2 * npart
+        jump *= 0.5
+        delta = min(delta, 0.5 * jump)
+        B = set([aa + x * dif / npart for x in range(npart + 1)])
+        C = B.difference(A)
+        A = B
+
+        for x2 in C:
+            fx2 = f(x2)
+            x1 = x2 - delta
+            fx1 = f(x1)
+            x3 = x2 + delta
+            fx3 = f(x3)
+            fmin, xmin = min([(fx1, x1), (fx2, x2), (fx3, x3), (fmin, xmin)])
+            while True:
+                f1 = (fx2 - fx1) / (x2 - x1)
+                f2 = (fx3 - fx2) / (x3 - x2)
+                a = (f2 - f1) / (x3 - x1)
+                if a <= 0:
+                    break
+                b = f1 - a * (x1 + x2)
+                vx = -b / (2*a)
+                if vx <= x1 or vx >= x3:
+                    break
+                c = fx1 + x1 * (x2 * a - f1)
+                disc = b**2 - 4 * a * c
+                vy = -disc / (4*a)
+                if vy < fmin:
+                    if abs((fmin - vy) / vy) < eps:
+                        ntries = 0
+                    fmin = vy
+                    xmin = vx
+                if abs(vx-x2) * delta < eps:
+                    break
+                if vx < x2:
+                    x3 = x2
+                    fx3 = fx2
+                else:
+                    x1 = x2
+                    fx1 = fx2
+                x2 = vx
+                fx2 = vy
+    return (xmin, fmin)
