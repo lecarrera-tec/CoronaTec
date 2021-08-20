@@ -5,7 +5,8 @@ from fmate import factores
 
 
 def fraccion(num: int, den: int, conSigno: bool = False,
-             signoNum: bool = False, dfrac: bool = True) -> str:
+        signoNum: bool = False, dfrac: bool = True, 
+        coef: bool = False) -> str:
     """ Texto en LaTeX de una fracción.
 
     Argumentos
@@ -23,6 +24,11 @@ def fraccion(num: int, den: int, conSigno: bool = False,
     dfrac:
         Opcional. Utiliza dfrac de manera predeterminada para construir
         una fracción. Si False utiliza \\frac.
+    coef:
+        Opcional. En caso de ser verdadero y la fracci\'on de 1 o -1.
+        Si conSigno es verdadero, entonces imprime respectivamente + o -.
+        Si conSigno es falso, entonces no imprime nada o - respectivamente.
+        
 
     Devuelve
     --------
@@ -60,7 +66,9 @@ def fraccion(num: int, den: int, conSigno: bool = False,
 
     # No es una fracción.
     if den == 1:
-        txt = '%s%d' % (txt, num)
+        # No es un coeficiente o es distinto de +- 1.
+        if (not coef) or (abs(num) != 1):
+            txt = '%s%d' % (txt, num)
     elif signoNum:
         txt = '\\%s{%s%d}{%d}' % (tipo, txt, num, den)
     else:
@@ -202,7 +210,7 @@ def decimal(numero: float, cifras: int, conSigno: bool = False) -> str:
     if numero < 0:
         numero = -numero
         signo = -1
-    if numero < pow(10, -cifras-6) or numero >= pow(10, cifras - 1):
+    if numero < pow(10, -cifras-6) or numero >= pow(10, cifras + 3):
         ftxt = '%%.%de' % (cifras - 1)
     elif numero >= 1:
         ndig = cifras - int(math.ceil(math.log10(numero)))
