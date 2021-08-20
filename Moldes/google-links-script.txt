@@ -1,0 +1,19 @@
+function getLinks() {
+  var ss=SpreadsheetApp.getActiveSpreadsheet();
+  var s=ss.getActiveSheet();
+  var c=s.getActiveCell();
+  var base=DriveApp.getFolderById("TEXTO_COLA_LINK_FOLDER");
+  var folder=base.getFolders();
+  var fnames=[],flinks=[],f,str,files;
+  while (folder.hasNext()) {
+    fldr = folder.next();
+    files=fldr.getFiles();
+    while (files.hasNext()) {
+      f=files.next();
+      fnames.push([f.getName()]);
+      flinks.push([f.getUrl()]);
+    }
+  }
+  s.getRange(c.getRow(),c.getColumn(),fnames.length).setValues(fnames);
+  s.getRange(c.getRow(),c.getColumn()+1,flinks.length).setValues(flinks);
+}
