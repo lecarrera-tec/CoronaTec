@@ -133,8 +133,10 @@ def __calificar__(respuestas, respEstud, nombre, idstr, todasResp,
     # idx = 1 + nombre.find(' ')
     # idstr = '%s%s' % (idstr[-6:],
     #                   nombre[idx:idx+4].lower().replace(' ', '_'))
-    idstr = '%s%s' % (nombre[:4].lower().replace(' ', '_'),
-                         idstr[-6:])
+    temp: str = nombre[:4].lower().replace(' ', '_').replace('á','a')
+    temp = temp.replace('é','e').replace('í','i').replace('ó','o')
+    temp = temp.replace('ú','u').replace('ñ','n').replace('ü','u')
+    idstr = '%s%s' % (temp, idstr[-6:])
     todasResp.append((idstr, unir))
     icol: int = 4
     for elem, resp in unir:
