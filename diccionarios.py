@@ -22,6 +22,7 @@ import fractions
 import fdistrib
 import ftexto
 import fmate
+import fmetodos
 import fmatriz
 import fvector
 
@@ -31,6 +32,7 @@ DGlobal: Dict[str, Any] = {
         'Fraction': fractions.Fraction,
         'math': math,
         'mate': fmate,
+        'metodos': fmetodos,
         'txt': ftexto,
         'matriz': fmatriz,
         'vector': fvector,
