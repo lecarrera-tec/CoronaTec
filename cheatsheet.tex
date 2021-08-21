@@ -119,6 +119,9 @@ _respuesta_
   Suma, resta, multiplicación, división, división entera, residuo y potencia.
 \end{asparaitem}
 
+\subsection{Expresiones lambda}
+\verb|f = lambda x,y,z,... : f(x,y,z,..)|
+
 \subsection{Funciones aleatorias}
 Solamente se utilizan a la hora de definir variables.
 
@@ -166,92 +169,6 @@ Toda tupla, lista o conjunto, es 0-indexado.
     \quad \verb|ls = [i**2 for i in range(1, 11) if i % 5]| \\
     \qquad R/ \verb|[1, 4, 9, 16, 36, 49, 64, 81]|
 \end{asparaitem}
-
-\section{Funciones CoronaTec}
-Funciones creadas en el proyecto. Se pueden ir agregando seg\'un se requiera.
-
-\subsection{Biblioteca \texttt{mate}}
-\begin{asparaitem}
-  \item \verb|mate.factores(a)| \\
-\quad Factorización de $a$. Por ejemplo \verb|mate.factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
-
-\item \verb|mate.descomponer(f)| \\
-  \quad Dado un n\'umero flotante $f$, lo descompone en su mantisa y su exponente. Devuelve un par ordenado, donde el primer valor es un flotante en el intervalo $[1, 10)$, y el segundo es un entero.
-
-\item \verb|descUnid(f)| \\
-  \quad Dado un n\'umero flotante $f$, lo descompone en un valor y unidades. Devuelve un par ordenado, donde el primer valor es un flotante en el intervalo $[1, 1000)$, y el segundo es una cadena de texto a utilizar.
-\end{asparaitem}
-
-\subsection{Biblioteca \texttt{txt}}
-Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \'unica. Texto en \LaTeX. Se asume que se est\'a en modo matem\'atico.
-\begin{asparaitem}
-\item \verb|txt.coef(a: int, conSigno: bool = False)| \\
-\quad Coeficiente que precede a una variable entera. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|). De manera similar ocurre si $a=-1$. En caso contrario imprime el valor.
-
-\item \verb|txt.conSigno(n: int)| \\
-\quad Imprime el entero con signo.
-
-\item \verb|txt.decimal(x: float, cifras: int, conSigno = False)| \\
-\quad Imprime un flotante según el n\'umero de cifras significativas indicado.
-
-\item \verb|txt.expo(n: int)| \\
-\quad Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
-
-\item \verb|txt.fraccion(num: int, den: int, conSigno = False,| \\
-      \verb|               signoNum = False, dfrac = True)| \\
-\quad Simplifica e imprime utilizando \verb|dfrac|. De manera opcional se especifica si se obliga el signo \verb|+|; si el signo se imprime en el numerador, y si no se utiliza \verb|dfrac|.
-
-\item  \verb|txt.raiz(a: int, n: int = 2, conSigno = False)| \\
-\quad Simplifica y escribe la raíz respectiva. De manera opcional se puede especificar el \'indice \verb|n|, y si se imprime un \verb|+| al inicio.
-
-\item \verb|txt.texto(n: int)| \\
-\quad Para $n > 0$, devuelve el texto que representa al valor de $n$.
-\end{asparaitem}
-
-\subsection{Biblioteca \texttt{vector}}
-\begin{asparaitem}
-\item \verb|vector.ceros(n: int)| \\
-\quad Vector de ceros de tamaño \verb|n|. 
-
-\item \verb|vector.aleatorio(n: int, vmin: int, vmax: int,| \\
-      \verb|                   factor: float = 1)| \\
-  \quad Vector de números aleatorios. Genera inicialmente enteros en \verb|vmin..vmax|, y luego los multiplica por \verb|factor|.
-
-\item \verb|vector.latex(v: Vector, txtSep: str,| \\
-      \verb|               ndigits: int = -1, ceros: int = 3)| \\
-  \quad Imprime un vector. El encabezado en \LaTeX\ lo especifica el usuario. El texto separador da el formato entre elementos: por ejemplo \verb|', '| o \verb|' & '| (para vectores fila), o \verb|' \\\\ '| (para vector columna). De manera opcional se puede especificar el n\'umero de d\'igitos a imprimir. Si es $-1$, intenta imprimir la menor cantidad \verb|n|, tal que \verb|round(10**n * v[i], ceros)| sea un entero.
-\end{asparaitem}
-
-\subsection{Biblioteca \texttt{matriz}}
-
-\begin{asparaitem}
-\item \verb|matriz.aleatorio(nfilas: int, ncols: int, vmin: int,| \\
-      \verb|                 vmax: int, factor: float = 1)| \\
-  \quad Matriz de valores aleatorios. Ver \verb|vector.aleatorio|
-
-\item \verb|matriz.latex(mat: Matriz, cifras = -1, ceros = 3)| \\
-  \quad Imprime una matriz. El encabezado \LaTeX\  lo especifica el usuario.
-
-\item \verb|matriz.intercambiar(mat, fila1: int, fila2: int)| \\
-  \quad Matriz resultante al intercambiar dos filas de una matriz.
-
-\item \verb|matriz.permutar(A: Matriz, perm: List[int])| \\
-\quad Coloca las filas de A, según la permutación dada.
-
-\item \verb|matriz.dominante(n, vmin, vmax, factor = 1)| \\
-    \quad Matriz cuadrada diagonalmente dominante. El rango de valores es solamente para los elementos fuera de la diagonal.
-
-\item \verb|matriz.jacobi(A: Matriz, bb: v.Vector, x0: v.Vector,|\\
-      \verb|                npasos: int)| \\
-      \quad Vector que se obtiene al aplicar \verb|npasos| de Jacobi.
-
-\item \verb|matriz.gaussSeidel(A, bb, x0, npasos)|\\
-  \quad Vector que se obtiene al aplicar \verb|npasos| de Gauss-Seidel.
-
-\item \verb|matriz.sistema(A, bb)|\\
-  \quad Resuelve el sistema. Devuelve una lista de valores.
-\end{asparaitem}
-
 
 \section{Funciones de Python}
 
@@ -348,7 +265,113 @@ s2 = {3, 5, 7, 11}
 \end{asparaitem}
 
 
+\newpage
+\section{Funciones CoronaTec}
+Funciones creadas en el proyecto. Se pueden ir agregando seg\'un se requiera.
 
+\subsection{Biblioteca \texttt{mate}}
+\begin{asparaitem}
+  \item \verb|mate.factores(a)| \\
+\quad Factorización de $a$. Por ejemplo \verb|mate.factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
+
+\item \verb|mate.descomponer(f)| \\
+  \quad Dado un n\'umero flotante $f$, lo descompone en su mantisa y su exponente. Devuelve un par ordenado, donde el primer valor es un flotante en el intervalo $[1, 10)$, y el segundo es un entero.
+
+\item \verb|descUnid(f)| \\
+  \quad Dado un n\'umero flotante $f$, lo descompone en un valor y unidades. Devuelve un par ordenado, donde el primer valor es un flotante en el intervalo $[1, 1000)$, y el segundo es una cadena de texto a utilizar.
+\end{asparaitem}
+
+\subsection{Biblioteca \texttt{txt}}
+Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \'unica. Texto en \LaTeX. Se asume que se est\'a en modo matem\'atico.
+\begin{asparaitem}
+\item \verb|txt.coef(a: int, conSigno: bool = False)| \\
+\quad Coeficiente que precede a una variable entera. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|). De manera similar ocurre si $a=-1$. En caso contrario imprime el valor.
+
+\item \verb|txt.conSigno(n: int)| \\
+\quad Imprime el entero con signo.
+
+\item \verb|txt.decimal(x: float, cifras: int, conSigno = False)| \\
+\quad Imprime un flotante según el n\'umero de cifras significativas indicado.
+
+\item \verb|txt.expo(n: int)| \\
+\quad Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
+
+\item \verb|txt.fraccion(num: int, den: int, conSigno=False,| \\
+      \verb|             signoNum=False, dfrac=True, coef=False)| \\
+\quad Simplifica e imprime utilizando \verb|dfrac|. De manera opcional se especifica si se obliga el signo \verb|+|; si el signo se imprime en el numerador o se imprime afuera; si se utiliza \verb|frac| en lugar de \verb|dfrac|, y si es un coeficiente, de manera que si da 1 o $-1$ no se imprima el valor.
+
+\item  \verb|txt.raiz(a: int, n: int = 2, conSigno = False)| \\
+\quad Simplifica y escribe la raíz respectiva. De manera opcional se puede especificar el \'indice \verb|n|, y si se imprime un \verb|+| al inicio.
+
+\item \verb|txt.texto(n: int)| \\
+\quad Para $n > 0$, devuelve el texto que representa al valor de $n$.
+\end{asparaitem}
+
+\subsection{Biblioteca \texttt{vector}}
+\begin{asparaitem}
+\item \verb|vector.ceros(n: int)| \\
+\quad Vector de ceros de tamaño \verb|n|. 
+
+\item \verb|vector.aleatorio(n: int, vmin: int, vmax: int,| \\
+      \verb|                   factor: float = 1)| \\
+  \quad Vector de números aleatorios. Genera inicialmente enteros en \verb|vmin..vmax|, y luego los multiplica por \verb|factor|.
+
+\item \verb|vector.latex(v: Vector, txtSep: str,| \\
+      \verb|               ndigits: int = -1, ceros: int = 3)| \\
+  \quad Imprime un vector. El encabezado en \LaTeX\ lo especifica el usuario. El texto separador da el formato entre elementos: por ejemplo \verb|', '| o \verb|' & '| (para vectores fila), o \verb|' \\\\ '| (para vector columna). De manera opcional se puede especificar el n\'umero de d\'igitos a imprimir. Si es $-1$, intenta imprimir la menor cantidad \verb|n|, tal que \verb|round(10**n * v[i], ceros)| sea un entero.
+\end{asparaitem}
+
+\subsection{Biblioteca \texttt{matriz}}
+
+\begin{asparaitem}
+\item \verb|matriz.aleatorio(nfilas: int, ncols: int, vmin: int,| \\
+      \verb|                 vmax: int, factor: float = 1)| \\
+  \quad Matriz de valores aleatorios. Ver \verb|vector.aleatorio|
+
+\item \verb|matriz.latex(mat: Matriz, cifras = -1, ceros = 3)| \\
+  \quad Imprime una matriz. El encabezado \LaTeX\  lo especifica el usuario.
+
+\item \verb|matriz.intercambiar(mat, fila1: int, fila2: int)| \\
+  \quad Matriz resultante al intercambiar dos filas de una matriz.
+
+\item \verb|matriz.permutar(A: Matriz, perm: List[int])| \\
+\quad Coloca las filas de A, según la permutación dada.
+
+\item \verb|matriz.dominante(n, vmin, vmax, factor = 1)| \\
+    \quad Matriz cuadrada diagonalmente dominante. El rango de valores es solamente para los elementos fuera de la diagonal.
+
+\item \verb|matriz.jacobi(A: Matriz, bb: v.Vector, x0: v.Vector,|\\
+      \verb|                npasos: int)| \\
+      \quad Vector que se obtiene al aplicar \verb|npasos| de Jacobi.
+
+\item \verb|matriz.gaussSeidel(A, bb, x0, npasos)|\\
+  \quad Vector que se obtiene al aplicar \verb|npasos| de Gauss-Seidel.
+
+\item \verb|matriz.sistema(A, bb)|\\
+  \quad Resuelve el sistema. Devuelve una lista de valores.
+\end{asparaitem}
+
+
+\subsection{Biblioteca \texttt{metodos}}
+
+
+\begin{asparaitem}
+\item \verb|cero(f, a, b)| \\
+  Determina un cero de la funci\'on $f$ en el intervalo $(a, b)$. Asume que $f(a)\cdot f(b) < 0$.
+
+\item \verb|cuadratica(a, b, c)|\\
+  \quad Determina, para un discriminante no-negativo, las soluciones reales.
+
+\item \verb|integral(f, a, b, eps = 1e-12, prof = math.inf)| \\
+  \quad M\'etodo adaptativo y recursivo que aproxima la integral de $f$ entre $a$ y $b$. \verb|eps| es el m\'aximo error relativo aceptado y \verb|prof| la m\'axima profundidad en la recursividad.
+
+\item \verb|newton(f, fp, x0, nmax = math.inf, eps = 1e-16)|\\
+  \quad M\'etodo de Newton, donde se da la funci\'on, la derivada, el valor inicial, y opcionalmente el m\'aximo n\'umero de iteraciones y tal que $|f(x)|<\varepsilon$, donde $x$ es la respuesta.
+
+\item \verb|fmin(f, a, b, tries = 3, eps = 1e-6, delta = 0.5)| \\
+  \quad M\'etodo que intenta encontrar el m\'inimo de f en el intervalo $[a, b]$. \verb|tries| se refiere al n\'umero de intentos \emph{sin} que haya mejorado la soluci\'on. En cada caso eval\'ua el doble de puntos que en el caso anterior. Utiliza el valor de \verb|delta| para construir una cuadr\'atica y determinar el v\'ertice: $\delta = \min(\delta, (x_{i+1}-x_i)/2)$. \verb|eps| se refiere a la diferencia en t\'erminos de \verb|delta|, tal que un nuevo v\'ertice se considere lo suficientemente cercano para detenerse. Devuelve $(x^*, f(x^*))$.
+
+\end{asparaitem}
 
 
 
