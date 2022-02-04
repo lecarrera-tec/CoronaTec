@@ -1,6 +1,6 @@
 import logging
 from typing import Any, List, Tuple
-from math import ceil, log10
+from math import ceil, log10, inf
 
 from diccionarios import DGlobal, DFunciones
 import TPreg
@@ -105,12 +105,13 @@ class Respuesta:
         pregunta.
         """
         logging.debug('Calificar: %s' % texto)
+        texto = texto.replace('^', '**')
         puntos: float = 0
-        if len(texto) == 0:
-            puntos = 0.0
-        elif self.tipoPreg & TPreg.TODOS:
+        if self.tipoPreg & TPreg.TODOS:
             logging.debug('  Tipo -> TODOS')
             puntos = 1.0 * self.puntaje
+        elif len(texto) == 0:
+            puntos = 0.0
         elif self.tipoPreg & TPreg.UNICA:
             puntos = __calificar_unica__(self.respuestas, texto,
                                          self.puntaje)
@@ -165,10 +166,13 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: int) -> float:
         expr = texto
     puntos: float = 0.0
     for resp, error, factor in respuestas:
-#        if isinstance(expr, str):
-#            puntos = 0.0
-#            break
-        if error == 0:
+        if isinstance(expr, str):
+            puntos = 0.0
+            break
+        elif error == inf:
+            puntos = puntaje
+            break
+        elif error == 0:
             logging.debug('@@@ %s (usuario) == %s (correcta)?'
                           % (str(expr), str(resp)))
             if expr == resp:

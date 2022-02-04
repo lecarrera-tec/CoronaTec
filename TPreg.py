@@ -14,6 +14,8 @@ TODOS: int = 16
 
 # Pregunta de respuesta corta
 RESP_CORTA: int = 64
+# Respuesta corta con función
+RC_FUNCION: int = 128
 
 # Tipo de encabezado
 ENCABEZADO: int = 512
