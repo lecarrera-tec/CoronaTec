@@ -2,9 +2,10 @@ import math
 from typing import List, Tuple
 
 from fmate import factores
+from fractions import Fraction
 
 
-def fraccion(num: int, den: int, conSigno: bool = False,
+def fraccion(num, den: int = 1, conSigno: bool = False,
         signoNum: bool = False, dfrac: bool = True, 
         coef: bool = False) -> str:
     """ Texto en LaTeX de una fracción.
@@ -23,7 +24,7 @@ def fraccion(num: int, den: int, conSigno: bool = False,
         externa.
     dfrac:
         Opcional. Utiliza dfrac de manera predeterminada para construir
-        una fracción. Si False utiliza \\frac.
+        una fracción. Si False utiliza \\tfrac.
     coef:
         Opcional. En caso de ser verdadero y la fracci\'on de 1 o -1.
         Si conSigno es verdadero, entonces imprime respectivamente + o -.
@@ -39,30 +40,21 @@ def fraccion(num: int, den: int, conSigno: bool = False,
     # Se determina el signo de la fracción.
     signo: int = 1
     assert(den != 0)
-    if num < 0:
-        signo *= -1
-        num = abs(num)
-    if den < 0:
-        signo *= -1
-        den = abs(den)
-
-    # Se determina el máximo común denominador, para simplificar.
-    factor: int = math.gcd(num, den)
-    num = num // factor
-    den = den // factor
-
+    ff = Fraction(num, den)
     # Si es positivo, se imprime o no el +
-    txt: str
-    if signo == 1:
+    txt: str = ''
+    if ff > 0:
         if conSigno:
             txt = '+'
         else:
             txt = ''
     # es negativo.
-    else:
+    elif ff < 0:
         txt = '-'
 
-    tipo = 'dfrac' if dfrac else 'frac'
+    tipo = 'dfrac' if dfrac else 'tfrac'
+    num = abs(ff.numerator)
+    den = ff.denominator
 
     # No es una fracción.
     if den == 1:
@@ -298,7 +290,7 @@ def texto(numero: int, mil: bool = False) -> str:
     return resp.strip()
 
 
-def minCifras(numero: float, ceros: int = 3) -> str:
+def minCifras(numero: float, ceros: int = 3, maxi: int = 20) -> str:
     """ Imprime con el mínimo número de cifras distintas de 0.
 
     El valor de ceros es el que decide cuando parar. Por ejemplo,
@@ -311,4 +303,25 @@ def minCifras(numero: float, ceros: int = 3) -> str:
     while isinstance(temp, float) and not round(temp, ceros).is_integer():
         temp *= 10
         n += 1
-    return ('%%.%df' % n) % numero
+    return ('%%.%df' % min(n, maxi)) % numero
+
+
+def sumar(numero: int, conSigno: bool = True, arg: str = '') -> str:
+    if numero == 0:
+        return ''
+    elif len(arg) == 0:
+        if conSigno:
+            return '%+d' % numero
+        else:
+            return '%d' % numero
+    elif numero == 1:
+        if conSigno:
+            return '+%s' % arg
+        else:
+            return arg
+    elif numero == -1:
+        return '-%s' % arg
+    elif conSigno:
+        return '%+d%s' % (numero, arg)
+    else:
+        return '%d%s' % (numero, arg)
