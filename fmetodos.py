@@ -36,6 +36,23 @@ def newton(f, fp, x0, nmax = math.inf, eps = 1e-16) -> float:
     return xn
 
 
+def derivada(f, x0, n=1, delta=1e-6):
+    assert(delta > 0)
+    delta = delta ** (1/n)
+    if n == 0:
+        return f(x0)
+    elif n == 1:
+        return (f(x0+delta) - f(x0-delta)) / (2 * delta)
+    elif n == 2:
+        return (f(x0+delta) - 2 * f(x0) + f(x0-delta)) / (delta * delta)
+    elif n == 3:
+        return (f(x0 + 2 * delta) - 2 * f(x0 + delta) + 2 * f(x0 - delta) - f(x0 - 2 * delta)) / (2 * delta**3)
+    elif n == 4:
+        return (f(x0 + 2 * delta) - 4 * f(x0 + delta) + 6 * f(x0) - 4 * f(x0 - delta) + f(x0 - 2 * delta)) / delta**4
+    else:
+        return math.nan
+
+
 def integral(f, a, b, eps = 1e-12, prof = math.inf):
     m = 0.5 * (b - a)
     k = 0.5 * (a + b)
@@ -75,11 +92,11 @@ def _integral_rec(f, a, b, eps, prof, ys, aprox):
 
 
 def cuadratica(a, b, c):
-    disc = b * b - 4 * a * c
+    disc = b**2 - 4 * a * c
     assert(disc >= 0)
-    b = -b
-    exp = math.copysign(b, disc)
-    return (exp / 2 * a, 2 * c / exp)
+    disc = math.sqrt(disc)
+    exp = -b + math.copysign(disc, -b)
+    return (exp / (2 * a), 2 * c / exp)
 
 
 def cero(f, a, b):
