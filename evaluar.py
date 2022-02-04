@@ -31,7 +31,7 @@ es para que genere un examen diferente con el mismo número de carnet.
 def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
     """ Imprime el reporte que se comparte a los estudiantes.
     """
-    infoBook = xlsxwriter.Workbook('%s/%s_reporte.xlsx' % (carpeta, filename))
+    infoBook = xlsxwriter.Workbook(os.path.join(carpeta, '%s_reporte.xlsx' % filename))
     infoSheet = infoBook.add_worksheet()
     bold = infoBook.add_format({'bold': 1})
     infoSheet.set_column('A:Z', 10)
@@ -167,10 +167,11 @@ try:
 except AttributeError:
     print('ERROR\n-----')
     print('Debe quitar el comentario en el archivo Info.py a alguna de las')
-    print('dos definiciones de CSV_IKEY. El valor de -1 es cuando se utiliza')
+    print('tres definiciones de CSV_IKEY. El valor de -1 es cuando se utiliza')
     print('el número de carnet al final del formulario como identificador;')
+    print('el valor de 3 es cuando se utiliza el correo de estudiantec como identificador;')
     print('el valor de 4 es cuando se utiliza el nombre como identificador')
-    print('cuando se utiliza una cuenta de Microsoft (estudiantec.cr)')
+    print('los dos últimos requieren una cuenta de Microsoft (estudiantec.cr)')
     sys.exit()
 
 
@@ -272,8 +273,8 @@ for fila in lineas:
 
     # Se utiliza el # de carnet como llave.
     llave: str
-    if Info.CSV_IKEY == -1:
-        llave = cols[Info.CSV_IKEY]
+    if Info.CSV_IKEY == Info.CSV_FINAL:
+        llave = cols[Info.CSV_FINAL]
         if llave in todxs:
             usuario = todxs[llave][1]
             print('%s tiene dos respuestas.' % llave)
@@ -281,7 +282,12 @@ for fila in lineas:
                   % (usuario, cols[Info.CSV_INAME]))
         todxs[cols[Info.CSV_IKEY]] = (cols[Info.CSV_ICOL:-1],
                                       cols[Info.CSV_INAME])
-    else:
+    # El correo es el identificador
+    elif Info.CSV_IKEY == Info.CSV_EMAIL:
+        llave = cols[Info.CSV_EMAIL].split('@')[0].lower()
+        todxs[llave] = (cols[Info.CSV_ICOL:], cols[Info.CSV_INAME])
+    # El nombre es el identificador
+    elif Info.CSV_IKEY == Info.CSV_INAME:
         llave = __nombre_es_llave__(cols[Info.CSV_INAME])
         if llave in todxs:
             print('\nAdvertencia\n-----------')
@@ -290,6 +296,9 @@ for fila in lineas:
             usuario = todxs[llave][1]
             print('"%s" vs "%s"\n' % (usuario, cols[Info.CSV_EMAIL]))
         todxs[llave] = (cols[Info.CSV_ICOL:], cols[Info.CSV_EMAIL])
+    else:
+        logging.critical('Identificador INFO.CSV_IKEY desconocido.\n')
+        sys.exit()
 
 # ----------------------------------------------------------------------
 # E. Se genera la lista con las listas de los grupos dados.
@@ -309,8 +318,7 @@ else:
             sys.argv[2],
             'con las listas de estudiantes.'))
         sys.exit()
-    if not path.endswith('/'):
-        path = '%s/' % path
+    path = os.path.join(path, '')
     for me in listdir:
         if me.endswith('.csv'):
             lestudiantes.append('%s%s' % (path, me))
@@ -334,14 +342,14 @@ for path in lestudiantes:
     logging.debug('PATH = %s\n' % path)
     # Carpeta donde se van a guardar las notas y el reporte
     # (es la misma carpeta donde se generaron los exámenes en pdf)
-    lista = path.rsplit(sep='/', maxsplit=1)
+    lista = os.path.split(path)
     filename = lista[1].rsplit(sep='.', maxsplit=1)[0]
-    carpeta = '%s/%s' % (lista[0], filename.upper())
+    carpeta = os.path.join(lista[0], filename.upper())
     if not os.path.exists(carpeta):
         os.mkdir(carpeta)
 
     # @ Para construir el archivo de notas.
-    notasBook = xlsxwriter.Workbook('%s/%s_notas.xlsx' % (carpeta, filename))
+    notasBook = xlsxwriter.Workbook(os.path.join(carpeta, '%s_notas.xlsx' % filename))
     notasSheet = notasBook.add_worksheet()
     bold = notasBook.add_format({'bold': 1})
     tabla.encabezadoNotas(notasSheet, sum(numPreguntas))
@@ -364,12 +372,14 @@ for path in lestudiantes:
         logging.debug('Nueva respuesta: %s' % linea.strip())
         respuestas: List[Respuesta] = []
         # Separamos el número de identificación del resto del nombre.
-        # ##-id-##, <apellidos/nombres>, xxxxx
+        # ##-id-##, <apellidos-nombres>, [<correo>@estudiantec.cr]
         separar = linea.split(',')
         idstr = separar[0].strip()
-        if Info.CSV_IKEY == -1:
+        if Info.CSV_IKEY == Info.CSV_FINAL:
             llave = idstr
-        else:
+        elif Info.CSV_IKEY == Info.CSV_EMAIL:
+            llave = separar[2].split('@')[0].lower()
+        elif Info.CSV_IKEY == Info.CSV_INAME:
             llave = __nombre_es_llave__(separar[1])
         nombre = ' '.join([palabra.capitalize()
                            for palabra in separar[1].strip().split()])

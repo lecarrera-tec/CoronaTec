@@ -79,8 +79,7 @@ else:
             sys.argv[2],
             'con las listas de estudiantes.'))
         sys.exit()
-    if not path.endswith('/'):
-        path = '%s/' % path
+    path = os.path.join(path, '')
     for me in listdir:
         if me.endswith('.csv'):
             lestudiantes.append('%s%s' % (path, me))
@@ -98,9 +97,10 @@ separar: List[str]   # Separar info del estudiante.
 for path in lestudiantes:
     logging.debug('Nueva lista: %s' % path)
     # Carpeta donde se van a guardar los pdf's de los exámenes.
-    lista = path.rsplit(sep='/', maxsplit=1)
+    lista = os.path.split(path)
     filename = lista[1].rsplit(sep='.', maxsplit=1)[0]
-    carpeta = '%s/%s' % (lista[0], filename.upper())
+    nombre = os.path.basename(sys.argv[1][:-4]).upper()
+    carpeta = os.path.join(lista[0], '%s-%s' % (nombre, filename.upper()))
     if not os.path.exists(carpeta):
         os.mkdir(carpeta)
 
@@ -152,7 +152,7 @@ for path in lestudiantes:
 
         # Se cambia de directorio.
         try:
-            os.chdir('%s/' % carpeta)
+            os.chdir(os.path.join(carpeta, ''))
         except FileNotFoundError:
             logging.critical('No se pudo cambiar a directorio.')
             sys.exit()

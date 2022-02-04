@@ -678,12 +678,14 @@ def __path_graphics__(filename: str, texto: str) -> str:
         Texto de la pregunta que se va a sustituir.
     """
     # Comenzamos extrayendo el path hasta el folder del archivo.
-    idx: int = filename.rfind('/')
-    if idx > 0:
-        path: str = filename[:idx]
+    path: str = os.path.dirname(filename)
+    if len(path) > 0:
+        path = os.path.join(path, '')
         # Ponemos el path en terminos absolutos.
         cwd = os.getcwd()
         os.chdir(path)
+        # Aqu\'i vamos a permitir linux, porque es para generar
+        # el archivo .tex.
         path = os.getcwd().replace('\\', '/')
         os.chdir(cwd)
 

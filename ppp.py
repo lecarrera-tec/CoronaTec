@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 from typing import List
 
@@ -51,10 +52,10 @@ class PPP:
         # actual, entonces vamos a guardar la dirección al archivo,
         # porque la referencia a los archivos de las preguntas es
         # relativa al directorio del archivo principal.
-        self.dirTrabajo: str = './'
-        idx = filename.rfind('/')
-        if idx > 0:
-            self.dirTrabajo = filename[0:idx+1]
+        self.dirTrabajo: str = os.path.join(os.curdir, '')
+        idx = os.path.dirname(filename)
+        if len(idx) > 0:
+            self.dirTrabajo = os.path.join(idx, '')
 
         # Vamos a leer el archivo linea x linea. Por lo general se van
         # a ignorar lineas en blanco y lineas que comiencen con el

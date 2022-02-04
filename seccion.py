@@ -212,8 +212,7 @@ def __muestra__(preg: Pregunta) -> List[str]:
         assert(muestra <= 1)
         return [path]
     # Debe ser una carpeta.
-    if not path.endswith('/'):
-        path = '%s/' % path
+    path = os.path.join(path, '')
     # Generando la lista de archivos de tipo pregunta. Se asume que
     # la dirección es una carpeta.
     lista: List[str] = sorted(['%s%s' % (path, yo) for yo in os.listdir(path)

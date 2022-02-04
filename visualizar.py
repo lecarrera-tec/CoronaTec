@@ -32,9 +32,9 @@ if len(sys.argv) < 3 or len(sys.argv) > 4:
     sys.exit()
 
 # Carpeta donde se va a guardar el pdf
-lista: List[str] = sys.argv[1].rsplit(sep='/', maxsplit=1)
+lista: List[str] = os.path.split(sys.argv[1])
 origen: str = lista[1]
-output: str = '%s-vp' % origen.rsplit(sep='.', maxsplit=1)[0]
+output: str = '%s-vp' % os.path.splitext(origen)[0]
 carpeta: str = lista[0]
 
 # Se comienza por el encabezado.
