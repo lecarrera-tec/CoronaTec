@@ -2,6 +2,7 @@
 import logging
 from typing import Any, List, Dict
 import sys
+from fractions import Fraction
 
 from diccionarios import DGlobal
 import ftexto as txt
@@ -103,9 +104,11 @@ def evaluarParam(linea: str, dLocal: Dict[str, Any],
 def update(linea: str, dLocal: Dict[str, Any], cifras: int = 3) -> str:
     """Actualiza cualquier @-expresión que haya que evaluar en el texto.
 
-    Las @-expresiones pueden ser de 3 tipos:
+    Las @-expresiones pueden ser de 5 tipos:
     * Texto (string): simplemente se imprime igual.
     * Entero (int): se imprime el texto del entero.
+    * Fracción (Fraction): se imprime la fracci\'on.
+    * Conjuntos: Se escribe entre llaves y se traduce cada expresi\'on.
     * Flotante (float): Aquí es donde hay que tomar decisiones. El
     número de cifras significativas se da por la variable ``cifras``.
     Argumentos
@@ -169,8 +172,10 @@ def __convertir_a_texto__(expr: Any, cifras: int) -> str:
     resp: str
     if isinstance(expr, float):
         resp = txt.decimal(expr, cifras)
+    elif isinstance(expr, Fraction):
+        resp = txt.fraccion(expr.numerator, expr.denominator)
     elif isinstance(expr, set):
-        resp = '\\{%s\\}' % str(expr)[1:-1].replace('\'', '')
+        resp = '\\left\\{%s\\right\\}' % str(expr)[1:-1].replace('\'', '')
     else:
         resp = str(expr)
     return resp
