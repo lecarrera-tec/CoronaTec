@@ -8,10 +8,12 @@ para aclarar que es la parte izquierda (Left) del texto.
 CSV_SEP: str = ';'
 CSV_ICOL: int = 5
 CSV_IROW: int = 1
-# CSV_IKEY: int = -1
-CSV_IKEY: int = 4
 CSV_INAME: int = 4
 CSV_EMAIL: int = 3
+CSV_FINAL: int = -1
+# CSV_IKEY: int = CSV_FINAL    # Utiliza el # de carnet, que debe venir como última pregunta.
+CSV_IKEY: int = CSV_EMAIL      # Utiliza el correo. Sirve perfecto, si *todxs* son @estudiantec.cr
+# CSV_IKEY: int = CSV_INAME    # Utiliza el nombre. Puede fallar.
 
 COMMENT: Tuple[str, str] = ('#', '%')
 
