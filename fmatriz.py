@@ -1,16 +1,30 @@
 import random
 from typing import List
 
-from ftexto import minCifras
+import ftexto as txt
 import fvector as v
+from fractions import Fraction
 
 
 # Definición del tipo matriz.
-Matriz = List[List[float]]
+Matriz = List[List[Fraction]]
 
+
+def ceros(nfilas: int, ncols: int) -> Matriz:
+    """ Genera una matriz de ceros """
+    return nfilas * [ ncols * [Fraction(0, 1)] ]
+
+def eye(nfilas: int, ncols: int) -> Matriz:
+    """ Genera una matriz identidad """
+    A = ceros(nfilas, ncols)
+    for i in range(min(nfilas, ncols)):
+        irow = ncols * [Fraction(0,1)]
+        irow[i] = Fraction(1,1)
+        A[i] = irow
+    return A
 
 def aleatorio(nfilas: int, ncols: int, vmin: int, vmax: int,
-              factor: float = 1) -> Matriz:
+              factor: Fraction = Fraction(1, 1)) -> Matriz:
     """ Genera una matriz de números aleatorios.
 
     Argumentos
@@ -25,10 +39,10 @@ def aleatorio(nfilas: int, ncols: int, vmin: int, vmax: int,
         Máximo valor entero a generar.
     factor:
         Opcional. Constante por la cual se multiplica la matriz.
-        El valor predeterminado es 1.0
+        El valor predeterminado es 1
     """
     mat: Matriz = []
-    mat = [[factor * random.randint(vmin, vmax) for j in range(ncols)]
+    mat = [[factor * Fraction(random.randint(vmin, vmax),1) for j in range(ncols)]
            for i in range(nfilas)]
     return mat
 
@@ -40,15 +54,41 @@ def copia(A: Matriz) -> Matriz:
         B.append(fila.copy())
     return B
 
+def vector(A: Matriz, v: v.Vector) -> v.Vector:
+    """ Hace el producto Av. """
+    nrows = len(A)
+    ncols = len(v)
+    return [sum([A[i][j] * v[j] for j in range(ncols)]) for i in range(nrows)]
 
-def cambiar(A: Matriz, irow: int, icol: int, valor: float) -> Matriz:
+
+def update(A: Matriz, irow: int, icol: int, valor) -> Matriz:
     """ Se actualiza el valor de la matriz. """
     B = copia(A)
     B[irow][icol] = valor
     return B
 
+def det(B: Matriz):
+    """ Calcula el determinante de una matriz """
+    det = Fraction(1, 1)
+    A = copia(B)
+    n = len(A)
+    for i in range(n-1):
+        _, ipiv = max([(abs(A[i+k][i]), i+k) for k in range(n - i)])
+        if i != ipiv:
+            A = intercambiar(A, i, ipiv)
+            det *= -1
+        for k in range(i + 1, n):
+            if A[k][i] != 0:
+                qq = Fraction(A[k][i], A[i][i])
+                A[k][i] = 0
+                for j in range(i + 1, n):
+                    A[k][j] -= qq * A[i][j]
+    for i in range(n):
+        det *= A[i][i]
+    return det
 
-def dominante(n: int, vmin: int, vmax: int, factor: float = 1) -> Matriz:
+
+def dominante(n: int, vmin: int, vmax: int, factor: Fraction = Fraction(1,1)) -> Matriz:
     """ Construye una matriz cuadrada diagonalmente dominante.
 
     Argumentos
@@ -61,7 +101,7 @@ def dominante(n: int, vmin: int, vmax: int, factor: float = 1) -> Matriz:
         Máximo valor entero a generar.
     factor:
         Opcional. Constante por la cual se multiplica el vector.
-        El valor predeterminado es 1.0
+        El valor predeterminado es 1
     """
     mat: Matriz = []
     fila: List[int]
@@ -84,7 +124,7 @@ def dominante(n: int, vmin: int, vmax: int, factor: float = 1) -> Matriz:
     return mat
 
 
-def latex(mat: Matriz, cifras: int = -1, ceros: int = 3) -> str:
+def latex(mat: Matriz, decimal = False, dfrac = False, espacio = '[1ex]', cifras: int = -20, ceros: int = 3) -> str:
     """ Imprime una matriz.
 
     Observe que solamente imprime el relleno. Es decir, se debe utilizar
@@ -94,6 +134,10 @@ def latex(mat: Matriz, cifras: int = -1, ceros: int = 3) -> str:
     ----------
     mat:
         Matriz a imprimir.
+    decimal:
+        Muestra los valores utilizando punto decimal. Sino, utiliza fracciones. 
+    dfrac:
+        Utiliza dfrac para mostrar las fracciones. Sino, utiliza tfrac.
     cifras:
         Opcional. Número de cifras a imprimir. El valor predeterminado
         es -1, que trata de ajustar al mínimo posible utilizando el
@@ -104,12 +148,19 @@ def latex(mat: Matriz, cifras: int = -1, ceros: int = 3) -> str:
         descartados.
     """
     matTexto: List[List[str]]
-    if cifras == -1:
-        matTexto = [[minCifras(elem, ceros) for elem in fila] for fila in mat]
+    if decimal:
+        if cifras < 0:
+            matTexto = [[txt.minCifras(elem, ceros, maxi = -cifras) for elem in fila] for fila in mat]
+        else:
+            formato: str = '%%.%df' % cifras
+            matTexto = [[formato % elem for elem in fila] for fila in mat]
     else:
-        formato: str = '%%.%df' % cifras
-        matTexto = [[formato % elem for elem in fila] for fila in mat]
-    texto = '  %s' % ' \\\\\n  '.join([' & '.join(fila) for fila in matTexto])
+        if dfrac:
+            matTexto = [[elem if isinstance(elem, str) else txt.fraccion(elem.numerator, elem.denominator, dfrac = True) for elem in fila] for fila in mat]
+        else:
+            matTexto = [[elem if isinstance(elem, str) else txt.fraccion(elem.numerator, elem.denominator, dfrac = False) for elem in fila] for fila in mat]
+    espacio = ' \\\\%s\n' % espacio
+    texto = '  %s' % espacio.join([' & '.join(fila) for fila in matTexto])
     return texto
 
 
@@ -178,13 +229,33 @@ def permutar(A: Matriz, perm: List[int]) -> Matriz:
     B = [A[j] for j in perm]
     return B
 
+def pivote(L: Matriz, U: Matriz, P: Matriz, ifila: int) -> (Matriz, Matriz, Matriz):
+    """ De ser necesario, intercambia las filas de la matriz. """
+    U = copia(U);
+    L = copia(L);
+    P = copia(P);
+    n = len(U)
+    _, ipiv = max([(abs(U[ifila+k][ifila]), ifila+k) for k in range(n - ifila)])
+    if ifila != ipiv:
+        L = intercambiar(L, ifila, ipiv)
+        U = intercambiar(U, ifila, ipiv)
+        P = intercambiar(P, ifila, ipiv)
+    L[ifila][ifila] = Fraction(1,1)
+    for i in range(ifila + 1, n):
+        if U[i][ifila] != 0:
+            L[i][ifila] = U[i][ifila] / U[ifila][ifila]
+            U[i][ifila] = 0
+            for iCol in range(ifila + 1, n):
+                U[i][iCol] -= L[i][ifila] * U[ifila][iCol]
+    return (L, U, P)
+
 
 def sistema(A: Matriz, b: v.Vector) -> v.Vector:
     """ Resuelve Ax = b """
     A = copia(A)
     b = b.copy()
     n = len(A)
-    xs: List[float] = n * [0.0]
+    xs: List[Fraction] = n * [Fraction(0,1)]
     assert(n > 0)
     assert(n == len(A[0]))
     for i in range(n - 1):
@@ -193,7 +264,7 @@ def sistema(A: Matriz, b: v.Vector) -> v.Vector:
             A = intercambiar(A, i, ipiv)
             b[i], b[ipiv] = b[ipiv], b[i]
         for iFila in range(i + 1, n):
-            if A[iFila][i] != 0.0:
+            if A[iFila][i] != 0:
                 k = A[iFila][i] / A[i][i]
                 A[iFila][i] = 0
                 for iCol in range(i + 1, n):
@@ -202,3 +273,10 @@ def sistema(A: Matriz, b: v.Vector) -> v.Vector:
     for i in range(n-1,-1,-1):
         xs[i] = (b[i] - sum([A[i][j] * xs[j] for j in range(i+1, n)])) / A[i][i]
     return xs
+
+def trans(A):
+    """ Calcula la matriz transpuesta """
+    nrows = len(A)
+    ncols = len(A[0])
+    B = [[A[j][i] for j in range(ncols)] for i in range(nrows)]
+    return B
