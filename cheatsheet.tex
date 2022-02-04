@@ -58,7 +58,7 @@
 \setlength{\columnsep}{2pt}
 
 \begin{center}
-     \Large{Funciones de CoronaTec} \\
+     \Huge{CoronaTec} \\
 \end{center}
 
 \section{Preguntas}
@@ -75,7 +75,7 @@ _texto de la pregunta_ @exp
 \end{verbatim}
 
 \subsection{Selección única}
-  Tambi\'en acepta \verb|cifras = _int_|. \vspace*{-1.5ex}
+  Tambi\'en acepta \verb|cifras = _int_|. Los \'indices para \verb|opcion| son 0-indexados.\vspace*{-1.5ex}
 \begin{verbatim}
 <tipo = seleccion unica[, opcion = (i[ & i]* | todos)]>
 
@@ -103,6 +103,8 @@ _texto de la pregunta_ @exp
 _respuesta_
 \end{verbatim}
 
+Puede utilizar \verb|error = math.inf| en caso de que deba aceptar todas las respuestas como correctas.
+
   \section{@-expresi\'on}
 
 \begin{asparaitem}
@@ -120,7 +122,17 @@ _respuesta_
 \end{asparaitem}
 
 \subsection{Expresiones lambda}
-\verb|f = lambda x,y,z,... : f(x,y,z,..)|
+\begin{verbatim}
+f = lambda x,y,z : <expresion que depende de x,y,z>
+r = f(x,y,z)
+\end{verbatim}
+Una forma de agregar funciones espec\'ificas. El problema es que debido a que Python utiliza evaluaci\'on perezosa (\emph{lazy evaluation}), no se pueden utilizar variables definidas previamente en la expresi\'on derecha de la definici\'on de $f$. En caso de que se deban utilizar variables \verb|m, n| definidas previamente, lo que se sugiere es que se agreguen como variables en la definici\'on de la funci\'on:
+\begin{verbatim}
+m = ...
+n = ...
+f = lambda u,v,x,y,z : <expresion de u,v,x,y,z>
+r = f(m,n,x,y,z)
+\end{verbatim}
 
 \subsection{Funciones aleatorias}
 Solamente se utilizan a la hora de definir variables.
@@ -243,8 +255,8 @@ s2 = {3, 5, 7, 11}
     \item \verb|math.erf(x)|; \verb|math.erfc(x)|; \verb|math.gamma(x)| \\
 \quad Funciones de error y función gamma.
 
-  \item \verb|math.gcd(a,b)| \\
- \quad Máximo común divisor de $a$ y $b$.
+  \item \verb|math.gcd(a_1,a_2,...,a_n)| \\
+    \quad Máximo común divisor del conjunto $\{a_1,a_2,\dots,a_n\}$.
 
     \item \verb|math.fmod(x, y)|; \verb|math.modf(x) -> (float, float)| \\
 \quad Función residuo para variables de tipo flotante; parte decimal y parte entera de $x$.
@@ -264,21 +276,33 @@ s2 = {3, 5, 7, 11}
 \quad Producto de los elementos de \verb|ls|.
 \end{asparaitem}
 
+\subsection{Biblioteca \texttt{Fraction}}
+Permite representar n\'umeros como fracciones:
 
-\newpage
+\verb|f = Fraction(a, b)|
+
+y realizar operaciones aritm\'eticas con ellos, las cuales se simplifican de manera autom\'atica. Se puede extraer luego su numerator y denominador mediante \verb|f.numerator| y \verb|f.denominator|. Aunque es un poco engorroso, para imprimir se utiliza \verb|fraccion(f.numerator, f.denominator)|.
+
 \section{Funciones CoronaTec}
 Funciones creadas en el proyecto. Se pueden ir agregando seg\'un se requiera.
 
 \subsection{Biblioteca \texttt{mate}}
 \begin{asparaitem}
-  \item \verb|mate.factores(a)| \\
-\quad Factorización de $a$. Por ejemplo \verb|mate.factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
-
 \item \verb|mate.descomponer(f)| \\
   \quad Dado un n\'umero flotante $f$, lo descompone en su mantisa y su exponente. Devuelve un par ordenado, donde el primer valor es un flotante en el intervalo $[1, 10)$, y el segundo es un entero.
 
-\item \verb|descUnid(f)| \\
+\item \verb|mate.descUnid(f)| \\
   \quad Dado un n\'umero flotante $f$, lo descompone en un valor y unidades. Devuelve un par ordenado, donde el primer valor es un flotante en el intervalo $[1, 1000)$, y el segundo es una cadena de texto a utilizar.
+
+\item \verb|mate.digSignif(x, d)| \\
+  \quad Redondeo de un n\'umero de punto flotante $x$, seg\'un la cantidad de d\'igitos significativos $d$.
+
+\item \verb|mate.divisores(n)| \\
+  \quad Devuelve una lista de los divisores positivos del n\'umero entero $n$.
+
+  \item \verb|mate.factores(a)| \\
+\quad Factorización de $a$. Por ejemplo \verb|mate.factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
+
 \end{asparaitem}
 
 \subsection{Biblioteca \texttt{txt}}
@@ -298,10 +322,13 @@ Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \
 
 \item \verb|txt.fraccion(num: int, den: int, conSigno=False,| \\
       \verb|             signoNum=False, dfrac=True, coef=False)| \\
-\quad Simplifica e imprime utilizando \verb|dfrac|. De manera opcional se especifica si se obliga el signo \verb|+|; si el signo se imprime en el numerador o se imprime afuera; si se utiliza \verb|frac| en lugar de \verb|dfrac|, y si es un coeficiente, de manera que si da 1 o $-1$ no se imprima el valor.
+\quad Simplifica e imprime utilizando \verb|dfrac|. De manera opcional se especifica si se obliga el signo \verb|+|; si el signo se imprime en el numerador o se imprime afuera; si se utiliza \verb|tfrac| en lugar de \verb|dfrac|, y si es un coeficiente, de manera que si da 1 o $-1$ no se imprima el valor.
 
 \item  \verb|txt.raiz(a: int, n: int = 2, conSigno = False)| \\
 \quad Simplifica y escribe la raíz respectiva. De manera opcional se puede especificar el \'indice \verb|n|, y si se imprime un \verb|+| al inicio.
+
+\item \verb|txt.sumar(a: int, conSigno = True, arg = '')| \\
+\quad Si $a=0$, no escribe nada. Si \verb|arg| es vac\'io, escribe el n\'umero. En caso contrario, escribe el coeficiente junto con el argumento.
 
 \item \verb|txt.texto(n: int)| \\
 \quad Para $n > 0$, devuelve el texto que representa al valor de $n$.
@@ -313,42 +340,71 @@ Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \
 \quad Vector de ceros de tamaño \verb|n|. 
 
 \item \verb|vector.aleatorio(n: int, vmin: int, vmax: int,| \\
-      \verb|                   factor: float = 1)| \\
-  \quad Vector de números aleatorios. Genera inicialmente enteros en \verb|vmin..vmax|, y luego los multiplica por \verb|factor|.
+  \verb|                   factor: Fraction = Fraction(1,1))| \\
+  \quad Vector de números aleatorios. Genera inicialmente enteros en \verb|vmin..vmax|, y luego los multiplica por \verb|factor|, que puede ser un n\'umero de punto flotante, o un n\'umero como fracci\'on.
 
 \item \verb|vector.latex(v: Vector, txtSep: str,| \\
-      \verb|               ndigits: int = -1, ceros: int = 3)| \\
-  \quad Imprime un vector. El encabezado en \LaTeX\ lo especifica el usuario. El texto separador da el formato entre elementos: por ejemplo \verb|', '| o \verb|' & '| (para vectores fila), o \verb|' \\\\ '| (para vector columna). De manera opcional se puede especificar el n\'umero de d\'igitos a imprimir. Si es $-1$, intenta imprimir la menor cantidad \verb|n|, tal que \verb|round(10**n * v[i], ceros)| sea un entero.
+      \verb|               ndigits: int = -2, ceros: int = 3)| \\
+  \quad Imprime un vector. El encabezado en \LaTeX\ lo especifica el usuario. El texto separador da el formato entre elementos: por ejemplo \verb|', '| o \verb|' & '| (para vectores fila), o \verb|' \\\\ '| (para vector columna). De manera opcional se puede especificar el n\'umero de d\'igitos a imprimir. Si es $-1$, intenta imprimir la menor cantidad \verb|n|, tal que \verb|round(10**n * v[i], ceros)| sea un entero. Observe que $-2$ es el valor predeterminado, lo que asume que lo que va a imprimir son fracciones.
+
+\item \verb|vector.kprod(k: float, v: Vector)| \\
+\quad $k\cdot v$
+
+\item \verb|vector.pprod(u: Vector, v: Vector)| \\
+\quad $u\cdot v$ Producto punto.
+
+\item \verb|vector.suma(v1: Vector, v2: Vector)| \\
+\quad $v_1 + v_2$
 \end{asparaitem}
 
 \subsection{Biblioteca \texttt{matriz}}
 
 \begin{asparaitem}
 \item \verb|matriz.aleatorio(nfilas: int, ncols: int, vmin: int,| \\
-      \verb|                 vmax: int, factor: float = 1)| \\
+  \verb|          vmax: int, factor: Fraction = Fraction(1,1))| \\
   \quad Matriz de valores aleatorios. Ver \verb|vector.aleatorio|
 
-\item \verb|matriz.latex(mat: Matriz, cifras = -1, ceros = 3)| \\
-  \quad Imprime una matriz. El encabezado \LaTeX\  lo especifica el usuario.
+\item \verb|matriz.copia(A)| \\
+  \quad Una copia de la matriz $A$. No deber\'ia ser necesario utilizar esta funci\'on.
+
+\item \verb|matriz.det(A)| \\
+  \quad Determinante de la matriz $A$. Construye una matriz triangular superior utilizando pivoteo, y multiplica los valores de la diagonal para tener el valor del determinante.
+
+\item \verb|matriz.update(A, irow, icol, valor)| \\
+  \quad Cambia el valor de una entrada de la matriz.
+
+\item \verb|matriz.dominante(n, vmin, vmax,| \\
+  \verb|                             factor = Fraction(1,1))| \\
+    \quad Matriz cuadrada diagonalmente dominante. El rango de valores es solamente para los elementos fuera de la diagonal.
+
+\item \verb|matriz.gaussSeidel(A: Matriz, bb: Vector,|
+  \verb|                            x0: Vector, npasos: int)|\\
+  \quad Vector que se obtiene al aplicar \verb|npasos| de Gauss-Seidel.
 
 \item \verb|matriz.intercambiar(mat, fila1: int, fila2: int)| \\
   \quad Matriz resultante al intercambiar dos filas de una matriz.
 
+\item \verb|matriz.jacobi(A: Matriz, bb: v.Vector, |\\
+      \verb|                      x0: v.Vector, npasos: int)| \\
+      \quad Vector que se obtiene al aplicar \verb|npasos| de Jacobi.
+
+\item \verb|matriz.latex(mat: Matriz, decimal = False,|
+  \verb|                   dfrac = False, espacio = '[1ex]',|
+  \verb|                            cifras = -20, ceros = 3)| \\
+  \quad Imprime una matriz. El encabezado \LaTeX\  lo especifica el usuario. \verb|decimal| es si imprime punto decimal, y si no, lo imprime con \verb|tfrac|. \verb|dfrac| especifica si se utiliza \verb|\dfrac| en lugar de \verb|\tfrac|. \verb|espacio| es el texto que pone al final de l\'inea. Tiene como predeterminado \verb|'[1ex]'|. Puede seleccionar tambi\'en un string vac\'io: \verb|' '|. \verb|cifras| se refiere al n\'umero de cifras significativas. Solo si \verb|cifras == -1| se utiliza el menor valor posible, y solo entonces se lee la variable \verb|ceros|, que quiere decir cu\'antos ceros consecutivos se leen para descartar el resto. Es decir, con \verb|ceros=3|, el valor 2.30005 se lee como 2.3.
+
 \item \verb|matriz.permutar(A: Matriz, perm: List[int])| \\
 \quad Coloca las filas de A, según la permutación dada.
 
-\item \verb|matriz.dominante(n, vmin, vmax, factor = 1)| \\
-    \quad Matriz cuadrada diagonalmente dominante. El rango de valores es solamente para los elementos fuera de la diagonal.
-
-\item \verb|matriz.jacobi(A: Matriz, bb: v.Vector, x0: v.Vector,|\\
-      \verb|                npasos: int)| \\
-      \quad Vector que se obtiene al aplicar \verb|npasos| de Jacobi.
-
-\item \verb|matriz.gaussSeidel(A, bb, x0, npasos)|\\
-  \quad Vector que se obtiene al aplicar \verb|npasos| de Gauss-Seidel.
+\item \verb|matriz.pivote(L: Matriz, U:Matriz, P:Matriz,|
+  \verb|             ifila: int) -> (Matriz, Matriz, Matriz)| \\
+  \quad Un paso de factorizaci\'on LU con pivoteo.
 
 \item \verb|matriz.sistema(A, bb)|\\
   \quad Resuelve el sistema. Devuelve una lista de valores.
+
+\item \verb|matriz.vector(A: Matriz, v: Vector)| \\
+  \quad Realiza el producto $Av$.
 \end{asparaitem}
 
 
@@ -356,23 +412,40 @@ Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \
 
 
 \begin{asparaitem}
-\item \verb|cero(f, a, b)| \\
+\item \verb|metodos.cero(f, a, b)| \\
   Determina un cero de la funci\'on $f$ en el intervalo $(a, b)$. Asume que $f(a)\cdot f(b) < 0$.
 
-\item \verb|cuadratica(a, b, c)|\\
+\item \verb|metodos.cuadratica(a, b, c)|\\
   \quad Determina, para un discriminante no-negativo, las soluciones reales.
 
-\item \verb|integral(f, a, b, eps = 1e-12, prof = math.inf)| \\
+\item \verb|metodos.derivada(f, x0, n=1, delta=1e-6)| \\
+  \quad Aproximaci\'on a la $n$-\'esima derivada de la funci\'on $f$ en el punto $x_0$.
+
+\item \verb|metodos.integral(f, a, b, eps = 1e-12,|\\
+  \verb|                                    prof = math.inf)| \\
   \quad M\'etodo adaptativo y recursivo que aproxima la integral de $f$ entre $a$ y $b$. \verb|eps| es el m\'aximo error relativo aceptado y \verb|prof| la m\'axima profundidad en la recursividad.
 
-\item \verb|newton(f, fp, x0, nmax = math.inf, eps = 1e-16)|\\
+\item \verb|metodos.newton(f, fp, x0, nmax = math.inf,|\\
+  \verb|                                        eps = 1e-16)|\\
   \quad M\'etodo de Newton, donde se da la funci\'on, la derivada, el valor inicial, y opcionalmente el m\'aximo n\'umero de iteraciones y tal que $|f(x)|<\varepsilon$, donde $x$ es la respuesta.
 
-\item \verb|fmin(f, a, b, tries = 3, eps = 1e-6, delta = 0.5)| \\
+\item \verb|metodos.fmin(f, a, b, tries = 3, eps = 1e-6,|\\
+  \verb|                                        delta = 0.5)| \\
   \quad M\'etodo que intenta encontrar el m\'inimo de f en el intervalo $[a, b]$. \verb|tries| se refiere al n\'umero de intentos \emph{sin} que haya mejorado la soluci\'on. En cada caso eval\'ua el doble de puntos que en el caso anterior. Utiliza el valor de \verb|delta| para construir una cuadr\'atica y determinar el v\'ertice: $\delta = \min(\delta, (x_{i+1}-x_i)/2)$. \verb|eps| se refiere a la diferencia en t\'erminos de \verb|delta|, tal que un nuevo v\'ertice se considere lo suficientemente cercano para detenerse. Devuelve $(x^*, f(x^*))$.
-
 \end{asparaitem}
 
+
+\subsection{Biblioteca \texttt{util}}
+
+\begin{asparaitem}
+\item \verb|util.lista(f, inicio, fin, args)| \\
+  Debido a las caracter\'isticas de \emph{lazy evaluation}, no es posible, por ejemplo, definir variables $a,b,c,k$, y luego construir la lista:
+  \verb|ls = [(a * i**2 + b * i + c)  for i in range(ini, fin)]| El problema son los valores de $a$, $b$ y $c$ que se utilizan (el valor de $k$ no lo es). As\'i que se tuvo que implementar una funci\'on que haga lo mismo:
+\begin{verbatim}
+f = lambda(i, args): args[0] * i**2 + args[1] * i + args[2]
+ls = lista(f, ini, fin, [a, b, c])
+\end{verbatim}
+\end{asparaitem}
 
 
 % You can even have references

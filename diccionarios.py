@@ -24,6 +24,7 @@ import ftexto
 import fmate
 import fmetodos
 import fmatriz
+import futil
 import fvector
 
 DGlobal: Dict[str, Any] = {
@@ -35,6 +36,7 @@ DGlobal: Dict[str, Any] = {
         'metodos': fmetodos,
         'txt': ftexto,
         'matriz': fmatriz,
+        'util': futil,
         'vector': fvector,
         }
 
