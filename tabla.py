@@ -17,10 +17,16 @@ def notasNull(sheet, numPregs: int, irow: int, pts: int, bold) -> None:
     for i in range(numPregs):
         sheet.write(irow, i + 5, 0)
     # Se suman los puntos ;)
-    formula = '=SUM(F%d:%c%d)'\
-              % (irow + 1,
-                 chr(ord('F') + numPregs - 1),
-                 irow + 1)
+    hasta = ord('F') + numPregs - 1
+    who = ord('A') - 1
+    while hasta > ord('Z'):
+        hasta = hasta - (ord('Z') - ord('A') + 1)
+        who = who + 1
+    if who >= ord('A'):
+        fin = chr(who) + chr(hasta)
+    else:
+        fin = chr(hasta)
+    formula = '=SUM(F%d:%s%d)' % (irow + 1, fin, irow + 1)
     sheet.write(irow, 4, formula)
     # y se calcula la nota
     formula = '= 100 * E%d / %d' % (irow + 1, pts)
