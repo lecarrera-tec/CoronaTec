@@ -19,6 +19,7 @@ import math
 from typing import Any, Dict
 import fractions
 
+import fconj
 import fdistrib
 import ftexto
 import fmate
@@ -29,6 +30,7 @@ import fvector
 
 DGlobal: Dict[str, Any] = {
         '__builtins__': __builtins__,
+        'conj': fconj,
         'distrib': fdistrib,
         'Fraction': fractions.Fraction,
         'math': math,
@@ -44,6 +46,7 @@ DFunRandom: Dict[str, Any] = {
         'randrange': random.randrange,
         'randint': random.randint,
         'choice': random.choice,
+        'choices': random.choices,
         'sample': random.sample,
         'random': random.random,
         'uniform': random.uniform,
@@ -53,7 +56,7 @@ DFunRandom: Dict[str, Any] = {
 DFunciones = {
         'inf': math.inf,
         'div': math.nan,
-        'C': math.comb,
-        'P': math.perm,
+        # 'C': math.comb,
+        # 'P': math.perm,
         'factorial': math.factorial,
         }

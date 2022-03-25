@@ -3,6 +3,7 @@ import os
 import random
 from typing import Any, Dict, List, Union
 import sys
+from fractions import Fraction
 
 import Info
 import leer
@@ -50,7 +51,7 @@ class Seccion:
           - titulo: titulo de la sección, si tiene.
           - instrucciones: si son dadas por el usuario.
           - puntaje: puntaje total de la sección
-          - preguntas: tuplas [int, str, int], formadas por el puntaje,
+          - preguntas: tuplas [Fraction, str, int], formadas por el puntaje,
                        el origen y el tamaño de la muestra de la
                        pregunta.
           - aleatorias: Si el orden de las preguntas debe ser aleatorio
@@ -93,7 +94,7 @@ class Seccion:
         if self.puntaje == 0:
             for preg in self.preguntas:
                 self.puntaje += preg.get_muestra() * preg.get_puntaje()
-        return self.puntaje
+        return int(self.puntaje)
 
     def get_latex(self) -> str:
         """Genera el código LaTeX de la sección."""
@@ -251,7 +252,7 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
             txtPts = 'puntos'
         else:
             txtPts = 'punto'
-        texto = '%s{[%d %s]}\n%s\n%s\n%s\n\n' % (
+        texto = '%s{[%g %s]}\n%s\n%s\n%s\n\n' % (
                 '  \\begin{ejer}~\\textbf', preg.get_puntaje(), txtPts,
                 texto, '\\end{ejer}', fin)
         if preg.es_bloque():

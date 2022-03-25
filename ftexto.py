@@ -7,7 +7,7 @@ from fractions import Fraction
 
 def fraccion(num, den: int = 1, conSigno: bool = False,
         signoNum: bool = False, dfrac: bool = True, 
-        coef: bool = False) -> str:
+        arg: str = '', coef: bool = False) -> str:
     """ Texto en LaTeX de una fracción.
 
     Argumentos
@@ -25,10 +25,12 @@ def fraccion(num, den: int = 1, conSigno: bool = False,
     dfrac:
         Opcional. Utiliza dfrac de manera predeterminada para construir
         una fracción. Si False utiliza \\tfrac.
-    coef:
-        Opcional. En caso de ser verdadero y la fracci\'on de 1 o -1.
+    arg:
+        Opcional. En caso de ser un string no vacío y el numerador sea 1 o -1.
         Si conSigno es verdadero, entonces imprime respectivamente + o -.
         Si conSigno es falso, entonces no imprime nada o - respectivamente.
+    coef:
+        Si es 1 o -1, se imprime sólo el signo.
         
 
     Devuelve
@@ -51,6 +53,8 @@ def fraccion(num, den: int = 1, conSigno: bool = False,
     # es negativo.
     elif ff < 0:
         txt = '-'
+    else:
+        return '0'
 
     tipo = 'dfrac' if dfrac else 'tfrac'
     num = abs(ff.numerator)
@@ -59,12 +63,19 @@ def fraccion(num, den: int = 1, conSigno: bool = False,
     # No es una fracción.
     if den == 1:
         # No es un coeficiente o es distinto de +- 1.
-        if (not coef) or (abs(num) != 1):
-            txt = '%s%d' % (txt, num)
+        if num == 1 and (coef or len(arg)):
+            txt = '%s%s' % (txt, arg)
+        else:
+            txt = '%s%d%s' % (txt, num, arg)
     elif signoNum:
-        txt = '\\%s{%s%d}{%d}' % (tipo, txt, num, den)
+        if num == 1 and len(arg) > 0:
+            txt = '\\%s{%s%s}{%d}' % (tipo, txt, arg, den)
+        else:
+            txt = '\\%s{%s%d%s}{%d}' % (tipo, txt, num, arg, den)
+    elif num == 1 and len(arg) > 0:
+        txt = '%s\\%s{%s}{%d}' % (txt, tipo, arg, den)
     else:
-        txt = '%s\\%s{%d}{%d}' % (txt, tipo, num, den)
+        txt = '%s\\%s{%d%s}{%d}' % (txt, tipo, num, arg, den)
 
     return txt
 
@@ -126,7 +137,7 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
     return txt
 
 
-def coef(numero: int, conSigno: bool = False) -> str:
+def coef(numero: int, conSigno: bool = False, arg: str = '') -> str:
     """ Imprime el coeficiente para una variable.
 
     Si el número es 1 no imprime nada o sólo un +. Si el número es
@@ -135,38 +146,49 @@ def coef(numero: int, conSigno: bool = False) -> str:
     """
 
     txtSigno: str
-    if numero >= 0 and conSigno:
+    if numero > 0 and conSigno:
         txtSigno = '+'
-    elif numero >= 0:
+    elif numero > 0:
         txtSigno = ''
-    else:
+    elif numero < 0:
         txtSigno = '-'
         numero = abs(numero)
-    if numero == 1:
-        return txtSigno
     else:
-        return '%s%d' % (txtSigno, numero)
+        assert(numero == 0)
+        if len(arg) > 0:
+            return ''
+        else:
+            return '0'
+    if numero == 1:
+        return '%s%s'%(txtSigno, arg)
+    else:
+        return '%s%d%s' % (txtSigno, numero, arg)
 
 
-def expo(expo: int) -> str:
+def expo(expo: int, arg='', coef=False) -> str:
     """ Escribe la expresión como exponente si se requiere (!= 1)
 
-    Si exp == 1 no devuelve nada. En cualquier otro caso devuelve
-    "^{exp}".
+    Si expo == 0, arg no es vac\'io y coef==True, no devuelve nada.
+    Si expo == 0, arg no es vac\'io y coef==False, devuelve uno.
+    Si expo == 1 no devuelve nada o imprime s\'olo el argumento en
+    caso de existir. En cualquier otro caso devuelve "arg^{exp}".
 
     Argumentos
     ----------
     expo:
         Valor del exponente.
-    Devuelve
-    --------
-    Un string vacío si expo == 1, "^{expo}" en cualquier otro caso.
+    arg:
+        Base del exponente.
+    coef:
+        Si el exponente es 0, no imprimir nada.
     """
 
     if expo == 1:
-        return ''
+        return arg
+    elif expo == 0 and len(arg) > 0:
+        '' if coef else '1'
     else:
-        return '^{%d}' % expo
+        return '%s^{%d}' % (arg,expo)
 
 
 def conSigno(numero: int) -> str:
@@ -304,24 +326,3 @@ def minCifras(numero: float, ceros: int = 3, maxi: int = 20) -> str:
         temp *= 10
         n += 1
     return ('%%.%df' % min(n, maxi)) % numero
-
-
-def sumar(numero: int, conSigno: bool = True, arg: str = '') -> str:
-    if numero == 0:
-        return ''
-    elif len(arg) == 0:
-        if conSigno:
-            return '%+d' % numero
-        else:
-            return '%d' % numero
-    elif numero == 1:
-        if conSigno:
-            return '+%s' % arg
-        else:
-            return arg
-    elif numero == -1:
-        return '-%s' % arg
-    elif conSigno:
-        return '%+d%s' % (numero, arg)
-    else:
-        return '%d%s' % (numero, arg)

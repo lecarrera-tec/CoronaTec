@@ -1,2 +1,28 @@
+2022-v06
+- Se agrega la opcion de 'coef' a las fracciones.
+- Se agrega \verb|choices| a las funciones aleatorias.
+- Se actualiza la documentaci\'on de txt.fraccion.
+
+2022-v05
+- Se corrige una pulga en txt.fraccion al imprimir 
+  elementos iguales a 0.
+- Se agregan en moldes las instrucciones para compartir
+  los links utilizando Google Drive.
+
+2022-v04
+- Se agrega la biblioteca ``conj'', que son funciones de
+  conjuntos aplicadas sobre listas.
+
+2022-v03
+- Se agrega un argumento para la funci\'on txt.expo.
+- Se elimina la funci\'on txt.sumar, y se a\~nade a txt.coef
+- Se corrije la funci\'on txt.fraccion
+
+2022-v02
+- Se agrega un argumento para la funci\'on txt.fraccion.
+- Se agregan puntuaciones decimales para las preguntas.
+- Se agregan las instrucciones para la consola de Windows.
+- Se eliminan para el usuario las funciones P(n, r) y C(n, r).
+
 2022-v01
 - Se hace que los paths sean independientes del sistema operativo.

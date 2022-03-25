@@ -154,23 +154,29 @@ def __calificar_unica__(respuestas, texto: str, puntaje: int) -> float:
     return puntos
 
 
-def __calificar_resp_corta__(respuestas, texto: str, puntaje: int) -> float:
+def __calificar_resp_corta__(respuestas, texto: str, puntaje: float) -> float:
     logging.debug('Calificar respuesta corta [%d pt]: `%s`' % (puntaje, texto))
-    try:
-        expr = eval(texto, DGlobal, DFunciones)
-    except (ValueError, TypeError, SyntaxError, AttributeError) as err:
-        print('\nError\n-----------')
-        print(err)
-        print('Expresión incorrecta: "%s"\n' % texto)
-        logging.error('Expresión incorrecta: "%s"' % texto)
-        expr = texto
     puntos: float = 0.0
     for resp, error, factor in respuestas:
-        if isinstance(expr, str):
-            puntos = 0.0
-            break
+        if isinstance(resp, str):
+            if texto.strip().lower() == resp.strip().lower():
+                puntos = factor * puntaje
+                break
+            else:
+                continue
         elif error == inf:
             puntos = puntaje
+            break
+        try:
+            expr = eval(texto, DGlobal, DFunciones)
+        except (ValueError, TypeError, SyntaxError, AttributeError) as err:
+            print('\nError\n-----------')
+            print(err)
+            print('Expresión incorrecta: "%s"\n' % texto)
+            logging.error('Expresión incorrecta: "%s"' % texto)
+            expr = texto
+        if isinstance(expr, str):
+            puntos = 0.0
             break
         elif error == 0:
             logging.debug('@@@ %s (usuario) == %s (correcta)?'

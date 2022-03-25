@@ -6,6 +6,7 @@ import os
 import random
 import sys
 from typing import Any, List, Dict, Tuple, Union
+from fractions import Fraction
 
 import parserPPP
 import Info
@@ -22,7 +23,7 @@ class Pregunta:
 
     Atributos
     ---------
-    puntaje: int
+    puntaje: float
         Puntos asignados a la pregunta.
     origen: str
         Origen de la pregunta (o carpeta al banco de preguntas)
@@ -34,9 +35,9 @@ class Pregunta:
         2 si se está en el medio de un bloque.
         -1 si se está en la última pregunta de un bloque.
     """
-    def __init__(self, puntaje: int, origen: str, muestra: int,
+    def __init__(self, puntaje: float, origen: str, muestra: int,
                  bloque: bool):
-        self.puntaje: int = puntaje
+        self.puntaje: float = puntaje
         self.origen: str = origen
         self.muestra: int = muestra
         self.bloque: int = 2 * int(bloque)
@@ -56,7 +57,7 @@ class Pregunta:
     def set_primera(self):
         self.bloque = 1
 
-    def get_puntaje(self) -> int:
+    def get_puntaje(self) -> float:
         return self.puntaje
 
     def get_muestra(self) -> int:

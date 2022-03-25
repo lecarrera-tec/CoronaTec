@@ -151,6 +151,10 @@ Solamente se utilizan a la hora de definir variables.
 \quad Un elemento del iterable no vacío \verb|seq|.
   \smallskip
 
+\item   \verb|choices(seq, k=1)| \\
+  \quad Devuelve $k$ elementos, seleccionados \textbf{con reemplazo}.
+  \smallskip
+
 \item   \verb|sample(seq, k)| \\
 \quad Muestra no ordenada de tamaño \verb|k| de un iterable. Si \verb|k| es el mismo tamaño del iterable, devuelve una permutación del mismo.
   \smallskip
@@ -168,7 +172,7 @@ Solamente se utilizan a la hora de definir variables.
 \end{asparaitem}
 
 \subsection{Sucesiones}
-Toda tupla, lista o conjunto, es 0-indexado.
+Toda tupla o lista, es 0-indexado.
 \begin{asparaitem}
   \item \verb|range(<stop>)|
   \item \verb|range(<start>, <stop>[, <step>])| \\
@@ -281,7 +285,7 @@ Permite representar n\'umeros como fracciones:
 
 \verb|f = Fraction(a, b)|
 
-y realizar operaciones aritm\'eticas con ellos, las cuales se simplifican de manera autom\'atica. Se puede extraer luego su numerator y denominador mediante \verb|f.numerator| y \verb|f.denominator|. Aunque es un poco engorroso, para imprimir se utiliza \verb|fraccion(f.numerator, f.denominator)|.
+y realizar operaciones aritm\'eticas con ellos, las cuales se simplifican de manera autom\'atica. Se puede extraer luego su numerator y denominador mediante \verb|f.numerator| y \verb|f.denominator|.
 
 \section{Funciones CoronaTec}
 Funciones creadas en el proyecto. Se pueden ir agregando seg\'un se requiera.
@@ -308,8 +312,8 @@ Funciones creadas en el proyecto. Se pueden ir agregando seg\'un se requiera.
 \subsection{Biblioteca \texttt{txt}}
 Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \'unica. Texto en \LaTeX. Se asume que se est\'a en modo matem\'atico.
 \begin{asparaitem}
-\item \verb|txt.coef(a: int, conSigno: bool = False)| \\
-\quad Coeficiente que precede a una variable entera. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|). De manera similar ocurre si $a=-1$. En caso contrario imprime el valor.
+\item \verb|txt.coef(a: int, conSigno: bool = False, arg='')| \\
+\quad Coeficiente que precede a una variable entera. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|). De manera similar ocurre si $a=-1$. En caso contrario imprime el valor. Si $a=0$ no imprime nada. Si se le incluye un argumento, lo agrega al final de la expresi\'on, esto es \'util si el coeficiente puede ser 0.
 
 \item \verb|txt.conSigno(n: int)| \\
 \quad Imprime el entero con signo.
@@ -317,18 +321,17 @@ Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \
 \item \verb|txt.decimal(x: float, cifras: int, conSigno = False)| \\
 \quad Imprime un flotante según el n\'umero de cifras significativas indicado.
 
-\item \verb|txt.expo(n: int)| \\
-\quad Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
+\item \verb|txt.expo(n: int, arg='', coef=False)| \\
+  \quad Si \verb|n == 1| no imprime nada. Si \verb|n==0| y \verb|arg|, imprime 1 o nada (seg\'un \verb|coef|). Si no imprime \verb|arg^{n}|.
 
-\item \verb|txt.fraccion(num: int, den: int, conSigno=False,| \\
-      \verb|             signoNum=False, dfrac=True, coef=False)| \\
-\quad Simplifica e imprime utilizando \verb|dfrac|. De manera opcional se especifica si se obliga el signo \verb|+|; si el signo se imprime en el numerador o se imprime afuera; si se utiliza \verb|tfrac| en lugar de \verb|dfrac|, y si es un coeficiente, de manera que si da 1 o $-1$ no se imprima el valor.
+\item \verb|txt.fraccion(num, den=1, conSigno=False,|\\
+      \verb|     signoNum=False, dfrac=True, arg='', coef=False)| \\
+  \quad Simplifica e imprime utilizando \verb|dfrac|. De manera opcional se especifica si se obliga el signo \verb|+|; si el signo se imprime en el numerador o se imprime afuera; si se utiliza \verb|tfrac| en lugar de \verb|dfrac|, y si tiene un argumento, de manera que si da 1 o $-1$ no se imprima el valor. Se puede utilizar \verb|Fraction| en el numerador, y ya no ser\'ia necesario especificar el denominador. Si \verb|coef=True|, entonces se imprime sólo el signo si es 1 o $-1$.
+
+Si el argumento es distinto de vac\'io, el numerador se toma como un coeficiente.
 
 \item  \verb|txt.raiz(a: int, n: int = 2, conSigno = False)| \\
 \quad Simplifica y escribe la raíz respectiva. De manera opcional se puede especificar el \'indice \verb|n|, y si se imprime un \verb|+| al inicio.
-
-\item \verb|txt.sumar(a: int, conSigno = True, arg = '')| \\
-\quad Si $a=0$, no escribe nada. Si \verb|arg| es vac\'io, escribe el n\'umero. En caso contrario, escribe el coeficiente junto con el argumento.
 
 \item \verb|txt.texto(n: int)| \\
 \quad Para $n > 0$, devuelve el texto que representa al valor de $n$.
@@ -445,6 +448,20 @@ Para imprimir en la pregunta, o en las opciones de una pregunta de selecci\'on \
 f = lambda(i, args): args[0] * i**2 + args[1] * i + args[2]
 ls = lista(f, ini, fin, [a, b, c])
 \end{verbatim}
+\end{asparaitem}
+
+
+\subsection{Biblioteca \texttt{conj}}
+Las siguientes operaciones trabajan sobre listas.
+\begin{asparaitem}
+\item \verb|conj.union(A, B)| $A\cup B$
+\item \verb|conj.interseccion(A, B)| $A\cap B$
+\item \verb|conj.diferencia(A, B)| $A-B$
+\item \verb|conj.dsimetrica(A, B)| $A \triangle B$
+\item \verb|conj.potencia(A)| $P(A)=2^A$
+\item \verb|conj.producto(A, B)| $A\times B$
+\item \verb|conj.impComo(A)| \\
+  Imprime el conjunto $A$, que es una lista.
 \end{asparaitem}
 
 

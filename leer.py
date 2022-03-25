@@ -169,7 +169,7 @@ def preguntas(contador: int, lsTexto: List[str], dirTrabajo: str,
     # Guardamos cada línea, hasta que encontremos la primera
     # línea en blanco: esto señala el final de la sección.
     texto: str
-    puntos: int
+    puntos: float
     muestra: int
     linea: str
     origen: str
@@ -224,14 +224,14 @@ def preguntas(contador: int, lsTexto: List[str], dirTrabajo: str,
     return lista
 
 
-def __puntos__(linea: str) -> int:
+def __puntos__(linea: str) -> float:
     # Buscamos los puntos de la pregunta, el tamaño de la
     # muestra y el origen de la pregunta.
     puntos = 1
     texto = parserPPP.derechaIgual(linea, 'puntaje')
     if len(texto) > 0:
         try:
-            puntos = int(texto)
+            puntos = float(texto)
         except ValueError:
             puntos = 1
             texto = '%s "%s".\n%s' % (
