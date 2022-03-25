@@ -1,0 +1,57 @@
+1. Guardar en una carpeta de Google Drive, todos los exámenes por grupo. 
+   Si es sólo un grupo, igual debe guardarlo adentro de una carpeta.
+
+2. Crear un nuevo archivo de hoja de cálculo en Google Drive, se
+   selecciona la primera casilla, y en Extensiones -> Apps Script, se borra
+   todo y se pega el texto que hay en el archivo: 
+        Moldes -> google-links-script.txt
+   (con click derecho se puede formatear el documento para que se vea
+   tabulado, pero no es obligatorio hacerlo.)
+
+3. En la línea 5, sustituir TEXTO_COLA_LINK_FOLDER, por:
+   irse al Drive, al folder donde están las carpetas de los exámenes
+   por grupo, y en la barra de direcciones del navegador:
+   https://drive.google.com/drive/folders/1XXYYZZ...
+   copiar justo después de la última barra inclinada el texto "raro"
+   que aparece (en este ejemplo 1XXYYZZ...) hasta el final.
+   Ese es el texto que se utiliza para sustituir TEXTO_COLA_LINK_FOLDER.
+
+4. Se guarda, y se ejecuta (> Ejecutar), y dar los permisos necesarios:
+     - Revisar permisos
+     - Asignar la cuenta de usuario
+     - Avanzado
+     - Seguir adelante con la parte insegura
+     - Dar aceptar
+
+5. Al ingresar a la hoja de cálculo, ya están los links. Se crea una
+   columna nueva en <B>, movimiendo los links hacia la derecha,
+   y se usa la función:
+                          =left(A1, 10)
+   Eso elimina la extensión ".pdf" del nombre de los archivos, dejando sólo
+   el identificador del archivo.
+
+6. Abrir el archivo Moldes -> ParaCompartirConEstudiantes.xlsx.
+   Irse a la página "link", copiar las columnas <B> y <C> de la hoja de 
+   cálculo del archivo de excel, y pegar como texto sin formato.
+
+7. Luego, seleccionar todo lo que acabamos de pegar, poner todo el texto
+   en blanco para que no se vea, dar click derecho sobre la página para
+   protegerla con una clave, quitar todos los permisos, y ocultarla, de 
+   manera que las personas estudiantes no tengan acceso.
+
+8. Ese archivo se puede compartir con las personas estudiantes. 
+   Recordarles que el identificador tiene el formato xxxxNNNNNN, donde
+   xxxx corresponde a las primeras 4 letras del primer apellido, y
+   NNNNNN a los últimos 6 dígitos del carnet.
+   Si el apellido es de 3 letras, entonces sería xxx_ (guión bajo al
+   final). Si el apellido es de 2 letras, entonces sería xx_y, donde
+   xx corresponde al apellido, seguido de guión bajo, seguido de la
+   primera letra del segundo apellido, o del nombre, según corresponda.
+
+   8.a) Recuerde ingresar a Google Drive y compartir la carpeta donde
+        están los exámenes. El hecho de que comparta el link, no da acceso
+        a los archivos.
+
+   8.b) Si utiliza OneDrive para compartir el archivo excel donde se
+        encuentran los link, cambiar el texto después de ?xxxxx
+        por ?download=1
