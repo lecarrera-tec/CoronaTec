@@ -1,7 +1,7 @@
 import math
 from typing import List, Tuple
 
-from fmate import factores
+import fmate
 from fractions import Fraction
 
 
@@ -108,13 +108,7 @@ def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
 
     # Se obtienen los factores, y se determina lo que queda afuera
     # y lo que queda adentro.
-    lfact: List[Tuple[int, int]] = factores(arg)
-    afuera: int = 1
-    adentro: int = 1
-    for primo, numRep in lfact:
-        exp_afuera, exp_adentro = divmod(numRep, indice)
-        afuera *= pow(primo, exp_afuera)
-        adentro *= pow(primo, exp_adentro)
+    afuera, adentro = fmate.raiz(arg, indice)
 
     txt: str = ''
     if signo == -1:

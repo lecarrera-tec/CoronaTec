@@ -114,3 +114,13 @@ def descUnid(numero: float) -> Tuple[float, str]:
         uni = ['', 'm', r'\ensuremath{\mu}', 'n', 'p', 'f', 'a', 'z', 'y'][-kk]
     expo = expo - kk * 3
     return (mant * 10**expo, uni)
+
+def raiz(numero: int, indice: int = 2) -> Tuple[int, int]:
+    lfact: List[Tuple[int, int]] = factores(numero)
+    afuera: int = 1
+    adentro: int = 1
+    for primo, numRep in lfact:
+        exp_afuera, exp_adentro = divmod(numRep, indice)
+        afuera *= pow(primo, exp_afuera)
+        adentro *= pow(primo, exp_adentro)
+    return (afuera, adentro)
