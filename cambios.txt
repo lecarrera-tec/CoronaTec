@@ -1,4 +1,5 @@
 2022-v06
+- Se agrega la funci\'on raiz a fmate.
 - Se agrega la opcion de 'coef' a las fracciones.
 - Se agrega \verb|choices| a las funciones aleatorias.
 - Se actualiza la documentaci\'on de txt.fraccion.

@@ -175,7 +175,7 @@ for path in lestudiantes:
         os.system('pdflatex %s' % filename)
         os.system('pdfcrop -margins 20 %s.pdf temp.pdf' % filename)
 
-        # Se eliminan los archivo '*.{aux,log,tex,...}'
+        # Se eliminan los archivos '*.{aux,log,tex,...}'
         flist = [f for f in os.listdir() if f.startswith(filename)]
         for f in flist:
             os.remove(f)
