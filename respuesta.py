@@ -169,7 +169,7 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: float) -> float:
             break
         try:
             expr = eval(texto, DGlobal, DFunciones)
-        except (ValueError, TypeError, SyntaxError, AttributeError) as err:
+        except (NameError, ValueError, TypeError, SyntaxError, AttributeError) as err:
             print('\nError\n-----------')
             print(err)
             print('Expresión incorrecta: "%s"\n' % texto)
