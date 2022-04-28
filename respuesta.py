@@ -1,6 +1,6 @@
 import logging
 from typing import Any, List, Tuple
-from math import ceil, log10, inf
+import math
 
 from diccionarios import DGlobal, DFunciones
 import TPreg
@@ -131,7 +131,7 @@ class Respuesta:
         elif self.tipoPreg & TPreg.RESP_CORTA:
             resp = self.respuestas[0][0]
             if isinstance(resp, float):
-                cifras: int = int(ceil(-log10(self.respuestas[0][1])))
+                cifras: int = int(math.ceil(-math.log10(self.respuestas[0][1])))
                 resp = txt.decimal(resp, cifras)
             return resp
         logging.error('No se pudo determinar el tipo de pregunta')
@@ -158,18 +158,24 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: float) -> float:
     logging.debug('Calificar respuesta corta [%d pt]: `%s`' % (puntaje, texto))
     puntos: float = 0.0
     for resp, error, factor in respuestas:
-        if isinstance(resp, str):
+        # Se pone buena si se responde. Esto aplica para *TODOS* los casos.
+        if math.isinf(error):
+            puntos = factor * puntaje
+            break
+        # Se pone para los casos particulares donde la respuesta es math.isnan.
+        elif math.isnan(resp):
+            puntos = factor * puntaje
+            break
+        # Si la respuesta es un string, compara los textos.
+        elif isinstance(resp, str):
             if texto.strip().lower() == resp.strip().lower():
                 puntos = factor * puntaje
                 break
             else:
                 continue
-        elif error == inf:
-            puntos = puntaje
-            break
         try:
             expr = eval(texto, DGlobal, DFunciones)
-        except (NameError, ValueError, TypeError, SyntaxError, AttributeError) as err:
+        except:
             print('\nError\n-----------')
             print(err)
             print('Expresión incorrecta: "%s"\n' % texto)
