@@ -152,7 +152,7 @@ def coef(numero: int, conSigno: bool = False, arg: str = '') -> str:
         if len(arg) > 0:
             return ''
         else:
-            return '0'
+            return ('+0' if conSigno else '0')
     if numero == 1:
         return '%s%s'%(txtSigno, arg)
     else:
@@ -219,7 +219,7 @@ def decimal(numero: float, cifras: int, conSigno: bool = False) -> str:
         numero = -numero
         signo = -1
     if numero < pow(10, -cifras-6) or numero >= pow(10, cifras + 3):
-        ftxt = '%%.%de' % (cifras - 1)
+        ftxt = '%%.%dE' % (cifras - 1)
     elif numero >= 1:
         ndig = cifras - int(math.ceil(math.log10(numero)))
         ftxt = '%%.%df' % max(0, ndig)
