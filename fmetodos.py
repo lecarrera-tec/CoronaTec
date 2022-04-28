@@ -200,3 +200,21 @@ def fmin(f, aa: float, bb: float, tries: int = 3, eps: float = 1e-6, delta = 0.5
                 x2 = vx
                 fx2 = vy
     return (xmin, fmin)
+
+def regresionLineal(xs: list[float], ys: list[float], fx=None, gy=None):
+    """ Aplica regresi\'on lineal a los datos. fx y gy son funciones
+    que aplica previo a la regresi\'on. Devuelve (m, b), la pendiente
+    y la intersecci\'on con el eje y. """
+    n = len(xs)
+    assert(n == len(ys))
+    if not fx == None:
+        xs = [fx(xi) for xi in xs]
+    if not gy == None:
+        ys = [gy(y) for y in ys]
+    sumxi = sum(xs)
+    sumyi = sum(ys)
+    sumx2 = sum([x**2 for x in xs])
+    sumxy = sum([xs[i] * ys[i] for i in range(n)])
+    m = (n * sumxy - sumxi * sumyi) / (n * sumx2 - sumxi**2)
+    b = (sumyi - m * sumxi) / n
+    return (m, b)
