@@ -1,5 +1,12 @@
-2022-v06
+2022-v07
+- Uso de math.nan para calificar casos particulares donde la pregunta de tipo respuesta corta no tiene respuesta.
+- Aclaraci\'on en la documentaci\'on del uso de inf en el error de las preguntas de respuesta corta.
+- Se corrige la documentación para vector.latex. Era 'cifras' en lugar de 'ndigits'.
+- Se crea la biblioteca relBin para trabajar con gr\'aficos y matrices de relaciones binarias.
+- Se crea la biblioteca conj para trabajar con conjuntos como listas.
 - Se agrega la funci\'on raiz a fmate.
+
+2022-v06
 - Se agrega la opcion de 'coef' a las fracciones.
 - Se agrega \verb|choices| a las funciones aleatorias.
 - Se actualiza la documentaci\'on de txt.fraccion.

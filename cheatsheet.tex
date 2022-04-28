@@ -103,7 +103,21 @@ _texto de la pregunta_ @exp
 _respuesta_
 \end{verbatim}
 
-Puede utilizar \verb|error = math.inf| en caso de que deba aceptar todas las respuestas como correctas.
+Puede utilizar \verb|error = inf| en caso de que deba aceptar todas las respuestas como correctas. Lo \'unico es que el sistema se la pone buena \'unicamente en los casos en que respondieron la pregunta. Si no respondieron, el sistema le pone un 0.
+
+Digamos que la respuesta es \verb|alfa|, pero en algunos casos no es posible, por un error de la pregunta, no es posible determinar el valor. As\'i, puede usar:
+\begin{verbatim}
+<variables>
+...
+alfa = math.nan if <condicion_sin_solucion> else <valor_en_casos_buenos>
+...
+
+<item>
+alfa
+\end{verbatim}
+
+Cuando se est\'a calificando la prueba, y el sistema encuentre un valor de \verb|math.nan| en la respuesta dada por el sistema, entonces el sistema pone buena la pregunta.
+
 
   \section{@-expresi\'on}
 
@@ -350,7 +364,7 @@ Si el argumento es distinto de vac\'io, el numerador se toma como un coeficiente
   \quad Vector de números aleatorios. Genera inicialmente enteros en \verb|vmin..vmax|, y luego los multiplica por \verb|factor|, que puede ser un n\'umero de punto flotante, o un n\'umero como fracci\'on.
 
 \item \verb|vector.latex(v: Vector, txtSep: str,| \\
-      \verb|               ndigits: int = -2, ceros: int = 3)| \\
+      \verb|               cifras: int = -2, ceros: int = 3)| \\
   \quad Imprime un vector. El encabezado en \LaTeX\ lo especifica el usuario. El texto separador da el formato entre elementos: por ejemplo \verb|', '| o \verb|' & '| (para vectores fila), o \verb|' \\\\ '| (para vector columna). De manera opcional se puede especificar el n\'umero de d\'igitos a imprimir. Si es $-1$, intenta imprimir la menor cantidad \verb|n|, tal que \verb|round(10**n * v[i], ceros)| sea un entero. Observe que $-2$ es el valor predeterminado, lo que asume que lo que va a imprimir son fracciones.
 
 \item \verb|vector.kprod(k: float, v: Vector)| \\
@@ -424,6 +438,9 @@ Si el argumento es distinto de vac\'io, el numerador se toma como un coeficiente
 \item \verb|metodos.cuadratica(a, b, c)|\\
   \quad Determina, para un discriminante no-negativo, las soluciones reales.
 
+\item \verb|metodos.regresionLineal(xs, ys, fx=None, gy=None)|
+  \quad Devuelve la tupla $(m, b)$ obtenida por regresi\'on lineal de $g(y) = m\cdot f(x) + b$.
+
 \item \verb|metodos.derivada(f, x0, n=1, delta=1e-6)| \\
   \quad Aproximaci\'on a la $n$-\'esima derivada de la funci\'on $f$ en el punto $x_0$.
 
@@ -448,11 +465,10 @@ Si el argumento es distinto de vac\'io, el numerador se toma como un coeficiente
   Debido a las caracter\'isticas de \emph{lazy evaluation}, no es posible, por ejemplo, definir variables $a,b,c,k$, y luego construir la lista:
   \verb|ls = [(a * i**2 + b * i + c)  for i in range(ini, fin)]| El problema son los valores de $a$, $b$ y $c$ que se utilizan (el valor de $k$ no lo es). As\'i que se tuvo que implementar una funci\'on que haga lo mismo:
 \begin{verbatim}
-f = lambda(i, args): args[0] * i**2 + args[1] * i + args[2]
+f=lambda(i,args):args[0]*i**2+args[1]*i+args[2]
 ls = lista(f, ini, fin, [a, b, c])
 \end{verbatim}
 \end{asparaitem}
-
 
 \subsection{Biblioteca \texttt{conj}}
 Las siguientes operaciones trabajan sobre listas.
@@ -467,6 +483,66 @@ Las siguientes operaciones trabajan sobre listas.
   Imprime el conjunto $A$, que es una lista.
 \end{asparaitem}
 
+\subsection{Biblioteca \texttt{relBin}}
+Una matriz en relaciones binarias es una lista de listas 0-indexada, donde cada elemento de la lista principal, corresponde a la fila.
+
+Un gr\'afico es una lista de tuplas de las parejas de elementos 0-indexados $(i,j)$ de la matriz que son 1's.
+
+\begin{asparaitem}
+\item \verb|relBin.grafico2grafico(G, Atxt, Btxt=Atxt)|
+  Dado un gr\'afico $G$ y una lista de caracteres que corresponde a los elementos del conjunto de salida $A$ (y una posible lista de caracteres que corresponde a los elementos del conjunto de salida $B$ en caso de que sean distintos), construye el string que corresponde al grafo respectivo.
+
+\item \verb|relBin.grafico2matriz(G, nfilas, ncols=nfilas)|
+  Construye una matriz dado el gr\'afico.
+
+\item \verb|relBin.matriz2grafico(M, Atxt=[], Btxt=Atxt)|
+  Construye el gr\'afico, o el string del gr\'afico si dado al menos el conjunto $A$ como una lista de caracteres.
+
+\item \verb|relBin.esMatrizReflexiva(M)|
+  Determina si la matriz representa o no una relaci\'on reflexiva.
+
+\item \verb|relBin.esMatrizSimetrica(M)|
+  Determina si la matriz representa o no una relaci\'on sim\'etrica.
+
+\item \verb|relBin.esMatrizTransitiva(M)|
+  Determina si la matriz representa o no una relaci\'on transitiva.
+
+\item \verb|relBin.esMatrizAntisimetrica(M)|
+  Determina si la matriz representa o no una relaci\'on antisim\'etrica.
+
+\item \verb|relBin.esMatrizTotal(M)|
+  Determina si la matriz representa o no una relaci\'on total.
+
+\item \verb|relBin.esMatricesMenorIgual(M1, M2)|
+  Determina si $M_1 \leq M2$.
+
+\item \verb|relBin.matrizDominio(M, Atxt)| 
+  Devuelve el dominio de $M$, seg\'un los valores (como texto) de A.
+
+\item \verb|relBin.matrizAmbito(M, Btxt)| 
+  Devuelve el dominio de $M$, seg\'un los valores (como texto) de B.
+
+\item \verb|relBin.matrizNegar(M)|
+  Construye el complemento de la matriz $M$.
+
+\item \verb|relBin.matricesAnd(M1, M2)|
+  Construye la matriz $M_1 \land M_2$.
+
+\item \verb|relBin.matricesOr(M1, M2)|
+  Construye la matriz $M_1 \lor M_2$.
+
+\item \verb|relBin.matricesComp(M1, M2)|
+  Construye la composici\'on $R_2 \circ R_1$ mediante el producto $M_1 \odot M_2$.
+
+\item \verb|relBin.matrizTranspuesta(M)|
+  Construye la matriz transpuesta.
+  
+\item \verb|relBin.reglaGrafico(A, B, f)|
+  Construye un gr\'afico a partir de una regla $f(a,b)$, que se aplica a cada elemento $(a,b)\in A\times B$.
+  
+\item \verb|relBin.reglaMatriz(nfilas, ncols, f)|
+  Construye una matriz a partir de una regla $f(i,j)$, que se aplica a cada elemento 0-indexado de la matriz.
+\end{asparaitem}
 
 % You can even have references
 \rule{0.3\linewidth}{0.25pt}
