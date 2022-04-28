@@ -213,6 +213,8 @@ def decimal(numero: float, cifras: int, conSigno: bool = False) -> str:
     assert(cifras > 0)
     if numero == 0:
         return '0'
+    elif math.isnan(numero):
+        return r'\ensuremath{\text{NaN}}'
     signo: int = 1
     ndig: int
     if numero < 0:

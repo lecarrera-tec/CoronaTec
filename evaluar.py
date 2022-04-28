@@ -58,6 +58,8 @@ def __imprimir_reporte__(carpeta, filename, todasResp, todosPuntos):
                     valor = int(valor)
                 elif temp[1].get_error() == math.inf:
                     valor = '*'
+                elif math.isnan(valor):
+                    valor = 'NaN'
                 elif temp[1].get_error() > 0:
                     cifras = 1 + math.ceil(-math.log10(temp[1].get_error()))
                     valor = fmate.digSignif(valor, cifras)

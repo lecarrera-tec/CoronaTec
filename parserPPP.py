@@ -173,7 +173,7 @@ def __convertir_a_texto__(expr: Any, cifras: int) -> str:
     if isinstance(expr, float):
         resp = txt.decimal(expr, cifras)
     elif isinstance(expr, Fraction):
-        resp = txt.fraccion(expr.numerator, expr.denominator)
+        resp = txt.fraccion(expr)
     elif isinstance(expr, set):
         resp = '\\left\\{%s\\right\\}' % str(expr)[1:-1].replace('\'', '')
     else:

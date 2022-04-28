@@ -67,7 +67,7 @@ def digSignif(numero: float, digitos: int) -> float:
         Número redondeado.
     """
     signo: int = 1
-    if numero == 0:
+    if numero == 0 or math.isnan(numero):
         return numero
     if numero < 0:
         signo = -1

@@ -45,6 +45,7 @@ class Respuesta:
         self.puntaje: int = 1
 
     def get_respuesta(self):
+        """ Devuelve la respuesta. """
         if self.tipoPreg & TPreg.TODOS:
             return '*'
         if self.tipoPreg & TPreg.UNICA:
