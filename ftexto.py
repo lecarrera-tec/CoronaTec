@@ -54,7 +54,12 @@ def fraccion(num, den: int = 1, conSigno: bool = False,
     elif ff < 0:
         txt = '-'
     else:
-        return '0'
+        if len(arg) > 0:
+            return ''
+        elif conSigno:
+            return '+0'
+        else:
+            return '0'
 
     tipo = 'dfrac' if dfrac else 'tfrac'
     num = abs(ff.numerator)
@@ -62,10 +67,9 @@ def fraccion(num, den: int = 1, conSigno: bool = False,
 
     # No es una fracción.
     if den == 1:
-        # No es un coeficiente o es distinto de +- 1.
-        if num == 1 and (coef or len(arg)):
+        if num == 1 and len(arg):
             txt = '%s%s' % (txt, arg)
-        else:
+        elif not coef or num > 1:
             txt = '%s%d%s' % (txt, num, arg)
     elif signoNum:
         if num == 1 and len(arg) > 0:

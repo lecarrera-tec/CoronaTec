@@ -136,7 +136,7 @@ def matrizNegar(M: Matriz):
     ncols = len(M[0])
     resp = []
     for i in range(nfilas):
-        resp.append([0] * ncols)
+        resp.append([1] * ncols)
         for j in range(ncols):
             if M[i][j]:
                 resp[i][j] = 0

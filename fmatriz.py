@@ -150,15 +150,12 @@ def latex(mat: Matriz, decimal = False, dfrac = False, espacio = '[1ex]', cifras
     matTexto: List[List[str]]
     if decimal:
         if cifras < 0:
-            matTexto = [[txt.minCifras(elem, ceros, maxi = -cifras) for elem in fila] for fila in mat]
+            matTexto = [[elem if isinstance(elem, str) else txt.minCifras(elem, ceros, maxi = -cifras) for elem in fila] for fila in mat]
         else:
-            formato: str = '%%.%df' % cifras
-            matTexto = [[formato % elem for elem in fila] for fila in mat]
+            formato: str = '%d' if cifras == 0 else '%%.%df' % cifras
+            matTexto = [[elem if isinstance(elem, str) else formato % elem for elem in fila] for fila in mat]
     else:
-        if dfrac:
-            matTexto = [[elem if isinstance(elem, str) else txt.fraccion(elem.numerator, elem.denominator, dfrac = True) for elem in fila] for fila in mat]
-        else:
-            matTexto = [[elem if isinstance(elem, str) else txt.fraccion(elem.numerator, elem.denominator, dfrac = False) for elem in fila] for fila in mat]
+        matTexto = [[elem if isinstance(elem, str) else txt.fraccion(elem.numerator, elem.denominator, dfrac=dfrac) for elem in fila] for fila in mat]
     espacio = ' \\\\%s\n' % espacio
     texto = '  %s' % espacio.join([' & '.join(fila) for fila in matTexto])
     return texto

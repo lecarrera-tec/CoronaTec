@@ -1,3 +1,6 @@
+2022-v08
+- Despulgar la función txt.fraccion, cuando utiliza coef, y cuando hay argumento.
+
 2022-v07
 - Uso de math.nan para calificar casos particulares donde la pregunta de tipo respuesta corta no tiene respuesta.
 - Aclaraci\'on en la documentaci\'on del uso de inf en el error de las preguntas de respuesta corta.
