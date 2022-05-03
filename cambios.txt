@@ -1,4 +1,6 @@
 2022-v08
+- Eliminar comillas en el caso de caracteres a la hora de imprimir una lista como un conjunto.
+- Agregar un pre-procesador a las respuestas de las personas estudiantes.
 - Despulgar la función txt.fraccion, cuando utiliza coef, y cuando hay argumento.
 
 2022-v07

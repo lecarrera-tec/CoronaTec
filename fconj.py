@@ -4,7 +4,7 @@ def impComo(ls: list) -> str:
     """ Imprime una lista como conjunto. Intercambia cada '['
     por llaves. """
     texto = str(ls)
-    texto = texto.replace('[]', r'\varnothing')
+    texto = texto.replace('[]', r'\varnothing').replace("'",'')
     texto = texto.replace('[', r'\{').replace(']', r'\}')
     return texto
 
