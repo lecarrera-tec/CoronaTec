@@ -92,6 +92,7 @@ _texto de respuesta o distractor_ @exp
 \subsection{Respuesta corta}
 \begin{verbatim}
 <tipo = respuesta corta[, cifras = _int_]>
+<tipo = respuesta corta[, funcion=_txtfun_]>
 
 <variables> ?
 _v1[, vn]*_ = _expresion_ +
@@ -105,11 +106,11 @@ _respuesta_
 
 Puede utilizar \verb|error = inf| en caso de que deba aceptar todas las respuestas como correctas. Lo \'unico es que el sistema se la pone buena \'unicamente en los casos en que respondieron la pregunta. Si no respondieron, el sistema le pone un 0.
 
-Digamos que la respuesta es \verb|alfa|, pero en algunos casos no es posible, por un error de la pregunta, no es posible determinar el valor. As\'i, puede usar:
+Digamos que la respuesta es \verb|alfa|, pero en algunos casos, por un error de la pregunta, no es posible determinar el valor. As\'i, puede usar:
 \begin{verbatim}
 <variables>
 ...
-alfa = math.nan if <condicion_sin_solucion> else <valor_en_casos_buenos>
+alfa = math.nan if <sin_solucion> else <casos_buenos>
 ...
 
 <item>
@@ -118,6 +119,18 @@ alfa
 
 Cuando se est\'a calificando la prueba, y el sistema encuentre un valor de \verb|math.nan| en la respuesta dada por el sistema, entonces el sistema pone buena la pregunta.
 
+\noindent\verb|<tipo = respuesta corta[, funcion=_txtfun_]>|
+Es posible pasar una funci\'on que pre-procese las respuestas. Lo \'unico es que hay que pasarla como un el texto de una funci\'on. Digamos que queremos calificar una pregunta cuya respuesta es una ecuaci\'on lineal $mx+b$.
+\begin{verbatim}
+<variables>
+m, b = randint(1, 9)
+ftxt = r"lambda ss: set(ss.replace('+', ' ').split())"
+resp = {txt.coef(m) + 'x', str(b)}
+...
+<item, f=ftxt>
+resp
+\end{verbatim}
+Este proceso califica buenas preguntas que se hayan escrito de la forma $mx+b$ o $b+mx$, al hacer la comparaci\'on utilizando conjuntos.
 
   \section{@-expresi\'on}
 

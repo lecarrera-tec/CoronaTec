@@ -487,8 +487,7 @@ def respuesta_unica(opciones: str, lsTexto: List[str],
         contador += 1
 
     # Generamos los items. No nos interesan las cifras?
-    # TODO: Revisar el uso de cifras. Poner 0, gener\'o un error
-    # en el Cuiz04 de Metodos Numericos!!
+    # TODO: Revisar el uso de cifras. Poner 0, gener\'o un error!!!
     contador, litems = __items_unica__(contador - 1, lsTexto, dLocal, 3)
 
     # Se obtiene cuáles items son respuesta correcta.
@@ -820,13 +819,26 @@ def __items_corta__(contador: int, lsTexto: List[str], resp: Respuesta,
             # Leyendo factor.
             factor = __leer_float__(linea, 'factor', 1.0)
 
+            # Leyendo funcion.
+            texto = parserPPP.derechaIgual(linea, 'funcion')
+            if len(texto):
+                logging.debug('variable de funcion = `%s`'%texto)
+                try:
+                    f = eval(texto, DGlobal, dLocal)
+                    logging.debug('funcion = `%s`'%f)
+                except:
+                    logging.error('No se pudo evaluar funcion.')
+                    f = None
+            else:
+                f = None
+
             # Ya se puede leer la siguiente línea y evaluar la
             # expresión.
             linea = lsTexto[contador].strip()
             contador += 1
             logging.debug('__items_corta__ evaluar: `%s`' % linea)
             valor = eval(linea, DGlobal, dLocal)
-            resp.add_respuesta((valor, error, factor))
+            resp.add_respuesta((valor, error, factor, f))
         if contador == len(lsTexto):
             break
         linea = lsTexto[contador]

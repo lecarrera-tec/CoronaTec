@@ -21,7 +21,7 @@ class Respuesta:
         - Selección única: varios elementos con el índice 0-indexado de
           las respuestas correctas.
         - Respuesta corta: Una lista de tuplas de la forma
-          (<resp>, <error>, <fraccion del puntaje>)
+          (<resp>, <error>, <fraccion del puntaje>, <funcion>)
     puntaje:
         Puntaje de la pregunta.
     """
@@ -106,7 +106,6 @@ class Respuesta:
         pregunta.
         """
         logging.debug('Calificar: %s' % texto)
-        texto = texto.replace('^', '**')
         puntos: float = 0
         if self.tipoPreg & TPreg.TODOS:
             logging.debug('  Tipo -> TODOS')
@@ -158,13 +157,17 @@ def __calificar_unica__(respuestas, texto: str, puntaje: int) -> float:
 def __calificar_resp_corta__(respuestas, texto: str, puntaje: float) -> float:
     logging.debug('Calificar respuesta corta [%d pt]: `%s`' % (puntaje, texto))
     puntos: float = 0.0
-    for resp, error, factor in respuestas:
+    for resp, error, factor, funcion in respuestas:
+        if funcion is not None:
+            logging.debug('Funcion = `%s`', funcion)
+            texto = (eval(funcion))(texto)
+            logging.debug('Nuevo texto = `%s`', texto)
         # Se pone buena si se responde. Esto aplica para *TODOS* los casos.
         if math.isinf(error):
             puntos = factor * puntaje
             break
         # Se pone para los casos particulares donde la respuesta es math.isnan.
-        elif math.isnan(resp):
+        elif isinstance(resp, float) and math.isnan(resp):
             puntos = factor * puntaje
             break
         # Si la respuesta es un string, compara los textos.
@@ -178,7 +181,6 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: float) -> float:
             expr = eval(texto, DGlobal, DFunciones)
         except:
             print('\nError\n-----------')
-            print(err)
             print('Expresión incorrecta: "%s"\n' % texto)
             logging.error('Expresión incorrecta: "%s"' % texto)
             expr = texto
