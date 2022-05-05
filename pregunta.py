@@ -63,62 +63,70 @@ class Pregunta:
     def get_muestra(self) -> int:
         return self.muestra
 
+    def get_latex(self, filename: str, dParams: Dict[str, Any],
+                  revisar: bool = False) -> str:
+        """Genera el código LaTeX de la pregunta.
 
-def get_latex(filename: str, dParams: Dict[str, Any],
-              revisar: bool = False) -> str:
-    """Genera el código LaTeX de la pregunta.
+        Lo que hace es clasificar el tipo de pregunta, y llamar a la
+        función correspondiente.
 
-    Lo que hace es clasificar el tipo de pregunta, y llamar a la
-    función correspondiente.
+        Argumentos
+        ----------
+        filename:
+            Path del archivo de la pregunta.
+        dParams:
+            Diccionario de parámetros definidos por el usuario.
+        revisar:
+            Para especificar que se está en la opción de visualizar,
+            y que se debe especificar/imprimir la respuesta.
 
-    Argumentos
-    ----------
-    filename:
-        Path del archivo de la pregunta.
-    dParams:
-        Diccionario de parámetros definidos por el usuario.
-    revisar:
-        Para especificar que se está en la opción de visualizar,
-        y que se debe especificar/imprimir la respuesta.
+        Devuelve
+        --------
+        El texto LaTeX de la pregunta.
+        """
+        # Se obtienen todas las lineas del archivo y se cierra.
+        try:
+            f = open(filename)
+        except FileNotFoundError:
+            logging.error('No se pudo abrir archivo "%s"' % filename)
+            return ''
+        lsTexto: List[str] = f.readlines()
+        f.close()
 
-    Devuelve
-    --------
-    El texto LaTeX de la pregunta.
-    """
-    # Se obtienen todas las lineas del archivo y se cierra.
-    try:
-        f = open(filename)
-    except FileNotFoundError:
-        logging.error('No se pudo abrir archivo "%s"' % filename)
-        return ''
-    lsTexto: List[str] = f.readlines()
-    f.close()
+        texto: str
+        linea: str
+        # Se ignoran los comentarios.
+        ignorar: bool = True
+        while ignorar:
+            linea = lsTexto.pop(0).strip()
+            ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
 
-    texto: str
-    linea: str
-    # Se ignoran los comentarios.
-    ignorar: bool = True
-    while ignorar:
-        linea = lsTexto.pop(0).strip()
-        ignorar = len(linea) == 0 or linea.startswith(Info.COMMENT)
+        # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
+        assert(linea.startswith(Info.LTIPO))
+        linea = linea.strip(Info.STRIP)
+        tipo: str = parserPPP.derechaIgual(linea, 'tipo')
+        if tipo == 'respuesta corta':
+            if self.puntaje == 0:
+                logging.critical('Pregunta de respuesta corta vale 0 puntos.')
+                assert(self.puntaje > 0)
+            texto = latex_corta(linea, lsTexto, dParams, revisar)
+        elif tipo == 'seleccion unica':
+            if self.puntaje == 0:
+                logging.critical('Pregunta de seleccion unica vale 0 puntos.')
+                assert(self.puntaje > 0)
+            texto = latex_unica(linea, lsTexto, dParams, revisar)
+        elif tipo == 'encabezado':
+            if self.puntaje > 0:
+                logging.critical('Se le asignaron puntos al encabezado.')
+                assert(self.puntaje == 0)
+            texto = latex_encabezado(linea, lsTexto, dParams)
+        else:
+            logging.critical('Tipo de pregunta desconocido: `%s`' % linea)
+            sys.exit()
 
-    # Debe comenzar con el tipo de la pregunta. Leemos cuál es.
-    assert(linea.startswith(Info.LTIPO))
-    linea = linea.strip(Info.STRIP)
-    tipo: str = parserPPP.derechaIgual(linea, 'tipo')
-    if tipo == 'respuesta corta':
-        texto = latex_corta(linea, lsTexto, dParams, revisar)
-    elif tipo == 'seleccion unica':
-        texto = latex_unica(linea, lsTexto, dParams, revisar)
-    elif tipo == 'encabezado':
-        texto = latex_encabezado(linea, lsTexto, dParams)
-    else:
-        logging.critical('Tipo de pregunta desconocido: `%s`' % linea)
-        sys.exit()
-
-    # Modificar path de figuras
-    texto = __path_graphics__(filename, texto)
-    return texto
+        # Modificar path de figuras
+        texto = __path_graphics__(filename, texto)
+        return texto
 
 
 def get_respuesta(filename: str, dParams: Dict[str, Any]) -> Respuesta:

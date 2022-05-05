@@ -124,7 +124,7 @@ class Seccion:
             if preg.get_puntaje() == 0:
                 assert(preg.muestra == 1)
                 assert(preg.es_bloque())
-                texto = pregunta.get_latex(filelist[0], dParams)
+                texto = preg.get_latex(filelist[0], dParams)
                 sublista.append('%s\n\\bigskip\n\n' % texto)
                 continue
 
@@ -240,7 +240,7 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
     texto: str
     fin: str
     for filename in filelist:
-        texto = pregunta.get_latex(filename, dParams)
+        texto = preg.get_latex(filename, dParams)
         # Estamos en un bloque y no es la última pregunta.
         if preg.bloque > 0:
             fin = '\\bigskip'
