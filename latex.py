@@ -12,6 +12,7 @@ def get_encabezadoExamen(examen: PPP) -> str:
                                                    'head=14.5pt'),
         '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
+        '\\usepackage{lmodern,microtype}\n',
         '\\usepackage[spanish]{babel}\n',
         '\\decimalpoint\n',
         '\\usepackage{paralist}\n',
