@@ -157,7 +157,9 @@ def __calificar_unica__(respuestas, texto: str, puntaje: int) -> float:
 def __calificar_resp_corta__(respuestas, texto: str, puntaje: float) -> float:
     logging.debug('Calificar respuesta corta [%d pt]: `%s`' % (puntaje, texto))
     puntos: float = 0.0
+    original = texto
     for resp, error, factor, funcion in respuestas:
+        texto = original
         if funcion is not None:
             logging.debug('Funcion = `%s`', funcion)
             texto = (eval(funcion))(texto)
