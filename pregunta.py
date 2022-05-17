@@ -243,7 +243,7 @@ def latex_unica(opciones: str, lsTexto: List[str],
 
     if revisar:
         # Se obtiene cuáles items son respuesta correcta.
-        litems = __respuestas_unica__(litems, opciones)
+        litems = __respuestas_unica__(litems, opciones, dLocal)
         litems = [(tupla[0], '%s%s' % ('R/ ' if tupla[0] else '', tupla[1]))
                   for tupla in litems]
 
@@ -499,7 +499,7 @@ def respuesta_unica(opciones: str, lsTexto: List[str],
     contador, litems = __items_unica__(contador - 1, lsTexto, dLocal, 3)
 
     # Se obtiene cuáles items son respuesta correcta.
-    litems = __respuestas_unica__(litems, opciones)
+    litems = __respuestas_unica__(litems, opciones, dLocal)
 
     # Desordenamos los items.
     if orden == 'aleatorio':
@@ -582,7 +582,7 @@ def __leer_orden__(opciones: str) -> str:
     return orden
 
 
-def __respuestas_unica__(litems: List[Item], opciones: str):
+def __respuestas_unica__(litems: List[Item], opciones: str, dLocal):
     """ Cambia a True aquellos items cuya respuesta es la correcta.
 
     Todos los items se asume que vienen con False. Revisa en opciones
@@ -598,7 +598,15 @@ def __respuestas_unica__(litems: List[Item], opciones: str):
         Opciones de la pregunta.
     """
     size = len(litems)
-    opcion: str = parserPPP.derechaIgual(opciones, 'opcion').strip()
+
+    algoSalioMal: str = parserPPP.derechaIgual(opciones, 'comodin').strip()
+    opcion: str = ''
+    if len(algoSalioMal):
+        opcion = eval(algoSalioMal, DGlobal, dLocal)
+
+    if len(opcion)==0:
+        opcion = parserPPP.derechaIgual(opciones, 'opcion').strip()
+
     if opcion == 'todos':
         litems = [(True, tupla[1]) for tupla in litems]
     elif len(opcion) == 0:
