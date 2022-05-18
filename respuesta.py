@@ -49,11 +49,7 @@ class Respuesta:
         if self.tipoPreg & TPreg.TODOS:
             return '*'
         if self.tipoPreg & TPreg.UNICA:
-            try:
-                opcion = self.respuestas[0]
-                return chr(ord('A') + opcion)
-            except IndexError:
-                logging.debug('@@ self.respuestas = %s' % str(self.respuestas))
+            return ','.join([chr(ord('A') + opcion) for opcion in self.respuestas])
         elif self.tipoPreg & TPreg.RESP_CORTA:
             return self.respuestas[0][0]
 

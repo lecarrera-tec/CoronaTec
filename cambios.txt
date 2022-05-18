@@ -1,6 +1,7 @@
-2022-v08
-- Agregar un error condicional para el caso de preguntas de selección única, que sea
-  dependiente de una variable entera.
+2022-v09
+- Imprime todas las opciones en las preguntas de selección única.
+- Agregar un comodín para el caso de preguntas de selección única, que sea
+  dependiente de una variable de tipo string.
 - Eliminar comillas en el caso de caracteres a la hora de imprimir una lista como un conjunto.
 - Agregar un pre-procesador a las respuestas de las personas estudiantes.
 - Despulgar la función txt.fraccion, cuando utiliza coef, y cuando hay argumento.
