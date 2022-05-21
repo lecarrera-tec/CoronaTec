@@ -1,4 +1,10 @@
 from typing import List, Tuple
+
+UNA_PREGUNTA_POR_PAGINA = True
+# Si se enumera el bloque, entonces puede
+# ser complicado el uso de formularios.
+ENUMERAR_BLOQUE = False
+
 """
 Claves para el texto de los archivos de entrada.
 
@@ -45,6 +51,16 @@ SOLUCION: str = '<solucion>'
 
 # Ver paquete paralist.
 FORMATO_ITEM: str = '[A)]'
+
+# Formato para el documento
+if UNA_PREGUNTA_POR_PAGINA:
+    LATEX_NUEVA_PREGUNTA = '\\newpage\n'
+    LATEX_NUEVA_SECCION = '\\newpage\n'
+    PAPER_SIZE = 'papersize={8.5in,30in}'
+else:
+    LATEX_NUEVA_PREGUNTA = '\\bigskip\n'
+    LATEX_NUEVA_SECCION = '\\bigskip\n'
+    PAPER_SIZE = 'papersize={8.5in,11in}'
 
 # para eliminar
 STRIP: str = ' <\t\n>'

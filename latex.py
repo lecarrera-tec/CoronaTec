@@ -1,5 +1,6 @@
 from typing import List
 from ppp import PPP
+import Info
 
 
 def get_encabezadoExamen(examen: PPP) -> str:
@@ -8,9 +9,8 @@ def get_encabezadoExamen(examen: PPP) -> str:
     texto: List[str] = [
         '\\documentclass[12pt]{article}\n\n',
         '\\usepackage[%s,%s,%s,%s]{geometry}\n' % ('scale=0.85', 'top=1in',
-                                                   'papersize={8.5in,30in}',
+                                                   Info.PAPER_SIZE,
                                                    'head=14.5pt'),
-        '\\usepackage[utf8]{inputenc}\n',
         '\\usepackage[T1]{fontenc}\n',
         '\\usepackage{lmodern,microtype}\n',
         '\\usepackage[spanish]{babel}\n',

@@ -12,21 +12,18 @@ import Info
 
 
 def __primera_seccion__(tex, examen, seccion):
+    tex.append('  ' + Info.LATEX_NUEVA_SECCION)
     if len(examen.secciones) > 1 or len(seccion.titulo) > 0:
-        tex.append('  \\newpage\n')
         tex.append('  \\section{%s %s %d puntos)}}\n\n'
                    % (seccion.titulo,
                       '{\\normalsize (total de la secci\\\'on:',
                       seccion.get_puntaje()))
-    else:
-        # Solamente se tiene una sección sin titulo.
-        tex.append('  \\newpage\n')
     tex.append(seccion.get_latex())
 
 
 def __resto_secciones__(tex, examen, seccion):
     for seccion in examen.secciones[1:]:
-        tex.append('\\newpage\n')
+        tex.append(Info.LATEX_NUEVA_SECCION)
         tex.append('\\section{%s %s %d puntos)}}\n\n'
                    % (seccion.titulo,
                       '{\\normalsize (total de la secci\\\'on:',
@@ -173,7 +170,12 @@ for path in lestudiantes:
         # Se genera el pdf.
         os.system('pdflatex %s' % filename)
         os.system('pdflatex %s' % filename)
-        os.system('pdfcrop -margins 20 %s.pdf temp.pdf' % filename)
+        if Info.UNA_PREGUNTA_POR_PAGINA: 
+            os.system('pdfcrop -margins 20 %s.pdf temp.pdf' % filename)
+        else:
+            # Renombramos el archivo, porque luego vamos a borrar
+            # todos los archivos que comiencen con el mismo nombre.
+            os.rename('%s.pdf' % filename, 'temp.pdf')
 
         # Se eliminan los archivos '*.{aux,log,tex,...}'
         flist = [f for f in os.listdir() if f.startswith(filename)]

@@ -118,14 +118,16 @@ class Seccion:
             # Extraemos las preguntas.
             filelist = __muestra__(preg)
             # El puntaje de la pregunta es 0. Entonces debe corresponder
-            # a un archivo de encabezado. Por eso no va entre
-            # \begin{ejer} y \end{ejer}. Solo se puede extraer un
+            # a un archivo de encabezado. Solo se puede extraer un
             # archivo y debemos estar en un bloque.
             if preg.get_puntaje() == 0:
                 assert(preg.muestra == 1)
                 assert(preg.es_bloque())
                 texto = preg.get_latex(filelist[0], dParams)
-                sublista.append('%s\n\\bigskip\n\n' % texto)
+                if Info.ENUMERAR_BLOQUE:
+                    sublista.append('\\begin{ejer}\n %s\n\\begin{enumerate}[(a)]\n' % texto)
+                else:
+                    sublista.append('%s\n\\bigskip\n\n' % texto)
                 continue
 
             sublista = __lista_latex__(preg, filelist, templs, sublista,
@@ -243,16 +245,28 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
         texto = preg.get_latex(filename, dParams)
         # Estamos en un bloque y no es la última pregunta.
         if preg.bloque > 0:
-            fin = '\\bigskip'
+            if Info.ENUMERAR_BLOQUE:
+                fin = ''
+            else:
+                fin = '\\bigskip'
         else:
-            fin = '\\newpage'
+            if Info.ENUMERAR_BLOQUE:
+                fin = '  \\end{enumerate}\n\\end{ejer}\n%s\n\n'%(
+                        Info.LATEX_NUEVA_PREGUNTA)
+            else:
+                fin = Info.LATEX_NUEVA_PREGUNTA
             dParams.clear()
 
         if preg.get_puntaje() > 1:
             txtPts = 'puntos'
         else:
             txtPts = 'punto'
-        texto = '%s{[%g %s]}\n%s\n%s\n%s\n\n' % (
+        if Info.ENUMERAR_BLOQUE:
+            texto = '%s{[%g %s]}\n%s\n%s\n\n' % (
+                '  \\item~\\textbf', preg.get_puntaje(), txtPts,
+                texto, fin)
+        else:
+            texto = '%s{[%g %s]}\n%s\n%s\n%s\n\n' % (
                 '  \\begin{ejer}~\\textbf', preg.get_puntaje(), txtPts,
                 texto, '\\end{ejer}', fin)
         if preg.es_bloque():
