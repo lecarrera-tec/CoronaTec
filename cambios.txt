@@ -1,3 +1,7 @@
+2022-v10
+- Se agrega, en Info.py, la opción para enumerar los encabezados
+  y dejar las preguntas de corrido.
+
 2022-v09
 - Imprime todas las opciones en las preguntas de selección única.
 - Agregar un comodín para el caso de preguntas de selección única, que sea

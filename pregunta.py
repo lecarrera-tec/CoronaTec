@@ -29,6 +29,9 @@ class Pregunta:
         Origen de la pregunta (o carpeta al banco de preguntas)
     muestra: int
         En caso de un banco de preguntas, tamaño de la muestra.
+    columnas: int
+        Número de columnas que se imprimen las opciones en
+        caso de que sea de selección única. 1 es por defecto.
     bloque: int
         0 si no se está en un bloque.
         1 si es el inicio de un bloque.
@@ -36,11 +39,12 @@ class Pregunta:
         -1 si se está en la última pregunta de un bloque.
     """
     def __init__(self, puntaje: float, origen: str, muestra: int,
-                 bloque: bool):
+            bloque: bool, columnas: int):
         self.puntaje: float = puntaje
         self.origen: str = origen
         self.muestra: int = muestra
         self.bloque: int = 2 * int(bloque)
+        self.columnas: int = columnas
 
     def es_bloque(self) -> bool:
         return self.bloque != 0
@@ -62,6 +66,9 @@ class Pregunta:
 
     def get_muestra(self) -> int:
         return self.muestra
+
+    def get_columnas(self) -> int:
+        return self.columnas
 
     def get_latex(self, filename: str, dParams: Dict[str, Any],
                   revisar: bool = False) -> str:
@@ -114,7 +121,7 @@ class Pregunta:
             if self.puntaje == 0:
                 logging.critical('Pregunta de seleccion unica vale 0 puntos.')
                 assert(self.puntaje > 0)
-            texto = latex_unica(linea, lsTexto, dParams, revisar)
+            texto = latex_unica(linea, lsTexto, dParams, revisar, self.get_columnas())
         elif tipo == 'encabezado':
             if self.puntaje > 0:
                 logging.critical('Se le asignaron puntos al encabezado.')
@@ -180,7 +187,7 @@ def get_respuesta(filename: str, dParams: Dict[str, Any]) -> Respuesta:
 
 
 def latex_unica(opciones: str, lsTexto: List[str],
-                dParams: Dict[str, Any], revisar: bool) -> str:
+        dParams: Dict[str, Any], revisar: bool, columnas: int) -> str:
     """LaTeX de pregunta de selección única.
 
     Argumentos
@@ -194,6 +201,7 @@ def latex_unica(opciones: str, lsTexto: List[str],
     revisar:
         Para especificar que se está en la opción de visualizar, y que
         se debe especificar/imprimir la respuesta.
+    columnas: # de columnas que se utilizar para imprimir las opciones.
 
     Devuelve
     --------
@@ -258,10 +266,14 @@ def latex_unica(opciones: str, lsTexto: List[str],
             random.shuffle(litems)
 
     # Construimos el latex
+    if columnas > 1:
+        lista.append('    \\begin{multicols}{%d}\n'%columnas)
     lista.append('    \\begin{enumerate}%s\n' % Info.FORMATO_ITEM)
     for _, item in litems:
         lista.append('      \\item %s' % item)
     lista.append('    \\end{enumerate}\n')
+    if columnas > 1:
+        lista.append('    \\end{multicols}\n')
     return ('%s\n' % ''.join(lista).strip())
 
 

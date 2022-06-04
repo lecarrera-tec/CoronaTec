@@ -208,6 +208,9 @@ def preguntas(contador: int, lsTexto: List[str], dirTrabajo: str,
         # Tamaño de la muestra.
         muestra = __muestra__(linea)
 
+        # # de columnas para las opciones
+        columnas = __columnas__(linea)
+
         # Origen de la pregunta.
         texto = parserPPP.derechaIgual(linea, 'origen')
         if len(texto) == 0:
@@ -215,7 +218,7 @@ def preguntas(contador: int, lsTexto: List[str], dirTrabajo: str,
                           + 'La pregunta no se pudo incluir.')
             continue
         origen = '%s%s' % (dirTrabajo, texto)
-        lista.append(Pregunta(puntos, origen, muestra, bloque))
+        lista.append(Pregunta(puntos, origen, muestra, bloque, columnas))
         # Es la primera pregunta de un bloque.
         if bloque and (len(lista) == 1 or lista[-2].es_ultima()
                        or not lista[-2].es_bloque()):
@@ -254,3 +257,18 @@ def __muestra__(linea: str) -> int:
                     'Por defecto queda de tamaño 1')
             logging.warning(texto)
     return muestra
+
+
+def __columnas__(linea: str) -> int:
+    columnas = 1
+    texto = parserPPP.derechaIgual(linea, 'columnas')
+    if len(texto) > 0:
+        try:
+            columnas = int(texto)
+        except ValueError:
+            columnas = 1
+            texto = '%s "%s".\n%s' % (
+                    'No se pudo leer número de columnas en', linea,
+                    'Por defecto queda de 1 columna.')
+            logging.warning(texto)
+    return columnas

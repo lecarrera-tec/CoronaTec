@@ -1,9 +1,9 @@
 from typing import List, Tuple
 
-UNA_PREGUNTA_POR_PAGINA = True
+UNA_PREGUNTA_POR_PAGINA = False
 # Si se enumera el bloque, entonces puede
 # ser complicado el uso de formularios.
-ENUMERAR_BLOQUE = False
+ENUMERAR_BLOQUE = True
 
 """
 Claves para el texto de los archivos de entrada.

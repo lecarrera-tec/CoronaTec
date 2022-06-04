@@ -240,7 +240,7 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
                     sublista: List[str], dParams: Dict[str, Any]) -> List[str]:
     filename: str
     texto: str
-    fin: str
+    fin: str = ''
     for filename in filelist:
         texto = preg.get_latex(filename, dParams)
         # Estamos en un bloque y no es la última pregunta.
@@ -249,7 +249,7 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
                 fin = ''
             else:
                 fin = '\\bigskip'
-        else:
+        elif preg.bloque == -1:
             if Info.ENUMERAR_BLOQUE:
                 fin = '  \\end{enumerate}\n\\end{ejer}\n%s\n\n'%(
                         Info.LATEX_NUEVA_PREGUNTA)
@@ -261,17 +261,20 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
             txtPts = 'puntos'
         else:
             txtPts = 'punto'
-        if Info.ENUMERAR_BLOQUE:
-            texto = '%s{[%g %s]}\n%s\n%s\n\n' % (
-                '  \\item~\\textbf', preg.get_puntaje(), txtPts,
-                texto, fin)
+        if preg.es_bloque():
+            if Info.ENUMERAR_BLOQUE:
+                texto = '%s{[%g %s]}\n%s\n%s\n\n' % (
+                    '  \\item~\\textbf', preg.get_puntaje(), txtPts,
+                    texto, fin)
+            else:
+                texto = '%s{[%g %s]}\n%s\n%s\n%s\n\n' % (
+                    '  \\begin{ejer}~\\textbf', preg.get_puntaje(), txtPts,
+                    texto, '\\end{ejer}', fin)
+            sublista.append(texto)
         else:
             texto = '%s{[%g %s]}\n%s\n%s\n%s\n\n' % (
                 '  \\begin{ejer}~\\textbf', preg.get_puntaje(), txtPts,
                 texto, '\\end{ejer}', fin)
-        if preg.es_bloque():
-            sublista.append(texto)
-        else:
             lista.append(texto)
 
         # Es la última pregunta del bloque. Agregamos la lista de
