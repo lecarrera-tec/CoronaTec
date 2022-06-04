@@ -1,4 +1,7 @@
 2022-v10
+- Se modifica metodos.cuadratica para que se pueda responder
+  fracciones cuando el discriminante es un cuadrado perfecto.
+- Se agrega la opción de poner las opciones en columnas.
 - Se agrega, en Info.py, la opción para enumerar los encabezados
   y dejar las preguntas de corrido.
 

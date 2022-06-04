@@ -1,5 +1,6 @@
 import math
 import fmatriz
+from fractions import Fraction
 
 w0 = 11
 w1 = 81
@@ -96,7 +97,8 @@ def cuadratica(a, b, c):
     assert(disc >= 0)
     disc = math.sqrt(disc)
     exp = -b + math.copysign(disc, -b)
-    return (exp / (2 * a), 2 * c / exp)
+    exp = round(exp) if round(exp) == exp else exp
+    return (exp / (2 * a), 2 * c / exp) if isinstance(exp, float) else (Fraction(exp, 2*a), Fraction(2*c, exp))
 
 
 def cero(f, a, b):
