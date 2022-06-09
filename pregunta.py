@@ -796,7 +796,7 @@ def __leer_pregunta__(contador: int, lsTexto: List[str],
             break
         linea = lsTexto[contador]
         contador += 1
-    lista.append('%s\n%s' % (''.join(texto).rstrip(), '    \\nopagebreak\n'))
+    lista.append('%s\n' % (''.join(texto).rstrip()))
     return (contador - 1, lista)
 
 

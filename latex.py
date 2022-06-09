@@ -28,6 +28,7 @@ def get_encabezadoExamen(examen: PPP) -> str:
         '\\usepackage{amsmath,amsthm,amssymb}\n',
         '\\theoremstyle{definition}\n',
         '\\newtheorem{ejer}{}\n\n',
+        '\\newcommand{\\LatexNuevaPregunta}{%s}\n\n' % Info.LATEX_NUEVA_PREGUNTA,
     ]
 
     # Se agrega el encabezado dado por el usuario, el nombre del curso

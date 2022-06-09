@@ -150,7 +150,7 @@ class Seccion:
         return '%s%s%s%s%s\n\n' % ('\\noindent\\rule{\\textwidth}{1pt}\n\n',
                                    self.instrucciones,
                                    '\n\n\\noindent\\rule{\\textwidth}{1pt}',
-                                   '\n\n\\bigskip\n\n',
+                                   r'\bigskip',
                                    ''.join(lista).strip())
 
     def get_respuestas(self) -> List[Respuesta]:
@@ -223,16 +223,12 @@ def __muestra__(preg: Pregunta) -> List[str]:
     logging.debug('Lista de archivos (se requieren %d):' % muestra)
     logging.debug('Path = %s' % path)
     logging.debug('%s' % str([yo.replace(path, '') for yo in lista]))
-    if muestra < len(lista):
+    logging.debug('Random: Muestra = %d' % muestra)
+    if muestra <= len(lista):
         # Devolviendo una muestra ordenada.
-        logging.debug('Random: Muestra = %d' % muestra)
         resp = sorted(random.sample(lista, muestra))
-    elif muestra == len(lista):
-        resp = lista
     else:
-        logging.critical(
-                'La carpeta no tiene la cantidad de preguntas requeridas.')
-        sys.exit()
+        resp = sorted(random.choices(lista, muestra))
     return resp
 
 
@@ -249,12 +245,12 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
                 fin = ''
             else:
                 fin = '\\bigskip'
+        # Estamos en la \'ultima pregunta del bloque.
         elif preg.bloque == -1:
             if Info.ENUMERAR_BLOQUE:
-                fin = '  \\end{enumerate}\n\\end{ejer}\n%s\n\n'%(
-                        Info.LATEX_NUEVA_PREGUNTA)
+                fin = '  \\end{enumerate}\n\\end{ejer}\n\\LatexNuevaPregunta\n\n'
             else:
-                fin = Info.LATEX_NUEVA_PREGUNTA
+                fin = '  \n\n\\LatexNuevaPregunta\n\n'
             dParams.clear()
 
         if preg.get_puntaje() > 1:
@@ -274,7 +270,7 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
         else:
             texto = '%s{[%g %s]}\n%s\n%s\n%s\n\n' % (
                 '  \\begin{ejer}~\\textbf', preg.get_puntaje(), txtPts,
-                texto, '\\end{ejer}', fin)
+                texto, '\\end{ejer}', r'\LatexNuevaPregunta')
             lista.append(texto)
 
         # Es la última pregunta del bloque. Agregamos la lista de
