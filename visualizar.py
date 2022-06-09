@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 import logging
 
 import pregunta
+from pregunta import Pregunta
 
 logging.basicConfig(
         filename='_visualizar.log', level=logging.DEBUG, filemode='w')
@@ -54,13 +55,15 @@ except OSError:
 foutput = open('%s.tex' % output, 'w')
 foutput.write(encabezado)
 
+# Se crea el objeto pregunta:
+preg: Pregunta = Pregunta(1, origen, muestra = 1, bloque = False, columnas = 1)
 texto: str
 numRep: int = int(sys.argv[2])
 dParams: Dict[str, Any]
 for i in range(numRep):
     dParams = {}
     foutput.write('\\begin{ejer}\n')
-    texto = pregunta.get_latex(origen, dParams, True)
+    texto = preg.get_latex(origen, dParams, True)
     foutput.write(texto)
     foutput.write('\n\\end{ejer}\n\\newpage\n\n')
 
