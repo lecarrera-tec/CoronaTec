@@ -157,7 +157,8 @@ def coef(numero: int, conSigno: bool = False, arg: str = '') -> str:
             return ''
         else:
             return ('+0' if conSigno else '0')
-    if numero == 1:
+    arg = arg.strip()
+    if numero == 1 and len(arg):
         return '%s%s'%(txtSigno, arg)
     else:
         return '%s%d%s' % (txtSigno, numero, arg)
