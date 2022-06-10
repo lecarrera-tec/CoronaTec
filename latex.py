@@ -27,7 +27,12 @@ def get_encabezadoExamen(examen: PPP) -> str:
 
         '\\usepackage{amsmath,amsthm,amssymb}\n',
         '\\theoremstyle{definition}\n',
-        '\\newtheorem{ejer}{}\n\n',
+        '\\newtheorem{pregunta}{}\n\n',
+        '\\newenvironment{ejer}'
+        '{\\par\\nobreak\\vfil\\penalty0\\vfilneg'
+        ' \\vtop\\bgroup\\begin{pregunta}}'
+        '{\\end{pregunta}\\par\\xdef\\tpd{\\the\\prevdepth}\\egroup'
+        ' \\prevdepth=\\tpd}'
         '\\newcommand{\\LatexNuevaPregunta}{%s}\n\n' % Info.LATEX_NUEVA_PREGUNTA,
     ]
 

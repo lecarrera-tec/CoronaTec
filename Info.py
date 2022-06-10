@@ -58,8 +58,8 @@ if UNA_PREGUNTA_POR_PAGINA:
     LATEX_NUEVA_SECCION = '\\newpage'
     PAPER_SIZE = 'papersize={8.5in,30in}'
 else:
-    LATEX_NUEVA_PREGUNTA = '\\bigskip'
-    LATEX_NUEVA_SECCION = '\\bigskip\n'
+    LATEX_NUEVA_PREGUNTA = ''
+    LATEX_NUEVA_SECCION = ''
     PAPER_SIZE = 'papersize={8.5in,11in}'
 
 # para eliminar
