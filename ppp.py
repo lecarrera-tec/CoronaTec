@@ -5,6 +5,7 @@ from typing import List
 
 import Info
 import leer
+import parserPPP
 from seccion import Seccion
 
 
@@ -107,11 +108,21 @@ class PPP:
 
         # Ahora revisamos si existe encabezado para LaTeX. Si no
         # hubiera encabezado, se tiene un texto vacío.
-        contador, self.encabezado = leer.verbatim(contador, lsTexto,
-                                                  Info.ENCABEZADO)
-        if len(self.encabezado) > 0:
-            logging.info('<Encabezado>')
+        contador = leer.blancos(contador, lsTexto)
+        linea = lsTexto[contador].strip()
+        if linea.startswith(Info.LENCABEZADO):
+            contador, self.encabezado = leer.verbatim(contador, lsTexto, linea)
+            logging.info(linea)
             logging.info(self.encabezado)
+            # Caso para que las preguntas salen de manera continua.
+            if 'False' == parserPPP.derechaIgual(linea.strip('>'), 'crop'):
+                logging.info('Preguntas de corrido.')
+                Info.UNA_PREGUNTA_POR_PAGINA = False
+                Info.LATEX_NUEVA_PREGUNTA = ''
+                Info.LATEX_NUEVA_SECCION = ''
+                Info.PAPER_SIZE = 'papersize={8.5in,11in}'
+            if 'False' == parserPPP.derechaIgual(linea, 'continuo'):
+                Info.ENUMERAR_BLOQUE = True
         else:
             logging.info('No se encontró encabezado.')
 

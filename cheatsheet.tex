@@ -1,7 +1,7 @@
 \documentclass[10pt,landscape]{article}
 \usepackage{multicol, paralist}
+\usepackage{lmodern,microtype}
 \usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage[landscape, scale=0.9]{geometry}
 \usepackage{amsmath,amsthm,amsfonts,amssymb}
@@ -75,9 +75,10 @@ _texto de la pregunta_ @exp
 \end{verbatim}
 
 \subsection{Selección única}
-  Tambi\'en acepta \verb|cifras = _int_|. Los \'indices para \verb|opcion| son 0-indexados.\vspace*{-1.5ex}
+  Tambi\'en acepta \verb|cifras = _int_|. Los \'indices para \verb|opcion| y \verb|comodin| son 0-indexados.\vspace*{-1.5ex}
 \begin{verbatim}
 <tipo = seleccion unica[, opcion = (i[ & i]* | todos)]>
+<tipo = seleccion unica, comodin=_var_>
 
 <variables> ?
 _v1[, vn]*_ = _expresion_ +
@@ -88,10 +89,6 @@ _texto de la pregunta_ @exp
 <item> +
 _texto de respuesta o distractor_ @exp
 \end{verbatim}
-
-Es posible utilizar un comod\'in. Lo que hace es definir la opci\'on o las opciones seg\'un un string en las variables.
-\verb|<tipo = seleccion unica, comodin=var>|
-Dicho comod\'in deber\'ia ser 0 usualmente, pero por alg\'un error, podr\'ia tomar otro valor o valores igual que en el caso de \verb|opcion|.
 
 \subsection{Respuesta corta}
 \begin{verbatim}
@@ -108,35 +105,7 @@ _texto de la pregunta_ @exp
 _respuesta_
 \end{verbatim}
 
-Puede utilizar \verb|error = inf| en caso de que deba aceptar todas las respuestas como correctas. Lo \'unico es que el sistema se la pone buena \'unicamente en los casos en que respondieron la pregunta. Si no respondieron, el sistema le pone un 0.
-
-Digamos que la respuesta es \verb|alfa|, pero en algunos casos, por un error de la pregunta, no es posible determinar el valor. As\'i, puede usar:
-\begin{verbatim}
-<variables>
-...
-alfa = math.nan if <sin_solucion> else <casos_buenos>
-...
-
-<item>
-alfa
-\end{verbatim}
-
-Cuando se est\'a calificando la prueba, y el sistema encuentre un valor de \verb|math.nan| en la respuesta dada por el sistema, entonces el sistema pone buena la pregunta.
-
-\noindent\verb|<tipo = respuesta corta[, funcion=_txtfun_]>|
-Es posible pasar una funci\'on que pre-procese las respuestas. Lo \'unico es que hay que pasarla como un el texto de una funci\'on. Digamos que queremos calificar una pregunta cuya respuesta es una ecuaci\'on lineal $mx+b$.
-\begin{verbatim}
-<variables>
-m, b = randint(1, 9)
-ftxt = r"lambda ss: set(ss.replace('+', ' ').split())"
-resp = {txt.coef(m) + 'x', str(b)}
-...
-<item, f=ftxt>
-resp
-\end{verbatim}
-Este proceso califica buenas preguntas que se hayan escrito de la forma $mx+b$ o $b+mx$, al hacer la comparaci\'on utilizando conjuntos.
-
-  \section{@-expresi\'on}
+\section{@-expresi\'on}
 
 \begin{asparaitem}
   \item \verb|@<_expr_>|

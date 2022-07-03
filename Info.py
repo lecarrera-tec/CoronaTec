@@ -1,10 +1,5 @@
 from typing import List, Tuple
 
-UNA_PREGUNTA_POR_PAGINA = False
-# Si se enumera el bloque, entonces puede
-# ser complicado el uso de formularios.
-ENUMERAR_BLOQUE = False
-
 """
 Claves para el texto de los archivos de entrada.
 
@@ -33,34 +28,34 @@ TIEMPO: str = '<Tiempo>'
 CURSOS: str = '<Cursos>'
 TITULO: str = '<Titulo>'
 INSTRUCCIONES: str = '<Instrucciones>'
-ENCABEZADO: str = '<Encabezado>'
-
-# Como la sección puede tener opciones, solamente nos
-# preocupamos por el lado izquierdo.
-LSECCION: str = '<Seccion'
 PREGUNTAS: str = '<Preguntas>'
 INICIO_BLOQUE: str = '<bloque>'
 FIN_BLOQUE: str = '</bloque>'
-
-LTIPO: str = '<tipo'
 VARIABLES: str = '<variables>'
 PREGUNTA: str = '<pregunta>'
-LITEM: str = '<item'
 RESPUESTA: str = '<respuesta>'
 SOLUCION: str = '<solucion>'
+
+# Como puede tener opciones, solamente nos
+# preocupamos por el lado izquierdo.
+LSECCION: str = '<Seccion'
+LENCABEZADO: str = '<Encabezado'
+LTIPO: str = '<tipo'
+LITEM: str = '<item'
 
 # Ver paquete paralist.
 FORMATO_ITEM: str = '[A)]'
 
-# Formato para el documento
-if UNA_PREGUNTA_POR_PAGINA:
-    LATEX_NUEVA_PREGUNTA = '\\newpage'
-    LATEX_NUEVA_SECCION = '\\newpage'
-    PAPER_SIZE = 'papersize={8.5in,30in}'
-else:
-    LATEX_NUEVA_PREGUNTA = ''
-    LATEX_NUEVA_SECCION = ''
-    PAPER_SIZE = 'papersize={8.5in,11in}'
+# Formato para el caso en que sea una pregunta
+# por página. Ese es el formato predeterminado.
+UNA_PREGUNTA_POR_PAGINA = True
+LATEX_NUEVA_PREGUNTA = '\\newpage\n'
+LATEX_NUEVA_SECCION = '\\newpage\n'
+PAPER_SIZE = r'papersize={8.5in,30in}'
+# Si se enumera el bloque, entonces puede
+# ser complicado el uso de formularios.
+ENUMERAR_BLOQUE = False
+
 
 # para eliminar
 STRIP: str = ' <\t\n>'

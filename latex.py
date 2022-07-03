@@ -28,12 +28,13 @@ def get_encabezadoExamen(examen: PPP) -> str:
         '\\usepackage{amsmath,amsthm,amssymb}\n',
         '\\theoremstyle{definition}\n',
         '\\newtheorem{pregunta}{}\n\n',
-        '\\newenvironment{ejer}'
-        '{\\par\\nobreak\\vfil\\penalty0\\vfilneg'
-        ' \\vtop\\bgroup\\begin{pregunta}}'
-        '{\\end{pregunta}\\par\\xdef\\tpd{\\the\\prevdepth}\\egroup'
-        ' \\prevdepth=\\tpd}'
-        '\\newcommand{\\LatexNuevaPregunta}{%s}\n\n' % Info.LATEX_NUEVA_PREGUNTA,
+        '\\newenvironment{ejer}\n',
+        '{\\par\\nobreak\\vfil\\penalty0\\vfilneg\n',
+        ' \\vtop\\bgroup\\begin{pregunta}}\n',
+        '{\\end{pregunta}\\par\\xdef\\tpd{\\the\\prevdepth}\\egroup\n',
+        ' \\prevdepth=\\tpd}\n\n',
+        '\\newcommand{\\LatexNuevaPregunta}{%s}\n' % Info.LATEX_NUEVA_PREGUNTA,
+        '\\newcommand{\\FormatoNombre}[1]{{\\large #1}}\n\n',
     ]
 
     # Se agrega el encabezado dado por el usuario, el nombre del curso
@@ -67,7 +68,7 @@ def get_inicioExamen(nombre: str, examen) -> List[str]:
         texto.append('\\textsc{%s}\\bigskip\n\n' % temp)
 
     texto.append('\n\\begin{center}\n  {\\Large %s}\\\\[1ex]' % examen.titulo)
-    texto.append('{\\large %s}\n\\end{center}\n\n' % nombre)
+    texto.append('\\FormatoNombre{%s}\n\\end{center}\n\n' % nombre)
     return texto
 
 

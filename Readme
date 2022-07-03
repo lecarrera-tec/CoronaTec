@@ -1,6 +1,9 @@
-Proyecto que genera Pruebas a partir de un banco de preguntas parametrizadas.
+Proyecto que generación y evaluación automatizada de pruebas a partir de un banco de preguntas parametrizadas.
 
-Las preguntas pueden ser de selecci\'on \'unica o respuesta corta.
+Las preguntas pueden ser de selección única o respuesta corta.
 
-Ver documentacion.pdf
+En el archivo documentacion.pdf, se encuentra una documentación general de cómo se estructura la prueba, y cómo dar formato a los archivos generados.
 
+En la carpeta de Moldes, se encuentran ejemplos para los diferentes tipos de preguntas.
+
+En el archivo cheatsheet.pdf se encuentran los comandos que se pueden acceder desde el sistema.

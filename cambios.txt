@@ -1,4 +1,12 @@
 2022-v10
+- Se asegura que las preguntas no se corten.
+- Se modifica que el número de muestras puede ser mayor
+  que el n\'umero de elementos en la carpeta. Se utiliza
+  "choices" en lugar de "sample" en ese caso.
+- Se corrige una pulga que se introdujo en visualizar.
+- Se permite mayor manipulación de la estructura del documento
+  desde el .ppp, y se documenta.
+- Se corrigen pulgas con la opción de preguntas a corrido.
 - Se modifica metodos.cuadratica para que se pueda responder
   fracciones cuando el discriminante es un cuadrado perfecto.
 - Se agrega la opción de poner las opciones en columnas.
@@ -15,16 +23,16 @@
 
 2022-v07
 - Uso de math.nan para calificar casos particulares donde la pregunta de tipo respuesta corta no tiene respuesta.
-- Aclaraci\'on en la documentaci\'on del uso de inf en el error de las preguntas de respuesta corta.
+- Aclaración en la documentación del uso de inf en el error de las preguntas de respuesta corta.
 - Se corrige la documentación para vector.latex. Era 'cifras' en lugar de 'ndigits'.
-- Se crea la biblioteca relBin para trabajar con gr\'aficos y matrices de relaciones binarias.
+- Se crea la biblioteca relBin para trabajar con gráficos y matrices de relaciones binarias.
 - Se crea la biblioteca conj para trabajar con conjuntos como listas.
-- Se agrega la funci\'on raiz a fmate.
+- Se agrega la función raiz a fmate.
 
 2022-v06
 - Se agrega la opcion de 'coef' a las fracciones.
 - Se agrega \verb|choices| a las funciones aleatorias.
-- Se actualiza la documentaci\'on de txt.fraccion.
+- Se actualiza la documentación de txt.fraccion.
 
 2022-v05
 - Se corrige una pulga en txt.fraccion al imprimir 
@@ -37,12 +45,12 @@
   conjuntos aplicadas sobre listas.
 
 2022-v03
-- Se agrega un argumento para la funci\'on txt.expo.
-- Se elimina la funci\'on txt.sumar, y se a\~nade a txt.coef
-- Se corrije la funci\'on txt.fraccion
+- Se agrega un argumento para la función txt.expo.
+- Se elimina la función txt.sumar, y se añade a txt.coef
+- Se corrije la función txt.fraccion
 
 2022-v02
-- Se agrega un argumento para la funci\'on txt.fraccion.
+- Se agrega un argumento para la función txt.fraccion.
 - Se agregan puntuaciones decimales para las preguntas.
 - Se agregan las instrucciones para la consola de Windows.
 - Se eliminan para el usuario las funciones P(n, r) y C(n, r).

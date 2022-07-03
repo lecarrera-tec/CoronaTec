@@ -393,7 +393,7 @@ def latex_encabezado(opciones: str, lsTexto: List[str],
     # Se lee la pregunta.
     contador, lista = __leer_pregunta__(contador, lsTexto, dLocal, cifras)
 
-    return ('%s\n' % ''.join(lista).strip())
+    return ('\n\\bigskip\n\n%s\n' % ''.join(lista).strip())
 
 
 def respuesta_corta(opciones: str, lsTexto: List[str],

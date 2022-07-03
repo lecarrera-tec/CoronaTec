@@ -9,6 +9,7 @@
 
 \theoremstyle{definition}
 \newtheorem{funcion}{}[section]
+\newtheorem{ejem}{Ejemplo}
 
 \newcommand{\ds}{\displaystyle}
 
@@ -32,6 +33,25 @@ Este proyecto consta de los siguientes programas:
     Si la pregunta requiere de paquetes adicionales, de manera opcional se puede pasar como argumento un \emph{encabezado} de la pregunta que debe iniciar desde \verb|\documentclass...| y llegar hasta \verb|\begin{document}|. Debe incluir un ambiente de tipo \emph{ejer}, porque cada pregunta se encierra entre un \verb|\begin{ejer}| \dots \verb|\end{ejer}|. Puede ver la variable \verb|encabezado| en el archivo \verb|visualizar.py| como referencia.
 
     Cuando se imprime la vista previa de preguntas de selección, el orden de los distractores se mantiene fijo según el orden original de la pregunta y se marca con `R/' la opción correcta. En el caso de preguntas de respuesta corta, se agrega la respuesta al final de la pregunta.
+    \bigskip
+
+    Sin embargo, la funci\'on de visualizar es un poco limitada. Se sugiere, mejor, utilizar el archivo \verb|.ppp| para ir viendo c\'omo va quedando la evaluaci\'on. Algunas sugerencias son, agregar en el \verb|<Encabezado>| los siguientes comandos:
+
+    \noindent \verb|\newcommand{\esta}{\qquad $\gets$}| \\
+    Utilizar, al final de la opci\'on correcta en las preguntas de selecci\'on unica, el comando \verb|\esta|.
+    \medskip
+
+    \noindent \verb|\newcommand{\resp}[1]{\hfill{\small R/#1}}| \\
+    En las preguntas de selecci\'on \'unica, imprimir la respuesta correcta.
+    \medskip
+
+    \noindent \verb|\usepackage{hyperref}| \\
+    \noindent \verb|\newcommand{\desc}[1]{Descripción: #1}| \\
+    Imprime información pertinente. Se utiliza, por ejemplo, \verb|\desc{\url{PATH DEL ARCHIVO}}| para saber cu\'al es el archivo origen de la pregunta.
+    \medskip
+
+    Para quitar los comandos, sin cambiar los archivos \verb|.tex|, simplemente se redefinen, por ejemplo: \\
+    \noindent \verb|\renewcommand{\desc}[1]{}|
 \end{itemize}
 
 \subsection{Requisitos}
@@ -41,6 +61,7 @@ Este proyecto consta de los siguientes programas:
   \item perl (no se requiere para la función \verb|visualizar|)
   \item ghostscript (no se requiere para la función \verb|visualizar|)
 \end{itemize}
+\verb|perl| y \verb|ghostscript| son necesarios solo si se utiliza una p\'agina por pregunta, como se explicar\'a m\'as adelante.
 
 \subsection{Comentarios}
 Puede utilizar \verb|%| o \verb|#| como comentario al inicio del renglón.
@@ -66,7 +87,7 @@ __Nombre de los cursos__
 <Titulo>
 __Título de la prueba__
 
-<Encabezado>
+<Encabezado[, crop=False][, continuo=False]>
 __Paquetes, comandos nuevos, etc, para el encabezado del archivo LaTeX__
 
 <Instrucciones>
@@ -101,7 +122,39 @@ __Instrucciones del examen__
   \item De manera opcional, se pueden encerrar varias preguntas entre \verb|<bloque>| y \verb|</bloque>|. El efecto es que no va a separar las preguntas con una nueva página, y va a mantener las variables entre las preguntas. Utilizar aleatorio en la sección no afecta el orden de las preguntas en el bloque.
 \end{itemize}
 
-\section{Preguntas}
+\section{Configurando formato del documento}
+En el encabezado, definir: \\
+\verb|<Encabezado, crop=False>|
+si lo que quiere es tener las preguntas de manera continua.
+\medskip
+
+\noindent \verb|\usepackage[fontsize=11]{fontsize}| \\
+El sistema utiliza 12pt como predeterminado para el tama\~no de de letra. Este comando permite utilizar una letra m\'as peque\~na.
+\medskip
+
+\noindent \verb|\usepackage{multicol}| \\
+Esto permite imprimir las opciones de las preguntas de selecci\'on \'unica en columnas. Cuando se agregue la pregunta en la secci\'on de \verb|<Preguntas>| del \verb|.ppp|, es posible especificar, en cada pregunta, las columnas deseadas: \\
+\verb|puntaje = 2, columnas = 4, origen = ...|
+\medskip
+
+\noindent \verb|geometry{...}| \\
+  Esto permite cambiar la geometr\'ia de la p\'agina. Ver la documentaci\'on del paquete \verb|geometry|.
+\medskip
+
+\noindent \verb|\renewcommand\thesection{\Roman{section}}| \\
+  Esto permite cambiar la enumeraci\'on de las secciones, de n\'umeros a n\'umeros romanos en may\'usculas.
+
+\noindent \verb|\renewcommand{\LatexNuevaPregunta}{...}| \\
+Esta definici\'on permite cambiar el comando a utilizar para el espacio entre preguntas.
+\medskip
+
+\noindent \verb|\renewcommand{\FormatoNombre}[1]{...}| \\
+Esta definici\'on permite cambiar el formato del nombre a imprimir en el encabezado en el examen. Por ejemplo: \\
+\verb|\renewcommand{\FormatoNombre}[1]{{\Large \textbf{#1}}}|
+\medskip
+
+
+\section{Tipos de Preguntas}
 
 \subsection{Encabezado}
 No es una pregunta. Es más bien como un texto para un grupo de preguntas. Lo ideal es que vaya al inicio de un bloque. Se distingue en el archivo \verb|.ppp| porque tiene un puntaje de 0.
@@ -125,6 +178,7 @@ Las cifras significativas se utilizan en caso de que se deba imprimir un número
 \small
 \begin{verbatim}
 <tipo = seleccion unica[, opcion = (__indice__[& __indice__]* | todos)][, cifras = ...]>
+<tipo = seleccion unica, comodin = __variable__[, cifras = ...]>
 
 <variables>
 __nombre_de_variables__ = __expresion__
@@ -138,12 +192,13 @@ __respuesta o distractor__
 \end{verbatim}
 \normalsize
 
-\begin{enumerate}
-  \item Es opcional especificar el índice de la respuesta (0-indexado); sino se asume que la respuesta correcta es el primero de los items (\verb|__indice__ == 0|).
+\begin{itemize}
+  \item Es opcional especificar el índice de la respuesta (0-indexado); sino se asume que la respuesta correcta es el primero de los items.
   \item Para el caso en que haya habido un error, se puede poner \verb|opcion = todos|, es decir, que toda respuesta es correcta, o items específicos (0-indexados).
+  \item En lugar de \verb|opcion|, se puede utilizar \verb|comodin|. En este caso, se define mediante una de las variables, que tiene entonces que tomar el valor de 0 hasta $n-1$, donde $n$ es el n\'umero de opciones. Se pueden usar varias opciones separadas por \verb| & |, o incluso se puede usar el valor \verb|'todos'|.
   \item \textbf{Se debe dejar una línea en blanco al final de cada item}.
   \item Las variable son opcionales.
-\end{enumerate}
+\end{itemize}
 
 
 %% \subsection{Selección única}
@@ -159,7 +214,8 @@ __respuesta o distractor__
 
 \small
 \begin{verbatim}
-<tipo = respuesta corta[, opcion = todos][, cifras = ...]>
+<tipo = respuesta corta[, cifras = ...]>
+<tipo = respuesta corta[, funcion=_txtfun_]>
 
 <variables>
 __nombre_de_variables__ = __expresion__
@@ -172,13 +228,38 @@ __respuesta__
 \end{verbatim}
 \normalsize
 
-\begin{enumerate}
-  \item Para el caso en que haya habido un error, se puede poner \verb|opcion = todos|, es decir, que toda respuesta es correcta, pero no imprime la solución al ejercicio, sino que imprime un \verb|*| en el informe al estudiante. La otra opción es poner \verb|error = inf|, lo cual pone la respuesta correcta, y le pone bueno a todo estudiante que haya dado un valor como respuesta.
+\begin{itemize}
+  \item Para el caso en que haya habido un error, se puede poner \verb|opcion = todos|, es decir, que toda respuesta es correcta, pero no imprime la solución al ejercicio, sino que imprime un \verb|*| en el informe al estudiante. La otra opción es poner \verb|error = inf|, lo cual pone la respuesta correcta, y le pone bueno a todo estudiante que haya dado un valor como respuesta. Lo \'unico es que el sistema se la pone buena \'unicamente en los casos en que respondieron la pregunta. Si no respondieron, el sistema le pone un 0.
   \item La respuesta \textbf{no} se escribe como una @-expresión.
   \item Aunque se asume que el primer item contiene la respuesta correcta, se puede especificar más de una respuesta.  
   \item Si no se da el error, se toma que es 0. Aunque sería lo esperable en una pregunta cuya respuesta es un entero, no se recomienda en absoluto para una respuesta de tipo flotante. 
   \item Si no se da un factor, entonces se toma 1 como factor. Se utiliza para ir relajando el error, pero castigar entonces el puntaje de la pregunta. Cada radio del error debe ser mayor, y cada puntaje no debe ser mayor al anterior, porque se toma como correcto el primero que se encuentre.
-\end{enumerate}
+  \item Digamos que la respuesta es \verb|alfa|, pero en algunos casos, por un error de la pregunta, no es posible determinar el valor. As\'i, puede usar:
+\begin{verbatim}
+<variables>
+...
+alfa = math.nan if <sin_solucion> else <casos_buenos>
+...
+
+<item>
+alfa
+\end{verbatim}
+
+Cuando se est\'a calificando la prueba, y el sistema encuentre un valor de \verb|math.nan| en la respuesta dada por el sistema, entonces el sistema pone buena la pregunta.
+
+\item \verb|<tipo = respuesta corta[, funcion=_txtfun_]>|
+Es posible pasar una funci\'on que pre-procese las respuestas. Lo \'unico es que hay que pasarla como el texto de una funci\'on. Digamos que queremos calificar una pregunta cuya respuesta es una ecuaci\'on lineal $mx+b$.
+\begin{verbatim}
+<variables>
+m, b = randint(1, 9)
+ftxt = r"lambda ss: set(ss.replace('+', ' ').split())"
+resp = {txt.coef(m) + 'x', str(b)}
+...
+<item, f=ftxt>
+resp
+\end{verbatim}
+Este proceso califica buenas preguntas que se hayan escrito de la forma $mx+b$ o $b+mx$, al hacer la comparaci\'on utilizando conjuntos.
+\end{itemize}
 
 \subsubsection{Consideraciones sobre el error}
 En general, es complicado determinar el rango de error admitido en una pregunta de respuesta corta cuando la respuesta \emph{no} es un número entero. Por ejemplo Moodle utiliza 2 técnicas distintas. Una opción que es 'Error nominal', el cual es una medida de error absoluto. El inconveniente que tiene en una pregunta parametrizada, es que si todas las respuestas no están en el mismo rango, es decir, entre $1.00\times 10^n$ y $9.99\times 10^n$, con $n\in\mathbb Z$ fijo, la exigencia de la respuesta sería distinto, dependiendo del valor de $n$. La otra forma que tiene es el error relativo, que al menos, sin profundizar mucho si es o no la forma correcta de evaluar, tiene un comportamiento que se considera no deseado, y es el siguiente:
@@ -189,66 +270,11 @@ Esta plataforma implementa un error nominal pero en término de cifras significa
 
 ¿Qué se debe considerar al respecto? Que al momento de presentar el reporte a la persona estudiante, se da la respuesta redondeada que se esperaba. Volviendo a nuestro ejemplo anterior, con 1.38532 y un error de 0.01, se toma el rango de la repuesta correcta entre [1.37532, 1.39532]. Al usuario se le muestra como 1.39 la respuesta correcta. Si responde 1.38 tiene la respuesta correcta. Si responde 1.40 tiene la respuesta mala.
 
-\section{Funciones}
-
-Se tienen dos tipos de funciones. Las funciones que únicamente se pueden llamar para definir variables, y las funciones generales que se pueden llamar en las variables, en la pregunta, y en los ítemes.
-
-En las variables se define de manera normal. En la pregunta y los items cualquier expresión que requiera ser evaluada debe escribirse como una @-expresión:
-\begin{itemize}
-  \item \verb|@<__expr__>|
-  \item \verb|@{__expr__}|
-  \item \verb|@(__expr__)|
-  \item \verb|@[__expr__]|
-  \item Una \verb|@| seguida de cualquier símbolo, que es el mismo que se utiliza para cerrar, por ejemplo podría ser \verb/@|__expr__|/. 
-\end{itemize}
-
-¡El único requisito, es que el símbolo para cerrar \textbf{no} debe aparecer en la expresión a evaluar! Bueno, no es el único. Toda expresión a evaluar debe estar contenida en una sola línea.
-
-Si el resultado de una @-expresión es un \verb|string| o un entero, entonces se concatena al texto; si es un punto flotante, entonces se trabaja de manera predeterminada con 3 cifras significativas, y se imprime el número en notación decimal o en notación científica, dependiendo de cómo se permita saber de la forma más clara que se tienen 3 cifras significativas. Si el resultado de la @-expresión es otra cosa, entonces se deja que python lo convierta a texto, y se concatena.
-
-\subsection{Funciones para definir variables}
-
-Estas funciones únicamente están disponibles para definir variables:
-
-\begin{funcion}
-  \verb|randrange(stop)| \\
-  \verb|randrange(start, stop[, step])| \\[1ex]
-  Un elemento \verb|n| seleccionado al azar tal que \verb|start<=n<stop|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|randint(a,b)| \\[1ex]
-  Un elemento \verb|n| seleccionado al azar tal que \verb|a<=n<=b|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|choice(__seq__)| \\[1ex]
-  Un elemento \verb|n| seleccionado al azar de la sucesión no vacía \verb|seq|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|sample(<list>, k)| \\[1ex]
-  Toma una muestra de tamaño \verb|k| de la lista \verb|list|. \verb|k| debe ser menor o igual al tamaño de la lista. La muestra no está ordenada con respecto a la lista. Si \verb|k| es el mismo tamaño de la lista, entonces devuelve una permutación de la lista.
-\end{funcion}
-
-\begin{funcion}
-  \verb|random()| \\[1ex]
-  Genera un número aleatorio con distribución uniforme en el intervalo $[0, 1)$.
-\end{funcion}
-
-\begin{funcion}
-  \verb|uniform(a, b)| \\[1ex]
-  Un elemento \verb|x| que sigue una distribución uniforme tal que \verb|a<=x<=b|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|gauss(mu, sigma)| \\[1ex]
-  Un elemento \verb|x| que sigue una distribución gaussiana con media \verb|mu| y desviación estándar \verb|sigma|.
-\end{funcion}
+\section{Informaci\'on general}
 
 \subsection{¿Cómo construir una sucesión?}
 
-En python las sucesiones para la función \verb|choice| o \verb|sample| se pueden definir mediante una de las siguientes formas:
+En python las sucesiones para las funciones \verb|choice|, \verb|choices| o \verb|sample| se pueden definir mediante una de las siguientes formas:
 \begin{itemize}
   \item \verb|range(<stop>)|
   \item \verb|range(<start>, <stop>[, <step>])|
@@ -269,12 +295,12 @@ Si lo que se quiere es tomar un elemento aleatorio de una sucesión simple, ento
 \subsection{Constantes y funciones generales}
 Lo que se tiene es un subconjunto de constantes y funciones de python, y algunas programadas específicamente para la generación de pruebas.
 
-\begin{funcion}
-\verb|div|; \verb|inf|; \verb|pi| \\[1ex]
-  El valor de $\pi$, y constantes utilizadas para evaluar límites en respuesta corta. Así $-\infty$ se escribiría \verb|-inf| y $+\infty$ como \verb|inf| o \verb|+inf|. Si el límite es divergente entonces utilizar \verb|div| (internamente se trabaja con la constante \verb|nan|, \emph{not a number}).
-
-  La constante \verb|e| se incluye como parte de la biblioteca de matemática: \verb|math.e|.
-\end{funcion}
+%% \begin{funcion}
+%% \verb|div|; \verb|inf|; \verb|pi| \\[1ex]
+%%   El valor de $\pi$, y constantes utilizadas para evaluar límites en respuesta corta. Así $-\infty$ se escribiría \verb|-inf| y $+\infty$ como \verb|inf| o \verb|+inf|. Si el límite es divergente entonces utilizar \verb|div| (internamente se trabaja con la constante \verb|nan|, \emph{not a number}).
+%% 
+%%   La constante \verb|e| se incluye como parte de la biblioteca de matemática: \verb|math.e|.
+%% \end{funcion}
 
 \begin{funcion}
   \verb|lambda x: __funcion que depende de x__| \\[1ex]
@@ -337,121 +363,47 @@ pf(pf, h, x0, n)
   podría dar como resultado \verb|[2, 4, -5, -6, 8]| para \verb|ls|.
 \end{funcion}
 
-\begin{funcion}
-  Funciones de matemática:
-  \begin{enumerate}[a)]
-    \item \verb|+ - * / // % **| \\[1ex]
-  Suma, resta, multiplicación, división normal (con punto flotante como respuesta), división entera, residuo y potencia.
-
-    \item \verb|math.degrees(x)|; \verb|math.radians(x)|
-
-      Conversión de radianes a grados; conversión de grados a radianes.
-
-\item \verb|math.acos(x)|;
-      \verb|math.acosh(x)|;
-      \verb|math.asin(x)|;
-      \verb|math.asinh(x)|;
-      \verb|math.atan(x)|;
-      \verb|math.atan2(y, x)|;
-      \verb|math.atanh(x)|;
-      \verb|math.cos(x)|;
-      \verb|math.cosh(x)|;
-      \verb|math.sin(x)|;
-      \verb|math.sinh(x)|;
-      \verb|math.tan(x)|;
-      \verb|math.tanh(x)|
-
-      Funciones trigonométricas y sus inversas (en radianes).
-
-\item \verb|math.isqrt(x)|; \verb|math.sqrt(x)|; \verb|math.exp(x)|; \verb|math.log(x)|; \verb|math.log10(x)|
-
-  Parte entera de la raíz de \verb|x|; funciones en punto flotante para la raíz, exponencial, logaritmo natural y logaritmo en base 10.
-
-    \item \verb|math.erf(x)|; \verb|math.erfc(x)|; \verb|math.gamma(x)|
-
-      Funciones de error y función gamma.
-
-    \item \verb|math.fmod(x, y)|; \verb|math.modf(x)|
-      
-      Función residuo para variables de tipo flotante; parte decimal y parte entera de $x$.
-
-\item \verb|round(__numero__[, __dig__])| \\[1ex]
-  Redondea un número, y se puede especificar el número de dígitos a utilizar. 0 es el valor predeterminado.
-
-    \item \verb|math.ceil(x)|;
-      \verb|math.floor(x)|;
-      \verb|math.trunc(x)|
-
-      Funciones de manejo de decimales.
-
-    \item \verb|math.factorial(a)|; \verb|math.comb(n, r)|; \verb|math.perm(n, r)|
-
-      Factorial, combinaciones y permutaciones. Para la respuesta, los estudiantes pueden utilizar respectivamente \verb|factorial(n), C(n, r) y P(n, r)|. Se aconseja separar con un espacio los argumentos, para poder diferenciar de aquellas respuestas en que se use coma decimal.
-
-    \item \verb|math.hypot(x, y)|; \verb|math.dist(xs, ys)|
-
-      $\sqrt{x^2+y^2}$ y distancia entre los vectores $n$-dimensionales  \verb|xs| y \verb|ys|
-
-    \item \verb|sum(xs)|; \verb|math.prod(xs)|
-
-      Suma y producto de los elementos de la secuencia \verb|xs|.
-
-  \end{enumerate}
-\end{funcion}
-
 \begin{funcion} \verb|__exp_True__ if __exp_bool__ else __exp_False__| \\[1ex]
   Un \verb|if| en un sólo renglón. En las expresiones booleanas se puede utilizar \verb|not|, \verb|or| y \verb|and| según se necesite.
 \end{funcion}
 
-\begin{funcion}
-  \verb|pow(a, b), a**b| \quad
-  $a^b$
-\end{funcion}
-
-\begin{funcion}
-  \verb|math.gcd(a,b)| \quad
-  Máximo común divisor de $a$ y $b$.
-\end{funcion}
-
-\begin{funcion}
-  \verb|mate.factores(a)| \\[1ex]
-  Factorización de $a$. Por ejemplo \verb|factores(1000)| devuelve la lista \verb|[(2, 3), (5, 3)]|, que representa a $2^3\cdot 5^3$.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txt.fraccion(a, b[, conSigno=False])| \\[1ex]
-  Simplifica y escribe la fracción respectiva en \LaTeX\ usando \verb|dfrac|. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la fracción si es positiva.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txt.raiz(a[, n=2[, conSigno=False]])| \\[1ex]
-  Simplifica y escribe la raíz respectiva en \LaTeX. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la raíz si es positiva.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txt.coef(a[, conSigno=False])| \\[1ex]
-  Coeficiente que precede a una variable entera. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|). De manera similar ocurre si $a=-1$. En caso contrario imprime el valor.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txt.conSigno(n)| \\[1ex]
-  Imprime el número entero con signo.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txt.expo(n)| \\[1ex]
-  Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txt.numero(n)| \\[1ex]
-  Para $n > 0$, devuelve el texto que representa al valor de $n$.
-\end{funcion}
-
-\begin{funcion}
-  \verb|txt.decimal(n, cifras, conSigno = False)| \\[1ex]
-  Imprimir un número según las cifras dadas.
-\end{funcion}
+%% \begin{funcion}
+%%   {\small
+%% \verb|txt.fraccion(num, den=1, conSigno=False, signoNum=False, dfrac=True, arg='', coef=False)|} \\[1ex]
+%% Simplifica e imprime utilizando \verb|dfrac|. De manera opcional se especifica si se obliga el signo \verb|+|; si el signo se imprime en el numerador o se imprime afuera; si se utiliza \verb|tfrac| en lugar de \verb|dfrac|, y si tiene un argumento, de manera que si da 1 o $-1$ no se imprima el valor. Se puede utilizar \verb|Fraction| en el numerador, y ya no ser\'ia necesario especificar el denominador. Si \verb|coef=True|, entonces se imprime sólo el signo si es 1 o $-1$.
+%% 
+%% Si el argumento es distinto de vac\'io, el numerador se toma como un coeficiente.
+%% \end{funcion}
+%% 
+%% \begin{funcion}
+%%   \verb|txt.raiz(a[, n=2[, conSigno=False]])| \\[1ex]
+%%   Simplifica y escribe la raíz respectiva en \LaTeX. \verb|conSigno| es un booleano (\verb|False| o \verb|True| con \verb|False| como predeterminado) que escribe un signo + antes de la raíz si es positiva.
+%% \end{funcion}
+%% 
+%% \begin{funcion}
+%%   \verb|txt.coef(a[, conSigno=False])| \\[1ex]
+%%   Coeficiente que precede a una variable entera. Si $a=1$ entonces no se escribe (o se escribe solo un signo + si \verb|conSigno|). De manera similar ocurre si $a=-1$. En caso contrario imprime el valor.
+%% \end{funcion}
+%% 
+%% \begin{funcion}
+%%   \verb|txt.conSigno(n)| \\[1ex]
+%%   Imprime el número entero con signo.
+%% \end{funcion}
+%% 
+%% \begin{funcion}
+%%   \verb|txt.expo(n)| \\[1ex]
+%%   Si \verb|n == 1| no imprime nada. Si no imprime \verb|^{n}|.
+%% \end{funcion}
+%% 
+%% \begin{funcion}
+%%   \verb|txt.numero(n)| \\[1ex]
+%%   Para $n > 0$, devuelve el texto que representa al valor de $n$.
+%% \end{funcion}
+%% 
+%% \begin{funcion}
+%%   \verb|txt.decimal(n, cifras, conSigno = False)| \\[1ex]
+%%   Imprimir un número según las cifras dadas.
+%% \end{funcion}
 
 \subsection{Trabajando con sucesiones}
 
@@ -513,6 +465,74 @@ s2 = {3, 5, 7, 11}
   \item Si se necesita concatenar varios textos: \verb|'(%d, %d)' % (m, n)| representa un par ordenado de enteros.
 \end{itemize}
 
+\section{Ejemplos}
+\begin{ejem}
+Obtener 3 valores distintos $a,b,c$, entre -9 y 9, quitando el cero:
+\begin{verbatim}
+a, b, c = sample([*range(-9, 0), *range(1, 10)], 3)
+\end{verbatim}
+
+Y si se quisiera que $|a|\neq |b| \neq |c|$:
+\begin{verbatim}
+a, b, c = sample(range(1, 10), 3)
+a = choice([-a, a])
+b = choice([-b, b])
+c = choice([-c, c])
+\end{verbatim}
+
+Si se quiere que sea al menos uno negativo y a lo sumo dos negativos:
+\begin{verbatim}
+a, b, c = sample(range(1, 10), 3)
+sa, sb, sc = sample([-1, -1, 1, 1], 3)
+a = a * sa
+b = b * sb
+c = c * sc
+\end{verbatim}
+y si se ocuparan 2 negativos y uno positivo, cambiar la generaci\'on de signos por: \\
+\verb|sa, sb, sc = sample([-1, -1, 1], 3)|
+\end{ejem}
+
+\begin{ejem}
+  Se quiere parametrizar una funci\'on $f$, mostrar el texto, y evaluarla en un valor entre 0.5 y 1, tambi\'en parametrizado:
+\begin{verbatim}
+opc = randrange(3)
+txtf = [r'\exp(x)', r'\ln(x)', r'1-\sen^2(x)'][opc]
+ff   = [math.exp, math.log, lambda x: 1 - (math.sin(x))**2][opc]
+x = 0.01 * randint(50, 99)
+fx = f(x)
+\end{verbatim}
+luego en el texto, como sabemos que $x$ tiene como m\'aximo 2 decimales despu\'es del 0, podemos usar:
+\verb|@['%.2f' % x]|
+\end{ejem}
+
+\begin{ejem}
+  Para imprimir $ax^2+bx+c$ donde $b$ y $c$ podr\'ian ser 0 (entonces no queremos que aparezcan): \\
+  \small
+  \verb|@[txt.coef(a)]x^2 @[txt.coef(b, conSigno=True, arg='x')] @[txt.coef(c, conSigno=True, arg=' ']| \\
+  \normalsize
+  Observe que en el caso de $c$, se le pasa como argumento un espacio en blanco. Con eso aseguramos que en caso de ser 0 no lo pone, y a\'un as\'i, si es 1, s\'i escribe el valor.
+\end{ejem}
+
+\begin{ejem}
+  Se quiere escribir $a + \dfrac{p}{q + \sqrt{r}}$, donde $p$ puede ser positivo o negativo, queremos que $r$ se pueda simplificar, tanto sacar t\'erminos fuera de la ra\'iz como simplificar, junto con $q$, con el valor de $p$.
+
+  En las variables, definir:
+\small
+\begin{verbatim}
+signo = -1 if p < 0 else 1
+p = abs(p)
+coef, argu = mate.raiz(r)
+factor = math.gcd(q, coef) if argu > 1 else q + coef
+q = q // factor if argu > 1 else factor
+coef = coef // factor if argu > 1 else 0
+ff = Fraction(p, factor)
+exp = r'%d %s \dfrac{%d}{%d %s\sqrt{%d}}' % (a, txt.coef(signo, conSigno=True), ...
+      ff.numerator, ff.denominator * q, txt.coef(ff.denominator * coef, conSigno=True, arg) ...
+      if argu > 1 else r'%d %s' % (a, txt.fraccion(ff, conSigno=True))
+\end{verbatim}
+\normalsize
+\end{ejem}
+Los puntos suspensivos \textbf{no} se usan. Se debe escribir toda la expresi\'on en un solo rengl\'on. Luego es suficiente escribir en el documento \verb|$@[exp]$|.
 \end{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -57,6 +57,7 @@ if len(sys.argv) == 4:
 # Se lee el archivo de la estructura general del examen
 # y se genera (casi todo) el encabezado.
 examen = PPP(sys.argv[1])
+
 encabezado: str = latex.get_encabezadoExamen(examen)
 
 # Vamos a guardar una lista de cada archivo .csv que existe, porque
@@ -170,7 +171,7 @@ for path in lestudiantes:
         # Se genera el pdf.
         os.system('pdflatex %s' % filename)
         os.system('pdflatex %s' % filename)
-        if Info.UNA_PREGUNTA_POR_PAGINA: 
+        if Info.UNA_PREGUNTA_POR_PAGINA:
             os.system('pdfcrop -margins 20 %s.pdf temp.pdf' % filename)
         else:
             # Renombramos el archivo, porque luego vamos a borrar
