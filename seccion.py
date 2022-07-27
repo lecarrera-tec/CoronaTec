@@ -94,7 +94,7 @@ class Seccion:
         if self.puntaje == 0:
             for preg in self.preguntas:
                 self.puntaje += preg.get_muestra() * preg.get_puntaje()
-        return int(self.puntaje)
+        return round(self.puntaje)
 
     def get_latex(self) -> str:
         """Genera el código LaTeX de la sección."""
@@ -244,7 +244,7 @@ def __lista_latex__(preg: Pregunta, filelist: List[str], lista: List[Latex],
             if Info.ENUMERAR_BLOQUE:
                 fin = ''
             else:
-                fin = '\\bigskip'
+                fin = '\\LatexNuevaPreguntaBloque'
         # Estamos en la \'ultima pregunta del bloque.
         elif preg.bloque == -1:
             if Info.ENUMERAR_BLOQUE:

@@ -50,6 +50,7 @@ FORMATO_ITEM: str = '[A)]'
 # por página. Ese es el formato predeterminado.
 UNA_PREGUNTA_POR_PAGINA = True
 LATEX_NUEVA_PREGUNTA = '\\newpage\n'
+LATEX_NUEVA_PREGUNTA_BLOQUE = '\\bigskip\n'
 LATEX_NUEVA_SECCION = '\\newpage\n'
 PAPER_SIZE = r'papersize={8.5in,30in}'
 # Si se enumera el bloque, entonces puede
