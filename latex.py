@@ -35,6 +35,7 @@ def get_encabezadoExamen(examen: PPP) -> str:
         ' \\prevdepth=\\tpd}\n\n',
         '\\newcommand{\\LatexNuevaPregunta}{%s}\n' % Info.LATEX_NUEVA_PREGUNTA,
         '\\newcommand{\\LatexNuevaPreguntaBloque}{%s}\n' % Info.LATEX_NUEVA_PREGUNTA_BLOQUE,
+        '\\newcommand{\\LatexNuevaSeccion}{%s}\n' % Info.LATEX_NUEVA_SECCION,
         '\\newcommand{\\FormatoNombre}[1]{{\\large #1}}\n\n',
     ]
 

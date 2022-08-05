@@ -23,7 +23,7 @@ def __primera_seccion__(tex, examen, seccion):
 
 def __resto_secciones__(tex, examen, seccion):
     for seccion in examen.secciones[1:]:
-        tex.append(Info.LATEX_NUEVA_SECCION)
+        tex.append('\\LatexNuevaSeccion')
         tex.append('\\section{%s %s %d puntos)}}\n\n'
                    % (seccion.titulo,
                       '{\\normalsize (total de la secci\\\'on:',

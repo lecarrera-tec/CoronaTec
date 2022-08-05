@@ -1,4 +1,5 @@
 2022-v10
+- Se agregan opciones para definir preguntas en un bloque, y para las nuevas secciones.
 - Se asegura que las preguntas no se corten.
 - Se modifica que el número de muestras puede ser mayor
   que el n\'umero de elementos en la carpeta. Se utiliza

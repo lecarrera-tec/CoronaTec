@@ -144,6 +144,9 @@ Esto permite imprimir las opciones de las preguntas de selecci\'on \'unica en co
 \noindent \verb|\renewcommand\thesection{\Roman{section}}| \\
   Esto permite cambiar la enumeraci\'on de las secciones, de n\'umeros a n\'umeros romanos en may\'usculas.
 
+\noindent \verb|\renewcommand{\LatexNuevaSeccion}{...}|
+  Esto permite redefinir lo que viene antes de una nueva secci\'on, a partir de la segunda secci\'on del documento. Si se pone \verb|crop=False|, entonces la primera secci\'on siempre vendr\'a en la primera p\'agina.
+
 \noindent \verb|\renewcommand{\LatexNuevaPregunta}{...}| \\
 Esta definici\'on permite cambiar el comando a utilizar para el espacio entre preguntas.
 \medskip
