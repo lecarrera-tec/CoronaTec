@@ -1,6 +1,7 @@
 import math
 import fmatriz
 from fractions import Fraction
+from typing import List, Tuple
 
 w0 = 11
 w1 = 81
@@ -139,18 +140,18 @@ def cero(f, a, b):
         m = 0.5 * (a + b)
         fm = f(m)
 
-def fmin(f, aa: float, bb: float, tries: int = 3, eps: float = 1e-6, delta = 0.5) -> tuple[float, float]:
+def fmin(f, aa: float, bb: float, tries: int = 3, eps: float = 1e-6, delta = 0.5) -> Tuple[float, float]:
     A: set = set([aa, bb])
     B: set
     C: set
-    X: list[float]
+    X: List[float]
     fmin: float
     xmin: float
     fmin, xmin = min((f(aa), aa), (f(bb), bb))
     npart: int = 1
     jump: float = bb - aa
     dif: float = (bb - aa)
-    vals: list[float]
+    vals: List[float]
     ntries: int = 0
     x1: float
     x2: float
@@ -203,7 +204,7 @@ def fmin(f, aa: float, bb: float, tries: int = 3, eps: float = 1e-6, delta = 0.5
                 fx2 = vy
     return (xmin, fmin)
 
-def regresionLineal(xs: list[float], ys: list[float], fx=None, gy=None):
+def regresionLineal(xs: List[float], ys: List[float], fx=None, gy=None):
     """ Aplica regresi\'on lineal a los datos. fx y gy son funciones
     que aplica previo a la regresi\'on. Devuelve (m, b), la pendiente
     y la intersecci\'on con el eje y. """

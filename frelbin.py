@@ -1,6 +1,7 @@
-Matriz = list[list[int]]
+from typing import List, Tuple
+Matriz = List[List[int]]
 
-def grafico2grafico(G: list[tuple], A: list[str], B: list[str] = []):
+def grafico2grafico(G: List[tuple], A: List[str], B: List[str] = []):
     """ Construye un grafico a partir de una grafico y el conjunto
     de llegada (y el de salida en caso de que fueran distintos). """
     resp = []
@@ -13,7 +14,7 @@ def grafico2grafico(G: list[tuple], A: list[str], B: list[str] = []):
     resp = resp.replace('[', r'\{').replace(']', r'\}')
     return resp
 
-def grafico2matriz(G : list[tuple], nfilas: int, ncols: int = 0):
+def grafico2matriz(G : List[tuple], nfilas: int, ncols: int = 0):
     if not ncols:
         ncols = nfilas
     resp = []
@@ -23,7 +24,7 @@ def grafico2matriz(G : list[tuple], nfilas: int, ncols: int = 0):
         resp[i][j] = 1
     return resp
 
-def matriz2grafico(M: Matriz, A: list[str] = [], B: list[str] = []):
+def matriz2grafico(M: Matriz, A: List[str] = [], B: List[str] = []):
     """ Construye un grafico a partir de una matriz y el conjunto
     de llegada (y el de salida en caso de que fueran distintos). """
     nfilas = len(M)
