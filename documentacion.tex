@@ -87,7 +87,7 @@ __Nombre de los cursos__
 <Titulo>
 __Título de la prueba__
 
-<Encabezado[, crop=False][, continuo=False]>
+<Encabezado[, crop=False][, continuo=False][, header=Nombre]>
 __Paquetes, comandos nuevos, etc, para el encabezado del archivo LaTeX__
 
 <Instrucciones>
@@ -123,9 +123,15 @@ __Instrucciones del examen__
 \end{itemize}
 
 \section{Configurando formato del documento}
-En el encabezado, definir: \\
-\verb|<Encabezado, crop=False>|
+En el encabezado, definir: 
+\begin{itemize}
+  \item \verb|<Encabezado, crop=False>|
 si lo que quiere es tener las preguntas de manera continua.
+\item \verb|<Encabezado, header=Nombre>| 
+pone el nombre de la persona estudiante en el medio del encabezado en cada p\'agina.
+\item \verb|<Encabezado, continuo=False>| 
+cada bloque se enumera como (a), (b) ..., en lugar de continuar con la enumeraci\'on continua. Hacer esto s\'olo si no se va a utilizar un formulario.
+\end{itemize}
 \medskip
 
 \noindent \verb|\usepackage[fontsize=11]{fontsize}| \\

@@ -22,7 +22,7 @@ def get_encabezadoExamen(examen: PPP) -> str:
         '\\usepackage{fancyhdr}\n',
         '\\pagestyle{fancy}\n',
         '\\fancyhf{}\n',
-        '\\lhead{Instituto Tecnol\\\'ogico de Costa Rica}\n',
+        '\\lhead{Tecnol\\\'ogico de Costa Rica}\n',
         '\\rhead{P\\\'agina \\thepage~de \\pageref{LastPage}}\n',
 
         '\\usepackage{amsmath,amsthm,amssymb}\n',
@@ -57,6 +57,8 @@ def get_inicioExamen(nombre: str, examen) -> List[str]:
     txt_temp: str
     # Se agrega el nombre al examen, se comienza el documento y se
     # imprime el puntaje total.
+    if Info.NOMBRE:
+        texto.append('\\chead{%s}\n\n' % nombre)
     texto.append('\\begin{document}\n\n')
     texto.append('\\noindent\\textsc{Instituto Tecnol\\\'ogico de Costa Rica}')
     texto.append('\\hfill \\textsc{%s}\\\\\n' % examen.semestre)

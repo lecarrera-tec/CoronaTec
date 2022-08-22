@@ -121,6 +121,8 @@ class PPP:
                 Info.LATEX_NUEVA_PREGUNTA = ''
                 Info.LATEX_NUEVA_SECCION = ''
                 Info.PAPER_SIZE = 'papersize={8.5in,11in}'
+            if 'nombre' == parserPPP.derechaIgual(linea.strip('>').lower(), 'header'):
+                Info.NOMBRE = True
             if 'False' == parserPPP.derechaIgual(linea, 'continuo'):
                 Info.ENUMERAR_BLOQUE = True
         else:

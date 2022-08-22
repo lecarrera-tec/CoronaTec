@@ -64,3 +64,6 @@ STRIP: str = ' <\t\n>'
 # Constante que se multiplica por el número de identificación para
 # generar la semilla.
 BY_SHIFT: List[int] = [99929, 9929, 929, 29, 99829, 9829, 829]
+
+# Para saber si pone o no el nombre de la persona estudiante en el centro del header.
+NOMBRE = False
