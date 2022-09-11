@@ -331,3 +331,14 @@ def minCifras(numero: float, ceros: int = 3, maxi: int = 20) -> str:
         temp *= 10
         n += 1
     return ('%%.%df' % min(n, maxi)) % numero
+
+def txtg(numero: float, decimales: int):
+    """ Imprime un punto flotante generado con %.ng, donde n
+    es el n\'umero de decimales especificado. """
+    texto = '%%.%dg' % decimales
+    texto = texto % numero
+    idx = texto.find('e')
+    if idx >= 0:
+        expo = int(texto[idx+1:])
+        texto = texto[:idx] + r' {\scriptstyle \times 10^{%d}} ' % expo
+    return texto
