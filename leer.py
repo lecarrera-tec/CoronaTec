@@ -144,14 +144,18 @@ def secciones(contador: int, lsTexto: List[str],
     lista: List[Seccion] = []
     es_aleatorio: bool = False
     linea: str = lsTexto[contador]
+    tempo: str
     contador += 1
     while linea.startswith(Info.LSECCION):
         linea = linea.strip(Info.STRIP)
         logging.info('Llamando a seccion ...')
-        linea = parserPPP.derechaIgual(linea, 'orden')
-        es_aleatorio = linea == 'aleatorio'
+        tempo = parserPPP.derechaIgual(linea, 'orden')
+        es_aleatorio = tempo == 'aleatorio'
+        tempo = parserPPP.derechaIgual(linea, 'alfinal')
+        logging.debug('Se agrega algo? `%s`' % tempo)
         # Creando la nueva seccion.
-        lista.append(Seccion(contador, lsTexto, dirTrabajo, es_aleatorio))
+        lista.append(Seccion(contador, lsTexto, dirTrabajo, 
+                             es_aleatorio, tempo))
 
         linea = lsTexto[contador].strip()
         contador += 1

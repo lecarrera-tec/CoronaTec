@@ -27,6 +27,8 @@ class Seccion:
     aleatorias: bool
         Si las preguntas se quieren (o no) en orden aleatorio. El
         predeterminado es que no.
+    alfinal: str
+        Un archivo para agregar al final de la sección.
     instrucciones: str
         Texto de las instrucciones específicas de la sección.
     preguntas: List[Pregunta]
@@ -41,7 +43,7 @@ class Seccion:
     """
     def __init__(
             self, contador: int, lsTexto: List[str], dirTrabajo: str,
-            aleatorio: bool = False):
+            aleatorio: bool = False, alfinal: str = ''):
         """Constructor a partir de archivo y el orden de las preguntas.
 
         Se supone que la última línea que se leyó del archivo es
@@ -59,6 +61,7 @@ class Seccion:
         """
         self.puntaje: int = 0
         self.aleatorias: bool = aleatorio
+        self.alfinal: str = alfinal
 
         linea: str
         # Se busca un título
@@ -146,12 +149,17 @@ class Seccion:
         # Concatenamos las instrucciones y colocamos al
         # final todas las preguntas.
         if len(self.instrucciones) == 0:
-            return '%s\n\n' % ''.join(lista).strip()
-        return '%s%s%s%s%s\n\n' % ('\\noindent\\rule{\\textwidth}{1pt}\n\n',
+            lista = '%s\n\n' % ''.join(lista).strip()
+        else:
+            lista = '%s%s%s%s%s\n\n' % ('\\noindent\\rule{\\textwidth}{1pt}\n\n',
                                    self.instrucciones,
                                    '\n\n\\noindent\\rule{\\textwidth}{1pt}',
                                    r'\bigskip',
                                    ''.join(lista).strip())
+        logging.debug('Agregar al final? `%s`' % self.alfinal)
+        if len(self.alfinal) > 0:
+            lista = '%s\n%s\n\n' % (lista, eval(self.alfinal))
+        return lista
 
     def get_respuestas(self) -> List[Respuesta]:
         """

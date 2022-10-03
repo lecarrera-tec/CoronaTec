@@ -339,6 +339,9 @@ Si el argumento es distinto de vac\'io, el numerador se toma como un coeficiente
 
 \item \verb|txt.texto(n: int)| \\
 \quad Para $n > 0$, devuelve el texto que representa al valor de $n$.
+
+\item \verb|txt.txtg(n: float, d: int)| \\
+  \quad Utiliza \verb|'%.dg' % n| para `imprimir' al n\'umero $n$ de manera `inteligente'. En caso de que se requiera \verb|e+XX| o \verb|e-XX|, lo cambia por \verb|{\scriptstyle \times 10^{XX}}|.
 \end{asparaitem}
 
 \subsection{Biblioteca \texttt{vector}}
@@ -532,6 +535,21 @@ Un gr\'afico es una lista de tuplas de las parejas de elementos 0-indexados $(i,
   
 \item \verb|relBin.reglaMatriz(nfilas, ncols, f)|
   Construye una matriz a partir de una regla $f(i,j)$, que se aplica a cada elemento 0-indexado de la matriz.
+\end{asparaitem}
+
+
+\subsection{Biblioteca \texttt{distrib}}
+Algunas distribuciones estad\'isticas y sus inversas.
+
+\begin{asparaitem}
+\item \verb|distrib.phi(z)| $\Phi(z)$, acumulada para la normal est\'andar.
+\item \verb|distrib.normal(x)| $\Phi(z)$, $z=(x-mu)/sigma$, acumulada para la normal.
+\item \verb|distrib.phiInv(p)| Dado $p\in (0,1)$, devuelve $z$ tal que $\Phi(z)=p$.
+\item \verb|distrib.gamma(x, alfa, beta)| Distribuci\'on gamma acumulada, con par\'ametros $\alpha$ y $\beta$.
+\item \verb|distrib.gammaInv(p, alfa, beta)| Inversa de la distribuci\'on gamma.
+\item \verb|distrib.binomAcumInv(n, p, t)| Calcula el m\'aximo valor de $k$, tal que un par\'ametro
+$t \in (0, 1]$ satisfaga que $t \geq \sum_{x=0}^k C(n, x)\, p^x\,  (1-p)^{n-x}$.
+
 \end{asparaitem}
 
 % You can even have references

@@ -233,7 +233,7 @@ def pivote(L: Matriz, U: Matriz, P: Matriz, ifila: int) -> (Matriz, Matriz, Matr
     P = copia(P);
     n = len(U)
     _, ipiv = max([(abs(U[ifila+k][ifila]), ifila+k) for k in range(n - ifila)])
-    if ifila != ipiv:
+    if ifila != ipiv and U[ifila][ifila] < U[ipiv][ifila]:
         L = intercambiar(L, ifila, ipiv)
         U = intercambiar(U, ifila, ipiv)
         P = intercambiar(P, ifila, ipiv)
