@@ -81,7 +81,7 @@ def fraccion(num, den: int = 1, conSigno: bool = False,
     else:
         txt = '%s\\%s{%d%s}{%d}' % (txt, tipo, num, arg, den)
 
-    return txt
+    return r"\ensuremath{%s}" % txt
 
 
 def raiz(arg: int, indice: int = 2, conSigno: bool = False) -> str:
@@ -174,7 +174,8 @@ def expo(expo: int, arg='', coef=False) -> str:
     Si expo == 0, arg no es vac\'io y coef==True, no devuelve nada.
     Si expo == 0, arg no es vac\'io y coef==False, devuelve uno.
     Si expo == 1 no devuelve nada o imprime s\'olo el argumento en
-    caso de existir. En cualquier otro caso devuelve "arg^{exp}".
+    caso de existir. 
+    En cualquier otro caso devuelve "arg^{exp}".
 
     Argumentos
     ----------
@@ -220,24 +221,13 @@ def decimal(numero: float, cifras: int, conSigno: bool = False) -> str:
     El string del número a imprimir.
     """
     assert(cifras > 0)
-    if numero == 0:
-        return '0'
-    elif math.isnan(numero):
+    if math.isnan(numero):
         return r'\ensuremath{\text{NaN}}'
-    signo: int = 1
-    ndig: int
-    if numero < 0:
-        numero = -numero
-        signo = -1
-    if numero < pow(10, -cifras-6) or numero >= pow(10, cifras + 3):
-        ftxt = '%%.%dE' % (cifras - 1)
-    elif numero >= 1:
-        ndig = cifras - int(math.ceil(math.log10(numero)))
-        ftxt = '%%.%df' % max(0, ndig)
+    if conSigno:
+        ftxt = '+%%.%dG' % cifras
     else:
-        ndig = cifras + int(math.ceil(-math.log10(numero))) - 1
-        ftxt = '%%.%df' % ndig
-    return ftxt % (signo * numero)
+        ftxt = '%%.%dG' % cifras
+    return ftxt % (numero)
 
 
 def texto(numero: int, mil: bool = False) -> str:

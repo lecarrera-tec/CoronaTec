@@ -158,7 +158,7 @@ def __calificar_resp_corta__(respuestas, texto: str, puntaje: float) -> float:
         texto = original
         if funcion is not None:
             logging.debug('Funcion = `%s`', funcion)
-            texto = (eval(funcion))(texto)
+            texto = str((eval(funcion))(texto))
             logging.debug('Nuevo texto = `%s`', texto)
         # Se pone buena si se responde. Esto aplica para *TODOS* los casos.
         if math.isinf(error):

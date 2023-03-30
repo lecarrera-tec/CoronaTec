@@ -195,7 +195,7 @@ logging.basicConfig(filename='_evaluar.log', level=logging.DEBUG, filemode='w')
 #    haber uno o más archivos `.csv`. Se genera una lista del path a
 #    cada uno de los archivos.
 #
-# F. Se trabaja ahora grupo por grupo. Aquí se inicia un archivo .pdf
+# F. Se trabaja ahora grupo por grupo. Aquí se inicia un archivo .xslx
 #    donde se van a guardar las notas de los estudiantes para dar a cada
 #    profesor.
 #
@@ -255,8 +255,8 @@ cols: List[str]
 # Diccionario!!!
 # Se escriben los elementos del nombre en orden alfabético como llave
 # para el diccionario. Cada elemento es la lista de respuestas, junto
-# con el correo, que es el identificador único del usuario en el
-# formulario.
+# con la llave (correo, nombre o # de carnet), que es el identificador 
+# único del usuario en el formulario.
 todxs: Dict[str, Tuple[List[str], str]] = {}
 for fila in lineas:
     # Se eliminan espacios en blanco y las comillas, en caso que
@@ -277,13 +277,7 @@ for fila in lineas:
     llave: str
     if Info.CSV_IKEY == Info.CSV_FINAL:
         llave = cols[Info.CSV_FINAL]
-        if llave in todxs:
-            usuario = todxs[llave][1]
-            print('%s tiene dos respuestas.' % llave)
-            print('Verifique usuario: "%s" vs "%s"'
-                  % (usuario, cols[Info.CSV_INAME]))
-        todxs[cols[Info.CSV_IKEY]] = (cols[Info.CSV_ICOL:-1],
-                                      cols[Info.CSV_INAME])
+        todxs[llave] = (cols[Info.CSV_ICOL:-1], cols[Info.CSV_FINAL])
     # El correo es el identificador
     elif Info.CSV_IKEY == Info.CSV_EMAIL:
         llave = cols[Info.CSV_EMAIL].split('@')[0].lower()

@@ -18,6 +18,7 @@ import random
 import math
 from typing import Any, Dict
 import fractions
+import datetime
 
 import fconj
 import fdistrib
@@ -32,6 +33,7 @@ import fvector
 DGlobal: Dict[str, Any] = {
         '__builtins__': __builtins__,
         'conj': fconj,
+        'datetime': datetime,
         'distrib': fdistrib,
         'Fraction': fractions.Fraction,
         'math': math,

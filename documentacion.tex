@@ -259,7 +259,7 @@ alfa
 
 Cuando se est\'a calificando la prueba, y el sistema encuentre un valor de \verb|math.nan| en la respuesta dada por el sistema, entonces el sistema pone buena la pregunta.
 
-\item \verb|<tipo = respuesta corta[, funcion=_txtfun_]>|
+\item \verb|<tipo = respuesta corta>|
 Es posible pasar una funci\'on que pre-procese las respuestas. Lo \'unico es que hay que pasarla como el texto de una funci\'on. Digamos que queremos calificar una pregunta cuya respuesta es una ecuaci\'on lineal $mx+b$.
 \begin{verbatim}
 <variables>
@@ -267,7 +267,7 @@ m, b = randint(1, 9)
 ftxt = r"lambda ss: set(ss.replace('+', ' ').split())"
 resp = {txt.coef(m) + 'x', str(b)}
 ...
-<item, f=ftxt>
+<item, funcion=ftxt>
 resp
 \end{verbatim}
 Este proceso califica buenas preguntas que se hayan escrito de la forma $mx+b$ o $b+mx$, al hacer la comparaci\'on utilizando conjuntos.

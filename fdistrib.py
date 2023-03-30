@@ -56,7 +56,7 @@ def gamma(x, alfa, beta):
         x = x / beta
         beta = 1
     f = lambda x: x**(alfa - 1) * math.exp(-x/beta) / ((beta ** alfa) * math.gamma(alfa))
-    return fmetodos.integral(f, 0, x, [], 0, 1e-6, 20)
+    return fmetodos.integral(f, 0, x, 1e-6, 20)
 
 
 def gammaInv(p, alfa, beta):
