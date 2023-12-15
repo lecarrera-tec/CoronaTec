@@ -176,6 +176,8 @@ for path in lestudiantes:
         else:
             # Renombramos el archivo, porque luego vamos a borrar
             # todos los archivos que comiencen con el mismo nombre.
+            if 'temp.pdf' in os.listdir():
+                os.remove('temp.pdf')
             os.rename('%s.pdf' % filename, 'temp.pdf')
 
         # Se eliminan los archivos '*.{aux,log,tex,...}'
